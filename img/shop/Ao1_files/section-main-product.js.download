@@ -1,0 +1,88 @@
+/** Shopify CDN: Minification failed
+
+Line 18:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 23:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 26:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 33:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 34:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 37:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 38:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 39:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 40:4 Transforming const to the configured target environment ("es5") is not supported yet
+... and 16 more hidden warnings
+
+**/
+(() => {
+var $231f3f49a079d4a3$export$2e2bcd8739ae039 = stickyElement = (element, parent, className)=>{
+    const isElementInViewport = (el)=>{
+        const rect = el.getBoundingClientRect();
+        return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+    };
+    parent.style.height = `${element.offsetHeight}px`;
+    const callback = (entries)=>{
+        entries.forEach(()=>element.classList.toggle(className, !isElementInViewport(parent)));
+    };
+    const observer = new IntersectionObserver(callback, {
+        threshold: 1
+    });
+    observer.observe(parent);
+};
+
+
+const $371bc2083c3ba57c$var$handleSidebarSticky = ()=>{
+    const sidebar = document.querySelector(".js-product-sidebar");
+    sidebar.style.top = null;
+    if (!sidebar) return;
+    const viewportHeight = window.innerHeight;
+    const topPosition = sidebar.getBoundingClientRect().top;
+    const trigger = sidebar.getBoundingClientRect().height + sidebar.getBoundingClientRect().top;
+    const navbarHeightPx = 80;
+    const rest = trigger - viewportHeight;
+    const onScroll = ()=>{
+        const viewportHeightScroll = window.scrollY + viewportHeight;
+        if (viewportHeightScroll >= trigger) {
+            if (!sidebar.classList.contains("product__info-container--sticky")) {
+                sidebar.classList.add("product__info-container--sticky");
+                if (rest > 0) {
+                    const topPx = rest * -1 + navbarHeightPx;
+                    sidebar.style.top = `${topPx}px`;
+                }
+            }
+        } else if (sidebar.classList.contains("product__info-container--sticky")) sidebar.classList.remove("product__info-container--sticky");
+    };
+    document.addEventListener("scroll", onScroll);
+};
+const $371bc2083c3ba57c$var$handleNoSizeSelected = ()=>{
+    const variantRadios = document.querySelector("variant-radios");
+    if (!variantRadios) return;
+    const options = Array.from(variantRadios.querySelectorAll('input[type="radio"'));
+    const enableBuyButton = ()=>{
+        const buyButton = document.querySelector("#main-buy-button");
+        if (buyButton) buyButton.dataset.noVariant = false;
+    };
+    const removeErrorMesssage = ()=>{
+        const fieldset = variantRadios.querySelector("fieldset");
+        if (fieldset) fieldset.classList.remove("has-error");
+    };
+    for (const option of options)option.addEventListener("change", ()=>{
+        if (option.checked) {
+            removeErrorMesssage();
+            enableBuyButton();
+        }
+    });
+};
+$371bc2083c3ba57c$var$handleSidebarSticky();
+window.addEventListener("resize", $371bc2083c3ba57c$var$handleSidebarSticky);
+$371bc2083c3ba57c$var$handleNoSizeSelected();
+// Enable sticky element
+const $371bc2083c3ba57c$var$enableStickyCta = ()=>{
+    const cta = document.querySelector("#fcb-product-form__buttons");
+    const wrapper = cta?.parentNode;
+    (0, $231f3f49a079d4a3$export$2e2bcd8739ae039)(cta, wrapper, "is-fixed");
+};
+$371bc2083c3ba57c$var$enableStickyCta();
+window.addEventListener("resize", $371bc2083c3ba57c$var$enableStickyCta);
+
+})();
+//# sourceMappingURL=section-main-product.js.map

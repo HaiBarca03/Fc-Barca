@@ -1,0 +1,125 @@
+/** Shopify CDN: Minification failed
+
+Line 17:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 18:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 20:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 21:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 22:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 23:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 24:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 45:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 46:0 Transforming const to the configured target environment ("es5") is not supported yet
+... and 17 more hidden warnings
+
+**/
+(() => {
+const $f560b1a8e20a780b$var$header = document.querySelector("#header");
+const $f560b1a8e20a780b$var$menu = $f560b1a8e20a780b$var$header.querySelector("#header-menu");
+const $f560b1a8e20a780b$var$allIterableItems = $f560b1a8e20a780b$var$header.querySelectorAll("#header-menu details, #header-icons > details, #header-icons > a, .fcb-header__logo-wrapper a ");
+const $f560b1a8e20a780b$var$menuDetails = $f560b1a8e20a780b$var$header.querySelectorAll("#header-menu details");
+const $f560b1a8e20a780b$var$desktopLinks = $f560b1a8e20a780b$var$header.querySelectorAll(".fcb-header__menu a.fcb-header__menu-item");
+const $f560b1a8e20a780b$var$details = $f560b1a8e20a780b$var$header.querySelectorAll("details");
+const $f560b1a8e20a780b$var$body = document.body;
+const $f560b1a8e20a780b$var$closeAllMenus = ()=>{
+    $f560b1a8e20a780b$var$menuDetails.forEach((detailsElement)=>detailsElement.removeAttribute("open"));
+};
+$f560b1a8e20a780b$var$desktopLinks.forEach((link)=>{
+    link.addEventListener("mouseover", ()=>{
+        $f560b1a8e20a780b$var$closeAllMenus();
+    });
+});
+$f560b1a8e20a780b$var$allIterableItems.forEach((link)=>{
+    link.addEventListener("mouseover", ()=>{
+        $f560b1a8e20a780b$var$closeAllMenus();
+    });
+});
+$f560b1a8e20a780b$var$menuDetails.forEach((detailsElement)=>{
+    detailsElement.addEventListener("mouseover", ()=>{
+        $f560b1a8e20a780b$var$closeAllMenus();
+        detailsElement.setAttribute("open", true);
+    });
+});
+$f560b1a8e20a780b$var$header.addEventListener("mouseleave", $f560b1a8e20a780b$var$closeAllMenus);
+// DRAWER
+const $f560b1a8e20a780b$var$drawer = $f560b1a8e20a780b$var$header.querySelector(".fcb-header__drawer");
+const $f560b1a8e20a780b$var$toggleDrawerBtn = $f560b1a8e20a780b$var$header.querySelector(".fcb-header__drawer > summary");
+const $f560b1a8e20a780b$var$drawerDetails = $f560b1a8e20a780b$var$drawer.querySelectorAll(".fcb-header__drawer__details");
+const $f560b1a8e20a780b$var$closeAllDetails = ()=>{
+    $f560b1a8e20a780b$var$drawerDetails.forEach((drawerDetailsElement)=>{
+        drawerDetailsElement.removeAttribute("open");
+    });
+    $f560b1a8e20a780b$var$drawer.removeAttribute("open");
+};
+$f560b1a8e20a780b$var$drawer.addEventListener("toggle", ()=>{
+    if ($f560b1a8e20a780b$var$drawer.hasAttribute("open")) {
+        $f560b1a8e20a780b$var$toggleDrawerBtn.setAttribute("aria-expanded", true);
+        $f560b1a8e20a780b$var$body.style.overflow = "hidden";
+    } else {
+        $f560b1a8e20a780b$var$toggleDrawerBtn.setAttribute("aria-expanded", false);
+        $f560b1a8e20a780b$var$body.style.overflow = "auto";
+    }
+});
+$f560b1a8e20a780b$var$drawerDetails.forEach((drawerDetailsElement)=>{
+    const buttonBack = drawerDetailsElement.querySelector(".fcb-header__drawer__submenu .fcb-header__drawer__submenu__back");
+    const summary = drawerDetailsElement.querySelector("summary");
+    const parentContent = drawerDetailsElement.closest(".fcb-header__drawer__content");
+    const onToggle = ()=>{
+        if (drawerDetailsElement.hasAttribute("open")) summary.setAttribute("aria-expanded", true);
+        else summary.setAttribute("aria-expanded", false);
+    };
+    drawerDetailsElement.addEventListener("toggle", onToggle);
+    buttonBack.addEventListener("click", ()=>{
+        drawerDetailsElement.classList.add("is-closing");
+        const onAnimationEnd = ()=>{
+            drawerDetailsElement.removeAttribute("open");
+            drawerDetailsElement.classList.remove("is-closing");
+            drawerDetailsElement.removeEventListener("animationend", onAnimationEnd);
+        };
+        drawerDetailsElement.addEventListener("animationend", onAnimationEnd);
+    });
+});
+// Drawer Localization Form
+class $f560b1a8e20a780b$var$LocalizationForm extends HTMLElement {
+    constructor(){
+        super();
+        this.elements = {
+            input: this.querySelector('input[name="locale_code"], input[name="country_code"]')
+        };
+        this.querySelectorAll("a").forEach((item)=>item.addEventListener("click", this.onItemClick.bind(this)));
+    }
+    onItemClick(event) {
+        event.preventDefault();
+        const form = this.querySelector("form");
+        this.elements.input.value = event.currentTarget.dataset.value;
+        if (form) form.submit();
+    }
+}
+customElements.define("drawer-localization-form", $f560b1a8e20a780b$var$LocalizationForm);
+// SEARCH
+const $f560b1a8e20a780b$var$headerSearch = $f560b1a8e20a780b$var$header.querySelector("#header-search");
+const $f560b1a8e20a780b$var$headerSearchCancel = $f560b1a8e20a780b$var$headerSearch.querySelector("#header-search-cancel");
+const $f560b1a8e20a780b$var$headerSearchInput = $f560b1a8e20a780b$var$headerSearch.querySelector("#Search-In-Modal");
+const $f560b1a8e20a780b$var$searchOverlay = $f560b1a8e20a780b$var$header.querySelector(".fcb-header-search__overlay");
+const $f560b1a8e20a780b$var$closeSearch = ()=>{
+    $f560b1a8e20a780b$var$headerSearch.removeAttribute("open");
+    document.removeEventListener("keydown", $f560b1a8e20a780b$var$closeSearchOnEsc);
+};
+const $f560b1a8e20a780b$var$closeSearchOnEsc = (ev)=>{
+    if (ev.keyCode == 27) $f560b1a8e20a780b$var$closeSearch();
+};
+$f560b1a8e20a780b$var$searchOverlay?.addEventListener("click", ()=>{
+    $f560b1a8e20a780b$var$closeSearch();
+});
+$f560b1a8e20a780b$var$headerSearchCancel.addEventListener("click", ()=>{
+    $f560b1a8e20a780b$var$closeSearch();
+});
+$f560b1a8e20a780b$var$headerSearch.addEventListener("toggle", ()=>{
+    if ($f560b1a8e20a780b$var$headerSearch.hasAttribute("open")) {
+        document.addEventListener("keydown", $f560b1a8e20a780b$var$closeSearchOnEsc);
+        $f560b1a8e20a780b$var$body.style.overflow = "hidden";
+    } else $f560b1a8e20a780b$var$body.style.overflow = "auto";
+});
+
+})();
+//# sourceMappingURL=menu-header.js.map

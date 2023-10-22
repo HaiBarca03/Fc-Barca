@@ -1,0 +1,886 @@
+(function() {
+    window.spcObj = (function() {
+        function spcObj() {}
+
+        spcObj.loadSocketScript = false;
+        spcObj.general_config = (typeof wk_general_config != 'undefined') ? wk_general_config : false;
+        spcObj.auction_config = (typeof wk_auction_config != 'undefined') ? wk_auction_config : false;
+        spcObj.widget_config = (typeof wk_widget_config != 'undefined') ? wk_widget_config : false;
+        spcObj.theme_colors = (typeof wk_theme_colors != 'undefined') ? wk_theme_colors : false;
+        spcObj.labels = (typeof wk_labels != 'undefined') ? wk_labels : false;
+
+        spcObj.loadjQuery = function(afterLoad) {
+            return spcObj.loadScript("//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js", function() {
+                spcObj.$ = jQuery.noConflict(true);
+                return afterLoad();
+            });
+        };
+        spcObj.loadScript = function(url, callback) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+
+            if (script.readyState) {
+                script.onreadystatechange = function() {
+                    if (script.readyState === "loaded" || script.readyState === "complete") {
+                        script.onreadystatechange = null;
+                        return callback();
+                    }
+                };
+            } else {
+                script.onload = function() {
+                    return callback();
+                };
+            }
+
+            script.src = url;
+            return document.getElementsByTagName("head")[0].appendChild(script);
+        };
+
+        spcObj.showProductAuctions = function(products, cust_id) {
+            jQuery.ajax({
+                url: spcObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "show_auction_on_category",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: { shop_name: spcObj.shop_name, products: products, cust_id: cust_id, timediff: spcObj.timediff, general_config: spcObj.general_config, auction_config: spcObj.auction_config, theme_colors: spcObj.theme_colors, widget_config: spcObj.widget_config },
+                success: function(response) {
+                    showAuctionOnCategory(response);
+                },
+                error: function(response) {
+                    console.log("oops error in category auction");
+                }
+            });
+        };
+
+        spcObj.loadSocket = function() {
+            if(typeof spObj == 'undefined' || !spObj.loadSocketScript)
+            {
+                console.log("socket loaded");
+                return spcObj.loadScript("https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js", function() {
+                    spcObj.loadSocketScript = true;
+                });
+            }
+            spcObj.loadSocketScript = true;
+            return true;
+        };
+
+        return spcObj;
+
+    })();
+
+    spcObj.path = window.location.pathname.split('/');
+
+    spcObj.shop_name = Shopify.shop;
+    // spcObj.product_handle = spcObj.path.pop(-1);
+    // spcObj.page = spcObj.path.pop(-2);
+
+    spcObj.connectSocketSuceess = function(auctionId) {
+
+        // console.log("connect  : " + auctionId)
+        var roomId = "wk_auction_" + auctionId;
+
+        if(typeof spcObj.socket == 'undefined' || spcObj.socket == ''){
+            spcObj.socket = io('https://app-sp.webkul.com:8000/',{
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax': 5000,
+                'reconnectionAttempts': 5,
+                transports: ['websocket']
+             });
+             spcObj.socket.on('connect', () => {
+                 spcObj.socket.emit('joinAuction', roomId)
+             });
+             spcObj.socket.on('placeBid', (response) => {
+                console.log(response);
+                let room = response['room'];
+                console.log("room : " + room);
+                if (typeof room == "undefined" || room == "") {
+                    console.log("Unable to get Auction Id To update Detail");
+                } else {
+                    var auctionId = room.toString().replace("wk_auction_", "");
+                    console.log("Receive Data");
+    
+                    if(typeof integer_bid_only && integer_bid_only)
+                    {
+                        // jQuery("."+selectAuction).find('.wk-current-bid').text(response['currency'] + " " + response['current_bid']);
+                        changeBidCountNCurrentBid(auctionId, response['bid_count'], Math.ceil(response['current_bid'].toString().replace(/,/g, '')), response['currency']);
+    
+                        changeAttributeValue(auctionId, 'data-minimum-bid-amount', Math.ceil(response['min_bid_amount'].toString().replace(/,/g, '')), true);
+    
+                        changeAttributeValue(auctionId, 'data-current-bid', Math.ceil(response['current_bid'].toString().replace(/,/g, '')), true);
+                    }
+                    else
+                    {
+                        var min_bid_amount = response['min_bid_amount'].toString().replace(/,/g, '');
+                        min_bid_amount = min_bid_amount.toString().replace(/,/g, '');
+                        changeBidCountNCurrentBid(auctionId, response['bid_count'], response['current_bid'], response['currency']);
+    
+                        changeAttributeValue(auctionId, 'data-minimum-bid-amount', min_bid_amount, true);
+    
+                        changeAttributeValue(auctionId, 'data-current-bid', response['current_bid'], true);
+                    }
+                    changeAttributeValue(auctionId, 'data-bid-count', response['bid_count']);
+    
+                    changeHighlightBid(auctionId, response['highest_bidder_Id']);
+    
+                    // popcorn bid code
+                    if (response['popcorn_enddate']) {
+                        eval('timer_end_date_' + auctionId).setTime(new Date(response['popcorn_enddate']).getTime());
+                        var aestTime = new Date(response['popcorn_enddate']).toLocaleString("en-US", { timeZone: time_zone });
+                        aestTime = new Date(aestTime);
+                        jQuery("#auction_" + auctionId).next().children().eq(1).text(formatDate(aestTime));
+                        jQuery(".wk-category-auction").find(".wk-auction-" + auctionId + " .wk-place-bid-modal").data('end-date', formatDate(aestTime));
+                    }
+                }
+            });
+        }else{
+            spcObj.socket.emit('joinAuction', roomId)
+        }
+        spcObj.connected_to_socket = true;
+    }
+
+    spcObj.loadSocket();
+    spcObj.connectSocket = function(auctionId, trytoconnect = 0) {
+
+        if (trytoconnect < 3) {
+            if (spcObj.loadSocketScript) {
+                spcObj.connectSocketSuceess(auctionId);
+            } else {
+                var i = 0
+                var x = window.setInterval(function() {
+                    if (spcObj.loadSocketScript) {
+                        spcObj.connectSocketSuceess(auctionId);
+                        clearInterval(x);
+                    } else {
+                        i++;
+                        if (i == 10) {
+                            spcObj.loadSocket();
+                            clearInterval(x);
+                            spcObj.connectSocket(trytoconnect++);
+                        }
+                    }
+                }, 10000)
+            }
+        }
+    };
+
+
+    spcObj.api_url = document.currentScript.src.split('js/')[0];
+
+
+    spcObj.timediff = new Date().getTimezoneOffset();
+
+    spcObj.loadjQuery(function() {
+        if (jQuery(".wk-category-auction").length > 0) {
+            var products = "";
+            var cust_id = jQuery(".wk-category-auction").attr("cust-id");
+            jQuery(".wk-category-auction").each(function() {
+                var product = parseInt(jQuery(this).data('prod'));
+
+                if (!isNaN(product) && product > 0) {
+                    products += product + ",";
+                } else {
+                    products = false;
+                    return false;
+                }
+            });
+
+            if (products)
+                spcObj.showProductAuctions(products, cust_id);
+            else
+                console.log('unable to get products');
+        }
+    });
+
+    spcObj.saveProxyBidFunc = function(custId, proxyBidAmount, auctionId, bidType, popcorn_enddate) {
+        console.log("saveProxyBidFunc");
+        jQuery.ajax({
+            url: spcObj.api_url + "index.php?p=wk_ajax_process",
+            type: "GET",
+            crossDomain: true,
+            jsonpCallback: "saveproxybid",
+            cache: false,
+            async: false,
+            dataType: "jsonp",
+            data: {
+                shop_name: spcObj.shop_name,
+                cust_id: custId,
+                auction_id: auctionId,
+                proxy_bid_amount: proxyBidAmount,
+                timediff: spcObj.timediff,
+                bid_type: bidType,
+                general_config: spcObj.general_config,
+                auction_config: spcObj.auction_config,
+                theme_colors: spcObj.theme_colors
+            },
+            beforeSend: function() {
+                jQuery(".wk-category-auction #collection_bid_place_btn").addClass("pa-btn-loader").prop("disabled", true);
+                // form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+            },
+            success: function(response) {
+                if (response["msg"] == "invalid_bid" && bidType == 'normal' && !response['proxy_allowed'])
+                    spcObj.saveNormalBid(custId, 1, proxyBidAmount, auctionId);
+                else if (response["msg"] == "invalid_bid_type") {
+                    if (jQuery("#pa_place_bid_category").is(".rm-on-fade-out")) {
+                        jQuery("#pa_place_bid_category").remove();
+                    }
+                    jQuery("#pa_invalid_type_alert_modal").show();
+                    jQuery("#pa_invalid_type_alert_modal").removeClass("pa-hide");
+
+                    jQuery("#pa_invalid_type_alert_modal").delay(2000).fadeOut(function() {
+                        jQuery("#pa_invalid_type_alert_modal").addClass("pa-hide");
+                    });
+                }else if(response['msg'] == 'store_pickup_not_found'){
+                    jQuery('#pa_place_bid_category').hide();
+                    jQuery('.wk-auction-'+auctionId+' #store_pickup_div').append(response['wk_store_pickup']);
+                    return;
+                } else
+                    bidSuccess(response, auctionId, bidType, popcorn_enddate);
+            },
+            error: function() {
+                alert("failed");
+            },
+            complete: function() {
+                jQuery(".wk-category-auction #collection_bid_place_btn").removeClass("pa-btn-loader").prop("disabled", false);
+            }
+        });
+    }
+
+    spcObj.savePopcornBid = function(cust_id, proxy_bid_amount, auction_id, customer_card_exists, success) {
+        jQuery.ajax({
+            url: spObj.api_url + "index.php?p=wk_ajax_process",
+            type: "GET",
+            crossDomain: true,
+            jsonpCallback: "popcornbid",
+            cache: false,
+            async: false,
+            dataType: "jsonp",
+            data: {
+                timediff: spObj.timediff,
+                cust_id: cust_id,
+                shop_name: spObj.shop_name,
+                bid_amount: proxy_bid_amount,
+                auction_id: auction_id,
+                customer_card_exists: customer_card_exists,
+                general_config: spObj.general_config,
+                auction_config: spObj.auction_config,
+                theme_colors: spObj.theme_colors
+            },
+            success: function(response) {
+                success(response);
+            },
+            error: function(response) {
+                // complete(true);
+                    // alert("failed");
+                console.error("Something Went Wrong, Unable to place Proxy Bid");
+            }
+        });
+    }
+
+    spcObj.saveNormalBid = function(custId, isPublic, bidAmount, auctionId, popcorn_enddate) {
+        console.log("saveNormalBid", popcorn_enddate);
+        jQuery.ajax({
+            url: spcObj.api_url + "index.php?p=wk_ajax_process",
+            type: "GET",
+            crossDomain: true,
+            jsonpCallback: "persistbid",
+            cache: false,
+            async: false,
+            dataType: "jsonp",
+            data: {
+                timediff: spcObj.timediff,
+                cust_id: custId,
+                is_public: isPublic,
+                shop_name: spcObj.shop_name,
+                bid_amount: bidAmount,
+                auction_id: auctionId,
+                prod_quantity: 1,
+                general_config: spcObj.general_config,
+                auction_config: spcObj.auction_config,
+                theme_colors: spcObj.theme_colors
+            },
+            beforeSend: function() {
+                jQuery(".wk-category-auction #collection_bid_place_btn").addClass("pa-btn-loader").prop("disabled", true);
+                // form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+            },
+            success: function(response) {
+                console.log('response ', response);
+                if(response['msg'] == 'store_pickup_not_found'){
+                    jQuery('#pa_place_bid_category').hide();
+                    jQuery('.wk-auction-'+auctionId+' #store_pickup_div').append(response['wk_store_pickup']);
+                    return;
+                }
+                if(response['msg'] == 'user_is_banned'){
+                    jQuery('#pa_place_bid_category').hide();
+                    jQuery('#wk_banned_bidder_msg').fadeIn();
+                    return;
+                }
+                bidSuccess(response, auctionId, '', popcorn_enddate);
+            },
+            error: function(response) {
+                alert("failed");
+            },
+            complete: function() {
+                jQuery(".wk-category-auction #collection_bid_place_btn").removeClass("pa-btn-loader").prop("disabled", false);
+            }
+        })
+    }
+
+    function bidSuccess(response, auctionId, bidType = 'normal', popcorn_enddate) {
+        var selector = jQuery("#pa_place_bid_category");
+        if (response == "sww")
+            console.log("something went wrong");
+        else if (response == "maintanance")
+            selector.find(".pa-maintanance").fadeIn();
+        else if (response['msg'] == "invalid_bid") {
+            console.log("Invalid Bid");
+            console.log(response);
+            
+            if(typeof integer_bid_only && integer_bid_only)
+            {
+                if (bidType == 'proxy') {
+                    if (response['proxy_allowed']) {
+                        console.log("Proxy allowed")
+                        selector.find("#wk_bid_amount").addClass('has-error');
+                        selector.find("#wk_minimum_bid_amount").addClass("error").text([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))].join(''));
+                        selector.find("#wk_minimum_bid_amount").prev().val(Math.ceil(response['min_bid_amount'].toString().replace(/,/g, '')));
+                        changeAttributeValue(auctionId, 'data-minimum-bid-amount', Math.ceil(response['min_bid_amount'].toString().replace(/,/g, '')), true);
+                    } else {
+                        alert("This proxy amount is already reserved.");
+                    }
+                } else {
+                    selector.find("#wk_bid_amount").addClass('has-error');
+                    selector.find("#wk_minimum_bid_amount").addClass("error").text(response['currency'] + " " + Math.ceil(response['min_bid_amount']));
+                    selector.find("#wk_minimum_bid_amount").prev().val(Math.ceil(response['min_bid_amount']));
+
+                    changeAttributeValue(auctionId, 'data-minimum-bid-amount', Math.ceil(response['min_bid_amount']), true);
+                }
+            }
+            else
+            {
+                var min_bid_amount = response['min_bid_amount'].toString().replace(/,/g, '');
+                min_bid_amount = min_bid_amount.toString().replace(/,/g, '');
+                if (bidType == 'proxy') {
+                    if (response['proxy_allowed']) {
+                        console.log("Proxy allowed")
+                        selector.find("#wk_bid_amount").addClass('has-error');
+                        selector.find("#wk_minimum_bid_amount").addClass("error").text(response['currency'] + " " + response['min_bid_amount']);
+                        selector.find("#wk_minimum_bid_amount").prev().val(response['min_bid_amount']);
+                        changeAttributeValue(auctionId, 'data-minimum-bid-amount', min_bid_amount, true);
+                    } else {
+                        alert("This proxy amount is already reserved.");
+                    }
+                } else {
+                    selector.find("#wk_bid_amount").addClass('has-error');
+                    selector.find("#wk_minimum_bid_amount").addClass("error").text(response['currency'] + " " + response['min_bid_amount']);
+                    selector.find("#wk_minimum_bid_amount").prev().val(response['min_bid_amount']);
+
+                    changeAttributeValue(auctionId, 'data-minimum-bid-amount', min_bid_amount, true);
+                }
+            }
+
+            // update Bid count response['bid_count']
+        } else if (response['msg'] == "invalid_bid_type") {
+            if (jQuery("#pa_place_bid_category").is(".rm-on-fade-out")) {
+                jQuery("#pa_place_bid_category").remove();
+            }
+            jQuery('#pa_invalid_type_alert_modal').fadeIn();
+            jQuery("#pa_invalid_type_alert_modal").removeClass("pa-hide");
+
+            jQuery("#pa_invalid_type_alert_modal").delay(2000).fadeOut(function() {
+                jQuery("#pa_invalid_type_alert_modal").addClass("pa-hide");
+            });
+        } else if (response['msg'] == "bt_not_found") {
+            //response['bt_form']
+            alert("Unable to find braintree detail");
+            // selector.find("#collection_modal_error_div").text("Unable to find braintree detail");
+        } else if (response['msg'] == "add_not_found") {
+            //response['no_add_found']
+            alert("Address Not Found");
+            // selector.find("#collection_modal_error_div").text("Add not Found");
+        } else if (response['msg'] == "success") {
+            selector.find("#wk_bid_amount").val("");
+
+            if(typeof integer_bid_only && integer_bid_only)
+            {
+                // change minimum bid
+                selector.find("#wk_minimum_bid_amount").text([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))]);
+                selector.find("#wk_minimum_bid_amount").prev().val(Math.ceil(response['min_bid_amount'].toString().replace(/,/g, '')));
+                changeAttributeValue(auctionId, 'data-minimum-bid-amount', Math.ceil(response['min_bid_amount'].toString().replace(/,/g, '')), true);
+
+                // change current bid
+                changeAttributeValue(auctionId, 'data-current-bid', Math.ceil(response['current_bid'].toString().replace(/,/g, '')), true);
+
+                // change Bid Count Number(response['bid_count'])
+                changeAttributeValue(auctionId, 'data-bid-count', response['bid_count']);
+
+                // change Bid count and Current bid
+                changeBidCountNCurrentBid(auctionId, response['bid_count'], Math.ceil(response['current_bid'].toString().replace(/,/g, '')), response['currency']);
+            }
+            else
+            {
+                var min_bid_amount = response['min_bid_amount'].toString().replace(/,/g, '');
+                min_bid_amount = min_bid_amount.toString().replace(/,/g, '');
+
+                    // change minimum bid
+                    selector.find("#wk_minimum_bid_amount").text(response['currency'] + " " + response['min_bid_amount']);
+                    selector.find("#wk_minimum_bid_amount").prev().val(response['min_bid_amount']);
+                    changeAttributeValue(auctionId, 'data-minimum-bid-amount', min_bid_amount, true);
+    
+                    // change current bid
+                    changeAttributeValue(auctionId, 'data-current-bid', response['current_bid'], true);
+    
+                    // change Bid Count Number(response['bid_count'])
+                    changeAttributeValue(auctionId, 'data-bid-count', response['bid_count']);
+    
+                    // change Bid count and Current bid
+                    changeBidCountNCurrentBid(auctionId, response['bid_count'], response['current_bid'], response['currency']);
+            }
+            // connect to room
+
+            if (spcObj.connected_to_socket) {
+                var data = {
+                    room: "wk_auction_" + auctionId,
+                    currency: response['currency'],
+                    bid_count: response['bid_count'],
+                    current_bid: response['current_bid'],
+                    min_bid_amount: response['min_bid_amount'],
+                    popcorn_enddate: popcorn_enddate,
+                    highest_bidder_Id: response['highest_bidder_Id'],
+                    show_start_or_current_bid: response['show_start_or_current_bid']
+                }
+                spcObj.socket.emit('placeBid', data);
+            }
+
+            if (popcorn_enddate) {
+                eval('timer_end_date_' + auctionId).setTime(new Date(popcorn_enddate).getTime());
+                var aestTime = new Date(popcorn_enddate).toLocaleString("en-US", { timeZone: time_zone });
+                aestTime = new Date(aestTime);
+                jQuery("#auction_" + auctionId).next().children().eq(1).text(formatDate(aestTime));
+                jQuery(".wk-category-auction").find(".wk-auction-" + auctionId + " .wk-place-bid-modal").data('end-date', formatDate(aestTime));
+            }
+
+            // chanage popcorn bid
+            // if (response['popcorn_enddate']) {
+            //     timer_end_date.setTime(new Date(response['popcorn_enddate']).getTime());
+            // }
+
+            jQuery("body").find('.pa-icon-close').trigger('click');
+            // show success msg
+            changeHighlightBid(auctionId, response['highest_bidder_Id']);
+            triggerSuccessMsg(auctionId);
+
+        } else if (response == "ended") {
+            alert("Auction Ended You can't place Bid");
+        }
+    }
+
+    function showAuctionOnCategory(data) {
+        console.log(data)
+        if (data) {
+
+            spcObj.loadScript(spcObj.api_url + "js/jquery.countdown.min.js", function() {
+
+                jQuery('body').append(data['theme']);
+                jQuery(".wk-category-auction").each(function() {
+                    var product = parseInt(jQuery(this).data('prod'));
+                    if (data[product]) {
+                        jQuery(this).append(data[product]['template']);
+                        // console.log(data[product]['auction_id']);
+                        spcObj.connectSocket(data[product]['auction_id']);
+                    } else
+                        jQuery(this).parents("a").find('.wk_hide_element').show();
+                });
+            });
+        } else {
+            jQuery(".wk-category-auction").each(function() {
+                jQuery(this).parents("a").find('.wk_hide_element').show();
+            });
+        }
+
+    }
+
+    function checkModal(modal) {
+        if (modal.is(".rm-on-fade-out")) {
+            modal.remove();
+        }
+    }
+
+    function prepareBidForm(auctionId, bidEndDate, hideBidderName, minimumBidAmount, proxyBidEnabled, popcornBidding) {
+        console.log(minimumBidAmount);
+        // console.log(minimumBidAmount);
+        // console.log();
+        jQuery("#wk_auction_id").val(auctionId);
+        jQuery("#wk_bid_end_date").text(bidEndDate);
+        jQuery("#wk_popcorn_bidding").val(popcornBidding);
+        if(typeof integer_bid_only && integer_bid_only)
+        {
+            jQuery("#wk_minimum_bid_amount").text([wkCurrency," ",Math.ceil(minimumBidAmount.toString().replace(/,/g, ''))].join(''));
+            jQuery("#wk_bid_amount").val(Math.ceil(minimumBidAmount.toString().replace(/,/g, '')));
+            jQuery("#wk_minimum_bid_amount").prev().val(Math.ceil(minimumBidAmount.toString().replace(/,/g, '')));
+        }
+        else
+        {
+            jQuery("#wk_minimum_bid_amount").text(wkCurrency + " " + constructPrice(minimumBidAmount));
+            jQuery("#wk_bid_amount").val(minimumBidAmount);
+            jQuery("#wk_minimum_bid_amount").prev().val(minimumBidAmount);
+        }
+        jQuery("input:radio").removeAttr("checked");
+
+        if (hideBidderName != 1) {
+            jQuery("#wk_hide_bidder_name_div").prev().hide();
+            jQuery("#wk_hide_bidder_name_div").hide();
+        }
+
+        // jQuery("#wk_bid_amount").val("");
+        jQuery("#wk_proxy").parent().next().children().removeClass("error");
+        jQuery("#wk_normal").parent().next().children().removeClass("error");
+        jQuery("#wk_proxy_same_btn").parent().next().children().removeClass("error");
+        jQuery("#wk_minimum_bid_amount").removeClass("error");
+        jQuery("#wk_bid_amount").removeClass("has-error");
+        jQuery("#pa_place_bid_category").find(".pa-maintanance").addClass('pa-hide');
+        prepareBidType(proxyBidEnabled);
+    }
+
+    function prepareBidType(proxyBidEnabled) {
+        if (proxyBidEnabled != 1 || wkProxyBidEnabled != 1) {
+            // jQuery("#proxy_bidding_div").hide();
+            jQuery("#bid_selection_div").hide();
+            jQuery("#bid_selection_div").prev().hide();
+            jQuery("#wk_normal").attr("checked", true);
+            jQuery("#proxy_bid_with_same_button_div").hide();
+        } else {
+            if (wkProxyWithSameBtn == 1) {
+                jQuery("#bid_selection_div").hide();
+                jQuery("#bid_selection_div").prev().hide();
+                jQuery("#wk_proxy_same_btn").parent().hide();
+                jQuery("#proxy_bid_with_same_button_div").show();
+                jQuery("#wk_proxy_same_btn").attr("checked", true);
+            } else {
+                jQuery("#bid_selection_div").show();
+                jQuery("#proxy_bidding_div").show();
+                jQuery("#bid_selection_div").prev().show();
+                jQuery("#proxy_bid_with_same_button_div").hide();
+            }
+        }
+    }
+
+    function formatDate(dateString) {
+        dateString = dateString.toString();
+        var allDate = dateString.split(' ');
+        var thisTime = allDate[4].split(':');
+        var day_date = allDate[2].replace(/0\d+/, function(t) { return t.substring(1); });
+        var newDate = [day_date, allDate[1], allDate[3]].join("-");
+        // var newDate = [thisDate[2],thisDate[1],thisDate[0] ].join("-");
+
+        var suffix = thisTime[0] >= 12 ? "PM" : "AM";
+        var hour = thisTime[0] > 12 ? thisTime[0] - 12 : thisTime[0];
+        var min = thisTime[1];
+        var sec = thisTime[2];
+        hour = hour < 10 ? '0' + hour : hour;
+        var newTime = hour + ':' + min + ':' + sec + ' ' + suffix;
+
+        return newDate + ' ' + newTime;
+    }
+
+    extractPrice = (a) => {
+        // console.log("value Price : " + a);
+        var regex = /[^0-9.]+/;
+        return parseFloat(a.toString().replace(regex, ''));
+    }
+
+    constructPrice = (price) => {
+        var formatObj = new Intl.NumberFormat('en-US');
+        return formatObj.format(parseFloat(price));
+    }
+
+    changeAttributeValue = (auctionId, attr, value, price = false) => {
+        var newValue = price ? extractPrice(value) : value;
+
+        jQuery(".wk-category-auction").find(".wk-auction-" + auctionId + " .wk-place-bid-modal").attr(attr, newValue);
+    }
+
+    changeBidCountNCurrentBid = (auctionId, bidCount, currentBid, currency) => {
+        var selector = jQuery(".wk-auction-" + auctionId);
+        selector.find(".wk-bid-count").text(bidCount);
+        //hide start bid on place bid
+        jQuery(".start_bid_div").addClass('hidden');
+        // show current bid on place bid
+        if(selector.hasClass("hidden")){
+            selector.removeClass('hidden');
+        }
+        selector.find(".wk-current-bid").text(currency + " " + currentBid);
+    }
+
+    triggerSuccessMsg = (auctionId) => {
+        jQuery(".wk-auction-" + auctionId).find(".pa-success").fadeIn(function() {
+            jQuery(this).fadeOut(3200);
+        });
+    }
+
+    changeHighlightBid = (auctionId, highestBidderId) => {
+        var customerId = jQuery(".wk-category-auction").attr("cust-id").trim();
+        var selector = jQuery(".wk-auction-" + auctionId);
+        if (customerId != "" && customerId != 0) {
+            if (customerId == highestBidderId) {
+                selector.find(".wk-current-bid").removeClass("customer_participated");
+                selector.find(".wk-current-bid").removeClass("customer_not_participated");
+                selector.find(".wk-current-bid").addClass("customer_highest_bidder");
+            } else {
+                if (!selector.find(".wk-current-bid").hasClass("customer_not_participated")) {
+                    selector.find(".wk-current-bid").removeClass("customer_highest_bidder");
+                    selector.find(".wk-current-bid").addClass("customer_participated");
+                }
+            }
+        }
+    }
+
+    wkSubmitBid = () => {
+            var normalProxySame = false;
+            var auctionId = jQuery("#wk_auction_id").val();
+            var bidAmount = parseFloat(jQuery("#wk_bid_amount").val());
+            var customerId = jQuery(".wk-category-auction").attr("cust-id");
+            var hideBidderName = parseInt(jQuery("#is_private:checked").val()) ? 0 : 1;
+            var popcorn_bidding = jQuery("#wk_popcorn_bidding").val();
+            var bidType = jQuery("input[name='bid-type']:checked").val();
+            if (typeof bidType == "undefined" && ((jQuery("#wk_normal").attr("checked") == "checked") || (jQuery("#wk_proxy_same_btn").attr("checked") == "checked"))) {
+                bidType = "normal";
+            }
+            console.log('bidType ', bidType);
+            if (jQuery("#wk_proxy_same_btn").attr("checked") == "checked")
+                normalProxySame = true;
+
+            if (typeof bidType != "undefined") {
+                var popcorn_enddate = '';
+                if(popcorn_bidding == 1){
+                    
+                    spcObj.savePopcornBid(customerId, bidAmount, auctionId, 1, function(response) {
+                        if (response.msg == "success") {
+                            popcorn_enddate = response.popcorn_enddate;
+                            console.log('popcorn_enddate_resopnse', popcorn_enddate);
+                            console.log('success');
+                            console.log('bidType', bidType);
+                            console.log('popcorn_enddate', popcorn_enddate);
+                            if (bidType == "normal") {
+                                if (normalProxySame) {
+                                    var selector = jQuery(".wk-auction-" + auctionId + " .wk-place-bid-modal");
+                                    var bidCount = parseInt(selector.attr("data-bid-count"));
+
+                                    if (bidCount == 0)
+                                        var checkProxyBidAmount = parseFloat(selector.attr("data-start-bid")) + (2 * parseFloat(selector.attr("data-bid-rule-rate")));
+                                    else
+                                        var checkProxyBidAmount = parseFloat(selector.attr("data-current-bid")) + (2 * (parseFloat(selector.attr("data-minimum-bid-amount")) - parseFloat(selector.attr("data-current-bid"))));
+                                    
+                                    if (checkProxyBidAmount <= bidAmount){
+                                        spcObj.saveProxyBidFunc(customerId, bidAmount, auctionId, bidType, popcorn_enddate);
+                                    }
+                                    else
+                                        spcObj.saveNormalBid(customerId, hideBidderName, bidAmount, auctionId, popcorn_enddate);
+                                } else
+                                    spcObj.saveNormalBid(customerId, hideBidderName, bidAmount, auctionId, popcorn_enddate);
+                            } else if (bidType == "proxy")
+                                spcObj.saveProxyBidFunc(customerId, bidAmount, auctionId, bidType, popcorn_enddate);
+                        }
+                    });
+                }
+                else
+                {
+                    console.log('bidType', bidType);
+                    console.log('popcorn_enddate', popcorn_enddate);
+                    if (bidType == "normal") {
+                        if (normalProxySame) {
+                            var selector = jQuery(".wk-auction-" + auctionId + " .wk-place-bid-modal");
+                            var bidCount = parseInt(selector.attr("data-bid-count"));
+
+                            if (bidCount == 0)
+                                var checkProxyBidAmount = parseFloat(selector.attr("data-start-bid")) + (2 * parseFloat(selector.attr("data-bid-rule-rate")));
+                            else
+                                var checkProxyBidAmount = parseFloat(selector.attr("data-current-bid")) + (2 * (parseFloat(selector.attr("data-minimum-bid-amount")) - parseFloat(selector.attr("data-current-bid"))));
+                            
+                            if (checkProxyBidAmount <= bidAmount){
+                                spcObj.saveProxyBidFunc(customerId, bidAmount, auctionId, bidType, popcorn_enddate);
+                            }
+                            else
+                                spcObj.saveNormalBid(customerId, hideBidderName, bidAmount, auctionId, popcorn_enddate);
+                        } else
+                            spcObj.saveNormalBid(customerId, hideBidderName, bidAmount, auctionId, popcorn_enddate);
+                    } else if (bidType == "proxy")
+                        spcObj.saveProxyBidFunc(customerId, bidAmount, auctionId, bidType, popcorn_enddate);
+                }
+            }
+        }
+        // Selection Related Section
+    jQuery('body').on('keypress', '.validate-decimal', function(event) {
+        if ((event.which != 8 && event.which != 0) && (event.which != 46 || jQuery(this).val().indexOf('.') != -1) && ((event.which < 48 || event.which > 57) && event.which != 13)) {
+            event.preventDefault();
+            jQuery(this).addClass('has-error');
+            return false;
+        } else {
+            jQuery(this).removeClass('has-error');
+            return true;
+        }
+    });
+
+    // Close Modal Box
+    jQuery("body").on("click", ".pa-icon-close, .pa-button-close", function() {
+        var target = jQuery(this).parents(".pa-area");
+        target.fadeOut(function() {
+            checkModal(target);
+        });
+    });
+
+    jQuery("body").on("click", ".pa-modal-container", function(e) {
+        if (jQuery(e.target).is(".pa-modal-container") && !jQuery(this).is('.close-by-icon')) {
+            jQuery(this).fadeOut(function() {
+                checkModal(jQuery(this));
+            });
+        }
+    });
+
+    // Show Modal
+    jQuery("body").on("click", ".wk-place-bid-modal", function() {
+        var auctionId = jQuery(this).data("auction-id");
+        var target = jQuery(this).data("toggle");
+        var bidEndDate = jQuery(this).data("end-date");
+        var popcornBidding = jQuery(this).data("popcorn-bidding");
+        var minimumBidAmount = jQuery(this).attr("data-minimum-bid-amount");
+        console.log('minimumBidAmount', minimumBidAmount);
+        var hideBidderName = jQuery(this).data("hide-bidder-name");
+        var proxyBidEnabled = jQuery(this).data("auction-proxy-bid");
+        console.log("fetch minimum bid amount : " + jQuery(this).data("minimum-bid-amount"));
+        prepareBidForm(auctionId, bidEndDate, hideBidderName, minimumBidAmount, proxyBidEnabled, popcornBidding);
+
+        jQuery(target).fadeIn();
+    });
+
+    jQuery("body").on("change", "#wk_normal, #wk_proxy, #wk_proxy_same_btn", function() {
+        var auctionId = jQuery("#wk_auction_id").val();
+        var selector = jQuery(".wk-auction-" + auctionId + " .wk-place-bid-modal");
+        var bidType = jQuery("input[name='bid-type']:checked").val();
+
+        if (bidType == 'proxy') {
+            var bidCount = parseInt(selector.attr("data-bid-count"));
+            if (bidCount == 0)
+                var minimumBidAmount = parseFloat(selector.attr("data-start-bid")) + (2 * parseFloat(selector.attr("data-bid-rule-rate")));
+            else
+                var minimumBidAmount = parseFloat(selector.attr("data-current-bid")) + (2 * (parseFloat(selector.attr("data-minimum-bid-amount")) - parseFloat(selector.attr("data-current-bid"))));
+
+            jQuery("#wk_minimum_bid_amount").text(wkCurrency + " " + constructPrice(minimumBidAmount));
+            jQuery("#wk_bid_amount").val(minimumBidAmount);
+            jQuery("#wk_minimum_bid_amount").prev().val(minimumBidAmount);
+        } else {
+            var minimumBidAmount = parseFloat(selector.attr("data-minimum-bid-amount"));
+            jQuery("#wk_minimum_bid_amount").text(wkCurrency + " " + constructPrice(minimumBidAmount));
+            jQuery("#wk_bid_amount").val(minimumBidAmount);
+            jQuery("#wk_minimum_bid_amount").prev().val(minimumBidAmount);
+        }
+
+        jQuery("#wk_proxy_same_btn").parent().next().children().removeClass("error");
+        jQuery("#wk_normal").parent().next().children().removeClass("error");
+        jQuery("#wk_proxy").parent().next().children().removeClass("error");
+        console.log(minimumBidAmount);
+        console.log(bidType);
+    })
+
+    jQuery("body").on("click", "#collection_bid_place_btn", function() {
+        spcObj.placeBid();
+    })
+
+    spcObj.placeBid = (store_pickup = false) => {
+        var normalProxySame = false;
+        var bidAmount = parseFloat(jQuery("#wk_bid_amount").val());
+        var minimumBidAmount = parseFloat(jQuery("#wk_minimum_bid_amount").prev().val());
+        var bidType = jQuery("input[name='bid-type']:checked").val();
+        console.log(jQuery("#wk_normal").attr("checked") == "checked");
+
+        if (typeof bidType == "undefined" && ((jQuery("#wk_normal").attr("checked") == "checked") || (jQuery("#wk_proxy_same_btn").attr("checked") == "checked"))) {
+            bidType = "normal";
+            if (jQuery("#wk_proxy_same_btn").attr("checked") == "checked")
+                normalProxySame = true;
+        }
+
+        if (bidAmount >= minimumBidAmount) {
+            jQuery("#wk_minimum_bid_amount").removeClass("error");
+            jQuery("#wk_bid_amount").removeClass("has-error");
+            if (typeof bidType != "undefined") {
+                if (wkConfirmationForBid == 1 && store_pickup == false)
+                    jQuery("body").find('#pa_confirm_bid_modal_category').fadeIn();
+                else
+                    wkSubmitBid();
+            } else {
+                jQuery("#wk_proxy_same_btn").parent().next().children().addClass("error");
+                jQuery("#wk_normal").parent().next().children().addClass("error");
+                jQuery("#wk_proxy").parent().next().children().addClass("error");
+            }
+        } else {
+            jQuery("#wk_minimum_bid_amount").addClass("error");
+            jQuery("#wk_bid_amount").addClass("has-error");
+        }
+    }
+
+    spcObj.storePickupCollectionSubmit = function() {
+        let want_product_as = $("input[name='want_product_as']:checked").val();
+        let address = $("#store_pickup_address").val();
+        let id_address = $("#store_pickup_address").find(':selected').data("id");
+        let location_name = $("#store_pickup_address").find(':selected').data("name");
+        let id_auction = $("input[name=id_auction]").val();
+        let main_id_product = $("input[name=main_id_product]").val();
+        var main_cust_id = $("input[name=main_cust_id]").val();
+        var bid_type = $("input[name=bid_type]").val();
+
+        var btn = jQuery('body').find(".wk_submit_bid");
+        if (bid_type == 'proxy') {
+            btn = jQuery('body').find(".wk_proxy_submit");
+        }
+
+        jQuery.ajax({
+            url: spObj.api_url + "index.php?p=wk_ajax_process",
+            type: "POST",
+            crossDomain: true,
+            async: false,
+            jsonpCallback: "storePickupSubmit",
+            cache: false,
+            dataType: "jsonp",
+            data: {
+                shop_name: spObj.shop_name,
+                address: address,
+                id_address: id_address,
+                location_name: location_name,
+                id_auction: id_auction,
+                main_id_product: main_id_product,
+                main_cust_id: main_cust_id,
+                want_product_as: want_product_as
+            },
+            beforeSend:function(){
+                jQuery('.store_pickup_submit').addClass("pa-btn-loader").prop("disabled", true);
+            },
+            success: function(res) {
+                var target = jQuery(".store-pickup-close").parents(".pa-area");
+                target.fadeOut(function() {
+                    checkModal(target);
+                });
+                if(res == 'success'){
+                    spcObj.placeBid(true);
+                }else{
+                    console.log('Something went wrong');
+                }
+                    
+            },
+            error: function() {
+                jQuery('#store_pickup_error').append("Oops! unable to save data");
+            },
+            complete: function() {
+                // jQuery('.store_pickup_submit').removeClass("pa-btn-loader").prop("disabled", false);
+            }
+        });
+    }
+    
+    jQuery("body").on("click", ".pa-category-submit-bid-confirm", function() {
+        jQuery("body").find('#pa_confirm_bid_modal_category').fadeOut();
+        wkSubmitBid();
+    })
+
+}).call(this);

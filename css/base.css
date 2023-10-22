@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: fcb-regular,Arial,Helvetica Neue,Helvetica,sans-serif;
+}
+:root {
+    --img: image(url(../img/barca_hor.jpg));
+}
+ul,li {
+    list-style: none;
+}
+li, a {
+    text-decoration: none;
+}
+.web__container {
+    background: linear-gradient(90deg,#cd122d 0,#154284);
+    padding-top: 80px;
+}
+.news__container {
+    background: linear-gradient(90deg,#cd122d 0,#154284);
+    padding-top: 80px;
+}
+a.active__here {
+    color: rgb(178, 115, 255);;
+}
+.nav__secondary {
+    margin: 10px 11px 10px -11px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.nav__secondary>span {
+    font-size: 20px;
+    font-weight: 550;
+}
+
+/* footer */
+.contents__footer {
+    border-top: 2px solid #fff;
+    margin: 0 30px;
+}
+.name__Club {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+}
+.logo__footer {
+    width: 40px;
+    height: 40px;
+}
+.name__footer {
+    margin-left: 10px;
+    font-size: 25px;
+    color: #fff;
+    font-weight: 700;
+}
+.corporate {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+.contentFooter {
+    display: flex;
+    text-align: center;
+}
+
+.monopoly {
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    opacity: 0.7;
+}
+.copyRight {    
+    color: #fff;
+}
+.link__corporate {
+    display: flex;
+    margin-bottom: 40px;
+}
+.link__corporate>a>li {
+    margin: 0 2.5px;
+    padding: 0 2.5px;
+    color: #fff;
+    opacity: 0.7;
+}
+.link__corporate>a>li:hover{
+    opacity: 1;
+}
+.link__corporate>a>li::after {
+    margin-left: 10px;
+    content: "|";
+}
+.last__child::after {
+    content: "" !important;
+}

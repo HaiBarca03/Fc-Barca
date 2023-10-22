@@ -1,0 +1,173 @@
+/** Shopify CDN: Minification failed
+
+Line 18:2 Transforming const to the configured target environment ("es5") is not supported yet
+Line 20:2 Transforming const to the configured target environment ("es5") is not supported yet
+Line 45:2 Transforming const to the configured target environment ("es5") is not supported yet
+Line 49:2 Transforming const to the configured target environment ("es5") is not supported yet
+Line 50:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 57:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 58:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 72:4 Transforming const to the configured target environment ("es5") is not supported yet
+Line 80:51 Transforming default arguments to the configured target environment ("es5") is not supported yet
+Line 81:2 Transforming const to the configured target environment ("es5") is not supported yet
+... and 12 more hidden warnings
+
+**/
+
+document.addEventListener('DOMContentLoaded', function () {
+  const editPositionElement = document.querySelector('.edit-position')
+
+  const cartItemsParent =
+    document.querySelector('.cart__contents').parentNode
+
+  if (editPositionElement && cartItemsParent) {
+    cartItemsParent.appendChild(editPositionElement)
+    console.log(
+      'Successfully moved .edit-position element after <cart-items>.',
+    )
+  } else {
+    if (!editPositionElement) {
+      console.log("Element with class 'edit-position' not found.")
+    }
+    if (!cartItemsParent) {
+      console.log('Parent element of <cart-items> not found.')
+    }
+  }
+})
+
+function toggleSlider(dataReference) {
+  console.log(
+    'toggleSlider function called with data-reference:',
+    dataReference,
+  )
+
+  // Check if there's an <li.fcb-cart-item> element with matching data-reference attribute
+  const matchingCartItem = $(
+    `li.fcb-cart-item[data-reference='${dataReference}']`,
+  )
+
+  const intervalId = setInterval(() => {
+    const element = $(`li.fcb-cart-item[sku-product='${dataReference}']`)
+
+    if (element.length > 0) {
+    } else {
+      console.log('Element disappeared')
+      if (matchingCartItem.length > 0) {
+        // If a matching <li.fcb-cart-item> element is found, check its display property
+        const targetLiElement = matchingCartItem[0]
+        const computedStyle = window.getComputedStyle(targetLiElement)
+
+        if (computedStyle.getPropertyValue('display') === 'none') {
+          // If the display is 'none', change it to 'block'
+          targetLiElement.style.display = 'block'
+        }
+      }
+      clearInterval(intervalId) // Stop the interval once the element is no longer found
+    }
+  }, 5) // Check every 1 second (adjust as needed)
+}
+
+$(document).ready(function () {
+  $('.button-submit-fill-cart').on('click', function () {
+    const dataReference = $(this).closest('li').attr('data-reference')
+
+    // Check if there's an <li> element with matching sku-product attribute
+    checkIfSkuIsInCart(dataReference)
+  })
+})
+
+// Function to check if an <li> element with the SKU is in the cart
+function checkIfSkuIsInCart(dataReference, counter = 0) {
+  const matchingCartItem = $(
+    `li.fcb-cart-item[sku-product='${dataReference}']`,
+  )
+
+  if (matchingCartItem.length > 0) {
+    $(`li[data-reference='${dataReference}']`).css('display', 'none')
+    console.log(
+      'Product found in cart:',
+      dataReference,
+      'after',
+      counter,
+      'checks',
+    )
+  } else {
+    // If no matching <li> element is found, schedule another check after an interval (e.g., 2 seconds)
+    setTimeout(function () {
+      checkIfSkuIsInCart(dataReference, counter + 1)
+    }, 300) // Adjust the delay time as needed
+  }
+}
+
+$(document).ready(function () {
+  $('.add-to-cart-recommended')
+    .off('submit')
+    .on('submit', function (event) {
+      event.preventDefault()
+      $.ajax({
+        type: 'POST',
+        url: '/cart/add.js',
+        data: $(this).serialize(),
+        dataType: 'json',
+        success: function (data) {
+          $.getJSON('/cart.js', function (cart) {
+            const cartItemsElement = document.querySelector('cart-items')
+            if (cartItemsElement) {
+              // Update the cart UI
+              const line = data.id
+              const allProductKeys = getRelatedProductsKeys(
+                cartItemsElement,
+                data.product_id,
+              )
+              const quantity = data.quantity
+              const name = 'updates[]'
+              cartItemsElement.updateQuantityAndRelated(
+                line,
+                allProductKeys,
+                quantity,
+                name,
+              )
+            } else {
+              console.log('cartItemsElement not found.')
+            }
+          })
+        },
+        error: function (xhr, status, error) { },
+      })
+    })
+})
+
+document.addEventListener('DOMContentLoaded', function () {
+  const cartItems = document.querySelector('cart-items')
+
+  if (cartItems && cartItems.classList.contains('is-empty')) {
+    const editPositionElement = document.querySelector('.edit-position')
+
+    if (editPositionElement) {
+      editPositionElement.style.display = 'none'
+    }
+  }
+})
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dataReferenceElement = document.querySelector('li[data-reference]');
+  if (!dataReferenceElement) {
+    return;
+  }
+  const dataReferenceSku = dataReferenceElement.getAttribute('data-reference');
+  const cartItems = document.querySelectorAll('li.fcb-cart-item');
+  let itemExists = false;
+  cartItems.forEach((item) => {
+    const itemSku = item.getAttribute('sku-product');
+    if (itemSku === dataReferenceSku) {
+      itemExists = true;
+    }
+  });
+
+  // If item with the same SKU exists, hide the dataReferenceElement
+  if (itemExists) {
+    dataReferenceElement.style.display = 'none';
+  }
+});
+
+

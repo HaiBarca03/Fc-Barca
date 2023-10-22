@@ -1,0 +1,231 @@
+body {
+  background-color: #5b5b6e;
+}
+
+/* header */
+
+.header__content {
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: antiquewhite;
+  padding: 15px 0;
+  z-index: 10;
+}
+
+.item__header {
+  width: 70%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item__header>a>i {
+  font-size: 25px;
+}
+
+.mid__content {
+  display: flex;
+  align-items: center;
+}
+
+.mid__content>img {
+  margin-right: 20px;
+  width: 40px;
+  height: 40px;
+}
+
+.mid__content span {
+  font-weight: 700;
+}
+
+.right__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right__header i {
+  font-size: 20px;
+}
+
+.right__header span input {
+  margin: 0 10px;
+  font-size: 13px;
+  font-weight: 550;
+  width: 90px;
+  padding: 10px 10px;
+  border: 1px solid;
+  border-radius: 10px;
+}
+
+.right__header button input {
+  padding: 5px 10px;
+}
+
+.right__header a button {
+  margin: 0 10px;
+  font-size: 13px;
+  font-weight: 550;
+  width: 90px;
+  padding: 10px 10px;
+  border: 1px solid;
+  border-radius: 20px;
+}
+
+.content__tv {
+  background-color: #bbb;
+}
+
+/* slider */
+.title__slider h2 {
+  font-size: 25px;
+  color: #fff;
+  padding: 20px 0;
+}
+
+.slideshow-container {
+  padding-top: 80px;
+  height: auto;
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
+}
+
+.item__video {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+/* .item__video iframe {
+    padding: 0 10px;
+} */
+.prev,
+.next {
+  cursor: pointer;
+  position: absolute;
+  top: 65%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active,
+.dot:hover {
+  background-color: #717171;
+}
+
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
+
+@keyframes fade {
+  from {
+    opacity: .4
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+/* On smaller screens, decrease text size */
+@media only screen and (max-width: 300px) {
+
+  .prev,
+  .next,
+  .text {
+    font-size: 11px
+  }
+}
+
+
+.tv__moment {
+  margin-top: 80px;
+}
+
+.row h2 {
+  margin-bottom: 20px;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 550;
+  margin-left: 10%;
+}
+
+.moment__laliga {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.list__moment {
+  width: 80%;
+}
+
+.item__moment {
+  display: flex;
+  justify-content: space-between;
+}
+
+.item__moment iframe {
+  margin-bottom: 20px;
+}
+
+.tv__behind-scenes {
+  margin-top: 80px;
+}
+
+/* footer */
+footer {
+  background: linear-gradient(90deg, #cd122d 0, #154284);
+}

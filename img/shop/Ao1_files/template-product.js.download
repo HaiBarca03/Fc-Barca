@@ -1,0 +1,4442 @@
+/** Shopify CDN: Minification failed
+
+Line 17:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 18:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:0 Transforming class syntax to the configured target environment ("es5") is not supported yet
+Line 20:15 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 28:9 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 31:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 36:16 Transforming let to the configured target environment ("es5") is not supported yet
+Line 46:11 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 47:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 59:8 Transforming const to the configured target environment ("es5") is not supported yet
+... and 115 more hidden warnings
+
+**/
+(() => {
+const $87c3128c623f6bf1$var$isArrowRightKey = (ev)=>ev.key === "ArrowRight" || ev.keyCode === 39;
+const $87c3128c623f6bf1$var$isArrowLeftKey = (ev)=>ev.key === "ArrowLeft" || ev.keyCode === 37;
+class $87c3128c623f6bf1$export$2e2bcd8739ae039 {
+    constructor(element){
+        this.element = element;
+        this.tabList = this.element.querySelector('[role="tablist"]');
+        this.tabs = Array.from(this.tabList.querySelectorAll('[role="tab"]'));
+        this.tabPanels = Array.from(this.element.querySelectorAll('[role="tabpanel"]'));
+        this.current = new Object();
+        this.#init();
+    }
+    #init() {
+        this.tabs.forEach((tab)=>tab.addEventListener("click", ()=>this.#select(tab)));
+        // Check if any tab if pre-selected. Otherwise, select the first tab.
+        const preSelectedTab = this.tabs.find((tab)=>tab.getAttribute("aria-selected") === "true");
+        preSelectedTab ? this.#select(preSelectedTab) : this.#select(this.tabs[0]);
+        // Move with key arrows
+        this.tabList.addEventListener("keydown", (e)=>{
+            if ($87c3128c623f6bf1$var$isArrowLeftKey(e) || $87c3128c623f6bf1$var$isArrowRightKey(e)) {
+                let currentTabIndex = this.current.tabIndex;
+                $87c3128c623f6bf1$var$isArrowLeftKey(e) && currentTabIndex--;
+                $87c3128c623f6bf1$var$isArrowRightKey(e) && currentTabIndex++;
+                if (currentTabIndex < 0) currentTabIndex = this.tabs.length - 1;
+                if (currentTabIndex > this.tabs.length - 1) currentTabIndex = 0;
+                this.#select(this.tabs[currentTabIndex]);
+                this.tabs[currentTabIndex].focus();
+            }
+        });
+    }
+    #select(tab) {
+        const panel = this.tabPanels.find((panel)=>panel.id === tab.getAttribute("aria-controls"));
+        this.current.tab = tab;
+        this.current.tabIndex = this.tabs.findIndex((tab)=>tab === this.current.tab);
+        this.current.panel = panel;
+        // Active tab
+        tab.setAttribute("aria-selected", true);
+        tab.setAttribute("tabindex", 0);
+        tab.dispatchEvent(new CustomEvent("active"));
+        // Active panel
+        panel.hidden = false;
+        panel.setAttribute("aria-expanded", true);
+        // Unselect other tabs
+        const otherTabs = this.tabs.filter((el)=>el.id !== tab.id);
+        otherTabs.forEach((tab)=>{
+            tab.setAttribute("aria-selected", false);
+            tab.setAttribute("tabindex", -1);
+        });
+        // Hide other panels
+        const otherPanels = this.tabPanels.filter((panel)=>panel.id !== tab.getAttribute("aria-controls"));
+        otherPanels.forEach((panel)=>{
+            panel.hidden = true;
+            panel.setAttribute("aria-expanded", false);
+        });
+    }
+    selectById(tabId, focus = false) {
+        const tab = this.tabs.find((tab)=>tab.id === tabId);
+        if (tab) {
+            this.#select(tab);
+            focus && tab.focus();
+        } else throw new Error(`tab with id ${tabId} not found in this tablist.`);
+    }
+    selectByIndex(index, focus = false) {
+        if (typeof index === "number") {
+            let validIndex = index - 1;
+            if (index === 0) validIndex = 0;
+            else if (index < 0) Math.abs(index) > this.tabs.length ? validIndex = 0 : validIndex = this.tabs.length + index;
+            else if (index > this.tabs.length) validIndex = this.tabs.length - 1;
+            const tab = this.tabs[validIndex];
+            this.#select(tab);
+            focus && tab.focus();
+        } else throw new Error(`index must be a number.`);
+    }
+}
+
+
+function $b8a262db10f72208$export$2e2bcd8739ae039(price, options = {}) {
+    const { prefix: prefix = "" , decimalSeparator: decimalSeparator = "," , withoutTrailingZeros: withoutTrailingZeros = true , forceCurrencyFormat: forceCurrencyFormat = false  } = options;
+    const format = forceCurrencyFormat ? window.shop.money_with_currency_format : window.shop.money_format;
+    let amount = (price / 100).toFixed(2);
+    if (withoutTrailingZeros) amount = amount.replace(/\.?0+$/, "");
+    const formattedAmount = amount.replace(".", decimalSeparator);
+    const formattedPrice = format.replace(/{{(.*?)}}/, formattedAmount);
+    return prefix ? `${prefix}${formattedPrice}` : formattedPrice;
+}
+
+
+var $03969527f5f7f562$export$2e2bcd8739ae039 = blacklist = [
+    {
+        text: "follar"
+    },
+    {
+        text: "meuca"
+    },
+    {
+        text: "faggot"
+    },
+    {
+        text: "Anal"
+    },
+    {
+        text: "Pimmel"
+    },
+    {
+        text: "puta"
+    },
+    {
+        text: "puta"
+    },
+    {
+        text: "faggotry"
+    },
+    {
+        text: "Beurette"
+    },
+    {
+        text: "Penis"
+    },
+    {
+        text: "joder"
+    },
+    {
+        text: "puto"
+    },
+    {
+        text: "bastard"
+    },
+    {
+        text: "Biffle"
+    },
+    {
+        text: "Schwanz"
+    },
+    {
+        text: "chapero"
+    },
+    {
+        text: "prostituta"
+    },
+    {
+        text: "bellend"
+    },
+    {
+        text: "Bitch"
+    },
+    {
+        text: "Eier"
+    },
+    {
+        text: "co\xf1o"
+    },
+    {
+        text: "vibrador"
+    },
+    {
+        text: "bint"
+    },
+    {
+        text: "Chatte"
+    },
+    {
+        text: "Muschi"
+    },
+    {
+        text: "chichi"
+    },
+    {
+        text: "verga"
+    },
+    {
+        text: "bollocks"
+    },
+    {
+        text: "Chibre"
+    },
+    {
+        text: "Fotze"
+    },
+    {
+        text: "chingar"
+    },
+    {
+        text: "cony"
+    },
+    {
+        text: "bugger"
+    },
+    {
+        text: "Couilles"
+    },
+    {
+        text: "Fick"
+    },
+    {
+        text: "tetas"
+    },
+    {
+        text: "cl\xedtoris"
+    },
+    {
+        text: "willy"
+    },
+    {
+        text: "Cul"
+    },
+    {
+        text: "Schlampe"
+    },
+    {
+        text: "chocho"
+    },
+    {
+        text: "teta"
+    },
+    {
+        text: "cock"
+    },
+    {
+        text: "Cuni"
+    },
+    {
+        text: "Hure"
+    },
+    {
+        text: "ch\xfapame la pija"
+    },
+    {
+        text: "tetes"
+    },
+    {
+        text: "codger"
+    },
+    {
+        text: "Cunnilingus"
+    },
+    {
+        text: "Hurenbock"
+    },
+    {
+        text: "ch\xfapame la polla"
+    },
+    {
+        text: "collons"
+    },
+    {
+        text: "cunt"
+    },
+    {
+        text: "\xc9jaculation"
+    },
+    {
+        text: "Hurensohn"
+    },
+    {
+        text: "fisting"
+    },
+    {
+        text: "semen"
+    },
+    {
+        text: "dickhead"
+    },
+    {
+        text: "Fellation"
+    },
+    {
+        text: "Nutte"
+    },
+    {
+        text: "chup\xe1rmela"
+    },
+    {
+        text: "regla"
+    },
+    {
+        text: "bonk"
+    },
+    {
+        text: "Fetish"
+    },
+    {
+        text: "Stricher"
+    },
+    {
+        text: "cipote"
+    },
+    {
+        text: "gland"
+    },
+    {
+        text: "slapper"
+    },
+    {
+        text: "Fils de pute"
+    },
+    {
+        text: "Freier"
+    },
+    {
+        text: "sexo"
+    },
+    {
+        text: "penis"
+    },
+    {
+        text: "tart"
+    },
+    {
+        text: "Fuck"
+    },
+    {
+        text: "Kl\xf6ten"
+    },
+    {
+        text: "hentai"
+    },
+    {
+        text: "cond\xf3"
+    },
+    {
+        text: "minger"
+    },
+    {
+        text: "Gang bang"
+    },
+    {
+        text: "Sack"
+    },
+    {
+        text: "gonorrea"
+    },
+    {
+        text: "figa"
+    },
+    {
+        text: "tosser"
+    },
+    {
+        text: "Gay"
+    },
+    {
+        text: "poppen"
+    },
+    {
+        text: "cojonazo"
+    },
+    {
+        text: "cul"
+    },
+    {
+        text: "twat"
+    },
+    {
+        text: "Gorge profonde"
+    },
+    {
+        text: "wegdr\xfccken"
+    },
+    {
+        text: "culo"
+    },
+    {
+        text: "parr\xfas"
+    },
+    {
+        text: "motherfucker"
+    },
+    {
+        text: "Gouine"
+    },
+    {
+        text: "blasen"
+    },
+    {
+        text: "guarra"
+    },
+    {
+        text: "palla"
+    },
+    {
+        text: "wanker"
+    },
+    {
+        text: "Jacquie & Michel"
+    },
+    {
+        text: "lecken"
+    },
+    {
+        text: "cojones"
+    },
+    {
+        text: "follar"
+    },
+    {
+        text: "knob"
+    },
+    {
+        text: "Lesbienne"
+    },
+    {
+        text: "spritzen"
+    },
+    {
+        text: "pajero"
+    },
+    {
+        text: "llet"
+    },
+    {
+        text: "knobend"
+    },
+    {
+        text: "LGBT"
+    },
+    {
+        text: "abspritzen"
+    },
+    {
+        text: "polla"
+    },
+    {
+        text: "pit"
+    },
+    {
+        text: "knobhead"
+    },
+    {
+        text: "Maso"
+    },
+    {
+        text: "D\xf6del"
+    },
+    {
+        text: "putero"
+    },
+    {
+        text: "pits"
+    },
+    {
+        text: "knobber"
+    },
+    {
+        text: "Masturbation"
+    },
+    {
+        text: "Luder"
+    },
+    {
+        text: "vete a la mierda"
+    },
+    {
+        text: "mamada"
+    },
+    {
+        text: "dildo"
+    },
+    {
+        text: "Non binaire"
+    },
+    {
+        text: "L\xfcmmel"
+    },
+    {
+        text: "verga"
+    },
+    {
+        text: "p\xe8ting"
+    },
+    {
+        text: "jizz"
+    },
+    {
+        text: "Nude"
+    },
+    {
+        text: "Schwanzlutscher"
+    },
+    {
+        text: "zorra"
+    },
+    {
+        text: "penetraci\xf3"
+    },
+    {
+        text: "ho"
+    },
+    {
+        text: "Nymphomane"
+    },
+    {
+        text: "Wichser"
+    },
+    {
+        text: "virgen"
+    },
+    {
+        text: "porno"
+    },
+    {
+        text: "nonce"
+    },
+    {
+        text: "Orgasme"
+    },
+    {
+        text: "Homo"
+    },
+    {
+        text: "chocha"
+    },
+    {
+        text: "fal\xb7lus"
+    },
+    {
+        text: "prick-teaser"
+    },
+    {
+        text: "PD"
+    },
+    {
+        text: "Schwuchtel"
+    },
+    {
+        text: "falo"
+    },
+    {
+        text: "esperma"
+    },
+    {
+        text: "rapey"
+    },
+    {
+        text: "P\xe9d\xe9"
+    },
+    {
+        text: "Arsch"
+    },
+    {
+        text: "teta"
+    },
+    {
+        text: "cigala"
+    },
+    {
+        text: "skank"
+    },
+    {
+        text: "P\xe9dophilie"
+    },
+    {
+        text: "Arschloch"
+    },
+    {
+        text: "incel"
+    },
+    {
+        text: "titola"
+    },
+    {
+        text: "slag"
+    },
+    {
+        text: "P\xe9nis"
+    },
+    {
+        text: "Schwanzlurch"
+    },
+    {
+        text: "simp"
+    },
+    {
+        text: "nap"
+    },
+    {
+        text: "slut"
+    },
+    {
+        text: "Pipe"
+    },
+    {
+        text: "Ficker"
+    },
+    {
+        text: "gay"
+    },
+    {
+        text: "pelila"
+    },
+    {
+        text: "whore"
+    },
+    {
+        text: "Porn"
+    },
+    {
+        text: "Ficksau"
+    },
+    {
+        text: "lesbiana"
+    },
+    {
+        text: "vulva"
+    },
+    {
+        text: "cock cheese"
+    },
+    {
+        text: "Pornhub"
+    },
+    {
+        text: "Fickhure"
+    },
+    {
+        text: "porno"
+    },
+    {
+        text: "xona"
+    },
+    {
+        text: "cock jockey"
+    },
+    {
+        text: "Porno"
+    },
+    {
+        text: "Freifick"
+    },
+    {
+        text: "tortillera"
+    },
+    {
+        text: "mamelles"
+    },
+    {
+        text: "cock-up"
+    },
+    {
+        text: "Pornographie"
+    },
+    {
+        text: "Affenarsch"
+    },
+    {
+        text: "orgasmo"
+    },
+    {
+        text: "metes"
+    },
+    {
+        text: "cocksucker"
+    },
+    {
+        text: "Pussy"
+    },
+    {
+        text: "Arschgeige"
+    },
+    {
+        text: "pedofilia"
+    },
+    {
+        text: "melindro"
+    },
+    {
+        text: "cockwomble"
+    },
+    {
+        text: "Pute"
+    },
+    {
+        text: "Arschficker"
+    },
+    {
+        text: "milf"
+    },
+    {
+        text: "erecci\xf3"
+    },
+    {
+        text: "minge"
+    },
+    {
+        text: "Queer"
+    },
+    {
+        text: "Saftsack"
+    },
+    {
+        text: "anal"
+    },
+    {
+        text: "coit"
+    },
+    {
+        text: "punani"
+    },
+    {
+        text: "Sado"
+    },
+    {
+        text: "Hurentochter"
+    },
+    {
+        text: "coj\xf3n"
+    },
+    {
+        text: "cardar"
+    },
+    {
+        text: "shag"
+    },
+    {
+        text: "Sado-Maso"
+    },
+    {
+        text: "Flachwichser"
+    },
+    {
+        text: "bondage"
+    },
+    {
+        text: "sucar"
+    },
+    {
+        text: "clunge"
+    },
+    {
+        text: "Salope"
+    },
+    {
+        text: "H\xe4ngetitte"
+    },
+    {
+        text: "org\xeda"
+    },
+    {
+        text: "xaper"
+    },
+    {
+        text: "fanny"
+    },
+    {
+        text: "Seins"
+    },
+    {
+        text: "Arschkriecher"
+    },
+    {
+        text: "bollera"
+    },
+    {
+        text: "fornicar"
+    },
+    {
+        text: "gash"
+    },
+    {
+        text: "Sex"
+    },
+    {
+        text: "Schwulette"
+    },
+    {
+        text: "masturbaci\xf3n"
+    },
+    {
+        text: "escorreguda"
+    },
+    {
+        text: "batty"
+    },
+    {
+        text: "Sexe"
+    },
+    {
+        text: "Matratze"
+    },
+    {
+        text: "squirt"
+    },
+    {
+        text: "orgasme"
+    },
+    {
+        text: "bum boy"
+    },
+    {
+        text: "SM"
+    },
+    {
+        text: "Flachtitte"
+    },
+    {
+        text: "pene"
+    },
+    {
+        text: "lletada"
+    },
+    {
+        text: "BNP"
+    },
+    {
+        text: "Sodomie"
+    },
+    {
+        text: "Flacharsch"
+    },
+    {
+        text: "cl\xedtoris"
+    },
+    {
+        text: "consolador"
+    },
+    {
+        text: "EDL"
+    },
+    {
+        text: "Tapette"
+    },
+    {
+        text: "Crackhure"
+    },
+    {
+        text: "nacionalismo"
+    },
+    {
+        text: "pubis"
+    },
+    {
+        text: "remoaner"
+    },
+    {
+        text: "Transgenre"
+    },
+    {
+        text: "Nationalsozialismus"
+    },
+    {
+        text: "nacionalista"
+    },
+    {
+        text: "cabota"
+    },
+    {
+        text: "feminazi"
+    },
+    {
+        text: "Travesti"
+    },
+    {
+        text: "NS"
+    },
+    {
+        text: "alcalde"
+    },
+    {
+        text: "fimosi"
+    },
+    {
+        text: "libtard"
+    },
+    {
+        text: "Vagin"
+    },
+    {
+        text: "Holocaust"
+    },
+    {
+        text: "anarquismo"
+    },
+    {
+        text: "pet\xf3 negre"
+    },
+    {
+        text: "TERF"
+    },
+    {
+        text: "Xhamster"
+    },
+    {
+        text: "NPD"
+    },
+    {
+        text: "facha"
+    },
+    {
+        text: "masturbar"
+    },
+    {
+        text: "yoon"
+    },
+    {
+        text: "Xivid\xe9os"
+    },
+    {
+        text: "SRP"
+    },
+    {
+        text: "aristocracia"
+    },
+    {
+        text: "assemblea"
+    },
+    {
+        text: "protty"
+    },
+    {
+        text: "Adrien Quatennens"
+    },
+    {
+        text: "NSU"
+    },
+    {
+        text: "autarqu\xeda"
+    },
+    {
+        text: "independ\xe8ncia"
+    },
+    {
+        text: "Fenian"
+    },
+    {
+        text: "Alexandre Loukachenko"
+    },
+    {
+        text: "Nationalsozialistischer Untergrund"
+    },
+    {
+        text: "Auschwitz"
+    },
+    {
+        text: "puta Espanya"
+    },
+    {
+        text: "Kafir"
+    },
+    {
+        text: "Angela Merkel"
+    },
+    {
+        text: "K\xfcmmelt\xfcrke"
+    },
+    {
+        text: "burocracia"
+    },
+    {
+        text: "Generalitat"
+    },
+    {
+        text: "Kufaar"
+    },
+    {
+        text: "Anne Hidalgo"
+    },
+    {
+        text: "Nigger*"
+    },
+    {
+        text: "caciquismo"
+    },
+    {
+        text: "fatxa"
+    },
+    {
+        text: "kike"
+    },
+    {
+        text: "Augusto Pinochet"
+    },
+    {
+        text: "Neger*"
+    },
+    {
+        text: "canciller"
+    },
+    {
+        text: "terrorista"
+    },
+    {
+        text: "papist"
+    },
+    {
+        text: "Ayatollah Khomeini"
+    },
+    {
+        text: "Mohr"
+    },
+    {
+        text: "caso Malaya"
+    },
+    {
+        text: "Franco"
+    },
+    {
+        text: "Prod"
+    },
+    {
+        text: "Bachar al-Assad"
+    },
+    {
+        text: "Schwatte"
+    },
+    {
+        text: "censura"
+    },
+    {
+        text: "Caudillo"
+    },
+    {
+        text: "taig"
+    },
+    {
+        text: "Benyamin Netanyahou"
+    },
+    {
+        text: "behindert"
+    },
+    {
+        text: "concejal"
+    },
+    {
+        text: "comunista"
+    },
+    {
+        text: "yid"
+    },
+    {
+        text: "Ceaucescu"
+    },
+    {
+        text: "Nafri"
+    },
+    {
+        text: "totalitarismo"
+    },
+    {
+        text: "capitalista"
+    },
+    {
+        text: "Hun"
+    },
+    {
+        text: "Charles III"
+    },
+    {
+        text: "Zigeuner"
+    },
+    {
+        text: "dictadura"
+    },
+    {
+        text: "socialista"
+    },
+    {
+        text: "muzzie"
+    },
+    {
+        text: "Cl\xe9mentine Autain"
+    },
+    {
+        text: "Schlitzauge"
+    },
+    {
+        text: "emir"
+    },
+    {
+        text: "anarquista"
+    },
+    {
+        text: "tarrier"
+    },
+    {
+        text: "Donald Trump"
+    },
+    {
+        text: "Ossi"
+    },
+    {
+        text: "Palma Arena"
+    },
+    {
+        text: "liberal"
+    },
+    {
+        text: "goddam"
+    },
+    {
+        text: "\xc9lisabeth Borne"
+    },
+    {
+        text: "Jude*"
+    },
+    {
+        text: "emperador"
+    },
+    {
+        text: "dictadura"
+    },
+    {
+        text: "Jimmy Savile"
+    },
+    {
+        text: "\xc9lisabeth II"
+    },
+    {
+        text: "Asyl*"
+    },
+    {
+        text: "consenso"
+    },
+    {
+        text: "dictador"
+    },
+    {
+        text: "Gordon Bennett"
+    },
+    {
+        text: "Emmanuel Macron"
+    },
+    {
+        text: "Staatssicherheit"
+    },
+    {
+        text: "corrupci\xf3n"
+    },
+    {
+        text: "cap d'estat"
+    },
+    {
+        text: "Tommy Robinson"
+    },
+    {
+        text: "\xc9ric Zemmour"
+    },
+    {
+        text: "Stasi"
+    },
+    {
+        text: "despotismo"
+    },
+    {
+        text: "president"
+    },
+    {
+        text: "Jack the Ripper"
+    },
+    {
+        text: "Fidel Castro"
+    },
+    {
+        text: "Rote Armee Fraktion"
+    },
+    {
+        text: "facci\xf3n"
+    },
+    {
+        text: "alcalde"
+    },
+    {
+        text: "Harold Shipman"
+    },
+    {
+        text: "Florian Philippot"
+    },
+    {
+        text: "AFD"
+    },
+    {
+        text: "federalismo"
+    },
+    {
+        text: "roig"
+    },
+    {
+        text: "Peter Sutcliffe"
+    },
+    {
+        text: "Francisco Franco"
+    },
+    {
+        text: "Syrien"
+    },
+    {
+        text: "imperialismo"
+    },
+    {
+        text: "roja"
+    },
+    {
+        text: "Wayne Couzens"
+    },
+    {
+        text: "Franco"
+    },
+    {
+        text: "Syrer"
+    },
+    {
+        text: "liberalismo"
+    },
+    {
+        text: "feixista"
+    },
+    {
+        text: "Charles Bronson"
+    },
+    {
+        text: "Gabriel Attal"
+    },
+    {
+        text: "Ukraine"
+    },
+    {
+        text: "l\xedder"
+    },
+    {
+        text: "nazi"
+    },
+    {
+        text: "Fred West"
+    },
+    {
+        text: "G\xe9rald Darmanin"
+    },
+    {
+        text: "Fl\xfcchtling"
+    },
+    {
+        text: "monarqu\xeda"
+    },
+    {
+        text: "antisemita"
+    },
+    {
+        text: "Rosemary West"
+    },
+    {
+        text: "Idi Amin"
+    },
+    {
+        text: "Migrant"
+    },
+    {
+        text: "nepotismo"
+    },
+    {
+        text: "genocidi"
+    },
+    {
+        text: "Myra Hindley"
+    },
+    {
+        text: "Isaac Herzog"
+    },
+    {
+        text: "Zuwanderung"
+    },
+    {
+        text: "oligarqu\xeda"
+    },
+    {
+        text: "estelada"
+    },
+    {
+        text: "Ghislaine Maxwell"
+    },
+    {
+        text: "Jean-Luc M\xe9lenchon"
+    },
+    {
+        text: "gendern"
+    },
+    {
+        text: "plutocracia"
+    },
+    {
+        text: "1 d'octubre"
+    },
+    {
+        text: "Jihadi John"
+    },
+    {
+        text: "Jean-Marie Le Pen"
+    },
+    {
+        text: "LGBTQ"
+    },
+    {
+        text: "prevaricaci\xf3n"
+    },
+    {
+        text: "independentista"
+    },
+    {
+        text: "Levi Bellfield"
+    },
+    {
+        text: "Joe Biden"
+    },
+    {
+        text: "queer"
+    },
+    {
+        text: "GAE"
+    },
+    {
+        text: "proc\xe9s"
+    },
+    {
+        text: "pissed"
+    },
+    {
+        text: "Jordan Bardella"
+    },
+    {
+        text: "trans*"
+    },
+    {
+        text: "P\xfanica"
+    },
+    {
+        text: "Arran"
+    },
+    {
+        text: "piss"
+    },
+    {
+        text: "Kim Jong-un"
+    },
+    {
+        text: "Lesb*"
+    },
+    {
+        text: "extrema derecha"
+    },
+    {
+        text: "CUP"
+    },
+    {
+        text: "berk"
+    },
+    {
+        text: "Louis Boyard"
+    },
+    {
+        text: "Schwul*"
+    },
+    {
+        text: "pr\xedncipe"
+    },
+    {
+        text: "Esquerra Republicana"
+    },
+    {
+        text: "arse"
+    },
+    {
+        text: "Mao Zedong"
+    },
+    {
+        text: "Silberr\xfccken"
+    },
+    {
+        text: "refer\xe9ndum"
+    },
+    {
+        text: "republic\xe0"
+    },
+    {
+        text: "arsehole"
+    },
+    {
+        text: "Marine Le Pen"
+    },
+    {
+        text: "alte wei\xdfe M\xe4nner"
+    },
+    {
+        text: "senado"
+    },
+    {
+        text: "republicana"
+    },
+    {
+        text: "cad"
+    },
+    {
+        text: "Marion Mar\xe9chal"
+    },
+    {
+        text: "Klimawandel"
+    },
+    {
+        text: "extrema izquierda"
+    },
+    {
+        text: "mon\xe0rquic"
+    },
+    {
+        text: "cack"
+    },
+    {
+        text: "Marl\xe8ne Schiappa"
+    },
+    {
+        text: "Braunkohle"
+    },
+    {
+        text: "socialismo"
+    },
+    {
+        text: "mon\xe0rquica"
+    },
+    {
+        text: "chav"
+    },
+    {
+        text: "Mathilde Panot"
+    },
+    {
+        text: "Tempolimit"
+    },
+    {
+        text: "GAL"
+    },
+    {
+        text: "monarquia"
+    },
+    {
+        text: "bloody"
+    },
+    {
+        text: "Mohammed Hosni Moubarak"
+    },
+    {
+        text: "Korruption"
+    },
+    {
+        text: "tirano"
+    },
+    {
+        text: "autodeterminaci\xf3"
+    },
+    {
+        text: "duffer"
+    },
+    {
+        text: "Mouammar Kadhafi"
+    },
+    {
+        text: "Lobbyismus"
+    },
+    {
+        text: "franquismo"
+    },
+    {
+        text: "desobedi\xe8ncia"
+    },
+    {
+        text: "feck"
+    },
+    {
+        text: "Nicolae Ceaușescu"
+    },
+    {
+        text: "Katar"
+    },
+    {
+        text: "BVE"
+    },
+    {
+        text: "Gu\xe0rdia Civil"
+    },
+    {
+        text: "git"
+    },
+    {
+        text: "Nicolas Sarkozy"
+    },
+    {
+        text: "Qatar"
+    },
+    {
+        text: "ideolog\xeda"
+    },
+    {
+        text: "Mossos d'Esquadra"
+    },
+    {
+        text: "gormless"
+    },
+    {
+        text: "Olivier Dussopt"
+    },
+    {
+        text: "Leiharbeiter"
+    },
+    {
+        text: "gerontocracia"
+    },
+    {
+        text: "Policia"
+    },
+    {
+        text: "naff"
+    },
+    {
+        text: "Olivier V\xe9ran"
+    },
+    {
+        text: "Mongo"
+    },
+    {
+        text: "conservadurismo"
+    },
+    {
+        text: "inhabilitaci\xf3"
+    },
+    {
+        text: "numpty"
+    },
+    {
+        text: "Omar Bongo"
+    },
+    {
+        text: "\xd6lauge"
+    },
+    {
+        text: "eutanasia"
+    },
+    {
+        text: "refer\xe8ndum"
+    },
+    {
+        text: "nutter"
+    },
+    {
+        text: "Pol Pot"
+    },
+    {
+        text: "Endl\xf6sung"
+    },
+    {
+        text: "falangista"
+    },
+    {
+        text: "rep\xfablica"
+    },
+    {
+        text: "pish"
+    },
+    {
+        text: "Prince Charles"
+    },
+    {
+        text: "Zwangsarbeit"
+    },
+    {
+        text: "N\xf3os"
+    },
+    {
+        text: "sedici\xf3"
+    },
+    {
+        text: "plonker"
+    },
+    {
+        text: "Prince Harry"
+    },
+    {
+        text: "Auschwitz"
+    },
+    {
+        text: "herri batasuna"
+    },
+    {
+        text: "Terra Lliure"
+    },
+    {
+        text: "prat"
+    },
+    {
+        text: "Prince William"
+    },
+    {
+        text: "DDR"
+    },
+    {
+        text: "Al Qaeda"
+    },
+    {
+        text: "Catalunya lliure"
+    },
+    {
+        text: "shite"
+    },
+    {
+        text: "Rachida Dati"
+    },
+    {
+        text: "Israel"
+    },
+    {
+        text: "socialista"
+    },
+    {
+        text: "p\xe0tria"
+    },
+    {
+        text: "wally"
+    },
+    {
+        text: "Raquel Garrido"
+    },
+    {
+        text: "Prophet"
+    },
+    {
+        text: "caso Kitchen"
+    },
+    {
+        text: "nacionalisme"
+    },
+    {
+        text: "fucktard"
+    },
+    {
+        text: "Recep Tayyip Erdoğan"
+    },
+    {
+        text: "Mohammed"
+    },
+    {
+        text: "terrorismo"
+    },
+    {
+        text: "nacionalista"
+    },
+    {
+        text: "pillock"
+    },
+    {
+        text: "Rishi Sunak"
+    },
+    {
+        text: "Muhammad"
+    },
+    {
+        text: "nazi"
+    },
+    {
+        text: "sobiranista"
+    },
+    {
+        text: "piss-flaps"
+    },
+    {
+        text: "Sandrine Rousseau"
+    },
+    {
+        text: "Quran"
+    },
+    {
+        text: "Meca"
+    },
+    {
+        text: "constitucional"
+    },
+    {
+        text: "pussy"
+    },
+    {
+        text: "Slobodan Milošević"
+    },
+    {
+        text: "Koran"
+    },
+    {
+        text: "Vaticano"
+    },
+    {
+        text: "unionista"
+    },
+    {
+        text: "randy"
+    },
+    {
+        text: "Val\xe9rie P\xe9cresse"
+    },
+    {
+        text: "Moschee"
+    },
+    {
+        text: "herej\xeda"
+    },
+    {
+        text: "presos pol\xedtics"
+    },
+    {
+        text: "rat-arsed"
+    },
+    {
+        text: "Viktor Orb\xe1n"
+    },
+    {
+        text: "Islam"
+    },
+    {
+        text: "proselitismo"
+    },
+    {
+        text: "exili"
+    },
+    {
+        text: "rotter"
+    },
+    {
+        text: "Vladimir Poutine"
+    },
+    {
+        text: "Ramadan"
+    },
+    {
+        text: "dios"
+    },
+    {
+        text: "Falange"
+    },
+    {
+        text: "rubbish"
+    },
+    {
+        text: "Volodymyr Zelensky"
+    },
+    {
+        text: "Muslim"
+    },
+    {
+        text: "juda\xedsmo"
+    },
+    {
+        text: "Jesucrist"
+    },
+    {
+        text: "scrubber"
+    },
+    {
+        text: "Xi Jinping"
+    },
+    {
+        text: "Moslem"
+    },
+    {
+        text: "catolicismo"
+    },
+    {
+        text: "sat\xe0nic"
+    },
+    {
+        text: "minging"
+    },
+    {
+        text: "Allah"
+    },
+    {
+        text: "Jude"
+    },
+    {
+        text: "exorcismo"
+    },
+    {
+        text: "Verge Maria"
+    },
+    {
+        text: "munter"
+    },
+    {
+        text: "Antis\xe9mite"
+    },
+    {
+        text: "Thora"
+    },
+    {
+        text: "amish"
+    },
+    {
+        text: "Papa Francesc"
+    },
+    {
+        text: "sod"
+    },
+    {
+        text: "Apostat"
+    },
+    {
+        text: "Synagoge"
+    },
+    {
+        text: "anglicano"
+    },
+    {
+        text: "pecat"
+    },
+    {
+        text: "cracker"
+    },
+    {
+        text: "Arabe"
+    },
+    {
+        text: "Klagemauer"
+    },
+    {
+        text: "Antiguo Testamento"
+    },
+    {
+        text: "Crist"
+    },
+    {
+        text: "freshie"
+    },
+    {
+        text: "Baader-Meinhof"
+    },
+    {
+        text: "Judenverfolgung"
+    },
+    {
+        text: "ap\xf3crifo"
+    },
+    {
+        text: "Mahoma"
+    },
+    {
+        text: "Jock"
+    },
+    {
+        text: "Bicot"
+    },
+    {
+        text: "Antisemitismus"
+    },
+    {
+        text: "apolog\xeda"
+    },
+    {
+        text: "B\xedblia"
+    },
+    {
+        text: "oriental"
+    },
+    {
+        text: "Boko Haram"
+    },
+    {
+        text: "Beschneidung"
+    },
+    {
+        text: "eucarist\xeda"
+    },
+    {
+        text: "Buda"
+    },
+    {
+        text: "taff"
+    },
+    {
+        text: "Bouddha"
+    },
+    {
+        text: "Katholische Kirche"
+    },
+    {
+        text: "beato"
+    },
+    {
+        text: "abat"
+    },
+    {
+        text: "bud bud"
+    },
+    {
+        text: "Bouddhisme"
+    },
+    {
+        text: "Evangelische Kirche"
+    },
+    {
+        text: "budismo"
+    },
+    {
+        text: "abadessa"
+    },
+    {
+        text: "Chinaman"
+    },
+    {
+        text: "Chr\xe9tien"
+    },
+    {
+        text: "Kirche"
+    },
+    {
+        text: "c\xe1liz"
+    },
+    {
+        text: "monjo"
+    },
+    {
+        text: "coconut"
+    },
+    {
+        text: "Croisade"
+    },
+    {
+        text: "Progrom"
+    },
+    {
+        text: "ap\xf3stol"
+    },
+    {
+        text: "monja"
+    },
+    {
+        text: "coloured"
+    },
+    {
+        text: "Daesh"
+    },
+    {
+        text: "Kreuzzug"
+    },
+    {
+        text: "baptista"
+    },
+    {
+        text: "cura"
+    },
+    {
+        text: "curry"
+    },
+    {
+        text: "Dieu"
+    },
+    {
+        text: "Kreuzz\xfcge"
+    },
+    {
+        text: "bautismo"
+    },
+    {
+        text: "ap\xf2stol"
+    },
+    {
+        text: "muncher"
+    },
+    {
+        text: "\xc9tat islamique"
+    },
+    {
+        text: "Kreuzfahrer"
+    },
+    {
+        text: "calvinismo"
+    },
+    {
+        text: "califa"
+    },
+    {
+        text: "honky"
+    },
+    {
+        text: "Fanatique"
+    },
+    {
+        text: "Zwangstaufe"
+    },
+    {
+        text: "capilla"
+    },
+    {
+        text: "secta"
+    },
+    {
+        text: "Jap"
+    },
+    {
+        text: "Fatwa"
+    },
+    {
+        text: "Judenhut"
+    },
+    {
+        text: "cardenal"
+    },
+    {
+        text: "cat\xf2lic"
+    },
+    {
+        text: "Kraut"
+    },
+    {
+        text: "FLN"
+    },
+    {
+        text: "Gelber Fleck"
+    },
+    {
+        text: "catedral"
+    },
+    {
+        text: "musulm\xe0"
+    },
+    {
+        text: "monkey"
+    },
+    {
+        text: "Fraction arm\xe9e rouge"
+    },
+    {
+        text: "Judenstern"
+    },
+    {
+        text: "catequesis"
+    },
+    {
+        text: "D\xe9u"
+    },
+    {
+        text: "Paddy"
+    },
+    {
+        text: "GIA"
+    },
+    {
+        text: "Ehrenmord"
+    },
+    {
+        text: "chamanismo"
+    },
+    {
+        text: "epifania"
+    },
+    {
+        text: "sheep"
+    },
+    {
+        text: "Hamas"
+    },
+    {
+        text: "Judensau"
+    },
+    {
+        text: "creyente"
+    },
+    {
+        text: "Judes"
+    },
+    {
+        text: "shagger"
+    },
+    {
+        text: "H\xe9r\xe9tique"
+    },
+    {
+        text: "koscher"
+    },
+    {
+        text: "cristiandad"
+    },
+    {
+        text: "Adam"
+    },
+    {
+        text: "slope"
+    },
+    {
+        text: "Hezbollah"
+    },
+    {
+        text: "halal"
+    },
+    {
+        text: "cristianismo"
+    },
+    {
+        text: "Eva"
+    },
+    {
+        text: "tinker"
+    },
+    {
+        text: "Idol\xe2tre"
+    },
+    {
+        text: "Schweinefleisch"
+    },
+    {
+        text: "crucifijo"
+    },
+    {
+        text: "Lilit"
+    },
+    {
+        text: "ching"
+    },
+    {
+        text: "Inf\xe2me"
+    },
+    {
+        text: "Freitagsgebet"
+    },
+    {
+        text: "nazareno"
+    },
+    {
+        text: "No\xe8"
+    },
+    {
+        text: "chong"
+    },
+    {
+        text: "Infid\xe8le"
+    },
+    {
+        text: "Muezzin"
+    },
+    {
+        text: "buda"
+    },
+    {
+        text: "Jehov\xe0"
+    },
+    {
+        text: "Chinky"
+    },
+    {
+        text: "Inquisition"
+    },
+    {
+        text: "Minarett"
+    },
+    {
+        text: "Cuaresma"
+    },
+    {
+        text: "imam"
+    },
+    {
+        text: "coon"
+    },
+    {
+        text: "Int\xe9griste"
+    },
+    {
+        text: "Antijudaismus"
+    },
+    {
+        text: "Navidad"
+    },
+    {
+        text: "avemaria"
+    },
+    {
+        text: "darkies"
+    },
+    {
+        text: "Islamophobe"
+    },
+    {
+        text: "Rabbiner"
+    },
+    {
+        text: "Semana Santa"
+    },
+    {
+        text: "benedicci\xf3"
+    },
+    {
+        text: "gippos"
+    },
+    {
+        text: "Isra\xebl"
+    },
+    {
+        text: "orthodox"
+    },
+    {
+        text: "krishna"
+    },
+    {
+        text: "Nostre Senyor"
+    },
+    {
+        text: "golliwog"
+    },
+    {
+        text: "J\xe9rusalem"
+    },
+    {
+        text: "Konvertit"
+    },
+    {
+        text: "dominicos"
+    },
+    {
+        text: "islam"
+    },
+    {
+        text: "golly"
+    },
+    {
+        text: "J\xe9sus"
+    },
+    {
+        text: "Islamist"
+    },
+    {
+        text: "misa"
+    },
+    {
+        text: "messies"
+    },
+    {
+        text: "half-caste"
+    },
+    {
+        text: "J\xe9sus-Christ"
+    },
+    {
+        text: "radikaler Islam"
+    },
+    {
+        text: "enc\xedclica"
+    },
+    {
+        text: "Mois\xe8s"
+    },
+    {
+        text: "jungle bunny"
+    },
+    {
+        text: "Jihad"
+    },
+    {
+        text: "Fundamentalist"
+    },
+    {
+        text: "islam"
+    },
+    {
+        text: "dimoni"
+    },
+    {
+        text: "gippo"
+    },
+    {
+        text: "Juif"
+    },
+    {
+        text: "Sunna"
+    },
+    {
+        text: "monasterio"
+    },
+    {
+        text: "salm"
+    },
+    {
+        text: "negro"
+    },
+    {
+        text: "Kafir"
+    },
+    {
+        text: "Scharia"
+    },
+    {
+        text: "evangelio"
+    },
+    {
+        text: "h\xf2stia"
+    },
+    {
+        text: "nigger"
+    },
+    {
+        text: "Le Groupe islamique arm\xe9"
+    },
+    {
+        text: "Dschihad"
+    },
+    {
+        text: "yihadista"
+    },
+    {
+        text: "sectari"
+    },
+    {
+        text: "nig nog"
+    },
+    {
+        text: "Le Pape"
+    },
+    {
+        text: "Radikalisierung"
+    },
+    {
+        text: "ate\xedsmo"
+    },
+    {
+        text: "Via Crucis"
+    },
+    {
+        text: "pikies"
+    },
+    {
+        text: "M\xe9cr\xe9ant"
+    },
+    {
+        text: "Kopftuch"
+    },
+    {
+        text: "feligr\xe9s"
+    },
+    {
+        text: "\xe0nima"
+    },
+    {
+        text: "raghead"
+    },
+    {
+        text: "Musulman"
+    },
+    {
+        text: "Burka"
+    },
+    {
+        text: "fraile"
+    },
+    {
+        text: "arc\xe0ngel"
+    },
+    {
+        text: "sambo"
+    },
+    {
+        text: "Pa\xefen"
+    },
+    {
+        text: "Hijab"
+    },
+    {
+        text: "franciscano"
+    },
+    {
+        text: "credo"
+    },
+    {
+        text: "spade"
+    },
+    {
+        text: "Paria"
+    },
+    {
+        text: "Kreuz"
+    },
+    {
+        text: "Inquisici\xf3n"
+    },
+    {
+        text: "pare nostre"
+    },
+    {
+        text: "spic"
+    },
+    {
+        text: "Religion"
+    },
+    {
+        text: "Salafismus"
+    },
+    {
+        text: "al\xe1"
+    },
+    {
+        text: "oraci\xf3"
+    },
+    {
+        text: "wog"
+    },
+    {
+        text: "Satan"
+    },
+    {
+        text: "Kalifat"
+    },
+    {
+        text: "rey Juan Carlos"
+    },
+    {
+        text: "rosari"
+    },
+    {
+        text: "gypo"
+    },
+    {
+        text: "Schisme"
+    },
+    {
+        text: "Muslimbruderschaft"
+    },
+    {
+        text: "rey Felipe"
+    },
+    {
+        text: "sant"
+    },
+    {
+        text: "gypos"
+    },
+    {
+        text: "S\xe9mite"
+    },
+    {
+        text: "Patriarch"
+    },
+    {
+        text: "Stalin"
+    },
+    {
+        text: "Mare de D\xe9u"
+    },
+    {
+        text: "nig-nog"
+    },
+    {
+        text: "Sioniste"
+    },
+    {
+        text: "Gebetsteppich"
+    },
+    {
+        text: "Pinochet"
+    },
+    {
+        text: "Esperit Sant"
+    },
+    {
+        text: "surrender monkey"
+    },
+    {
+        text: "Talibans"
+    },
+    {
+        text: "fasten"
+    },
+    {
+        text: "Hitler"
+    },
+    {
+        text: "al\xb7leluia"
+    },
+    {
+        text: "Paki"
+    },
+    {
+        text: "Th\xe9ocratie"
+    },
+    {
+        text: "Attila Hildmann"
+    },
+    {
+        text: "Mussolini"
+    },
+    {
+        text: "am\xe9n"
+    },
+    {
+        text: "darky"
+    },
+    {
+        text: "Youpin"
+    },
+    {
+        text: "Adolf Hitler"
+    },
+    {
+        text: "Rafael Videla"
+    },
+    {
+        text: "anticrist"
+    },
+    {
+        text: "dago"
+    },
+    {
+        text: "Abdelhamid Abaaoud"
+    },
+    {
+        text: "Albert Speer"
+    },
+    {
+        text: "Gerardo D\xedaz Ferr\xe1z"
+    },
+    {
+        text: "Satan\xe0s"
+    },
+    {
+        text: "gook"
+    },
+    {
+        text: "Adolf Eichmann"
+    },
+    {
+        text: "Joseph Goebbels"
+    },
+    {
+        text: "Heinrich Himmler"
+    },
+    {
+        text: "Llucifer"
+    },
+    {
+        text: "pikey"
+    },
+    {
+        text: "Adolf Hitler"
+    },
+    {
+        text: "Heinrich Himmler"
+    },
+    {
+        text: "Antonio Gonz\xe1lez Pacheco"
+    },
+    {
+        text: "Pilar Rahola"
+    },
+    {
+        text: "Polack"
+    },
+    {
+        text: "Anders Behring Breivik"
+    },
+    {
+        text: "Hermann Goering"
+    },
+    {
+        text: "Villarejo"
+    },
+    {
+        text: "Carme Forcadell"
+    },
+    {
+        text: "fairy"
+    },
+    {
+        text: "Anne Frank"
+    },
+    {
+        text: "Rudolf Hess"
+    },
+    {
+        text: "general\xedsimo"
+    },
+    {
+        text: "Carles Puigdemont"
+    },
+    {
+        text: "bender"
+    },
+    {
+        text: "Benito Mussolini"
+    },
+    {
+        text: "He\xdf"
+    },
+    {
+        text: "Serrano Su\xf1er"
+    },
+    {
+        text: "Santiago Abascal"
+    },
+    {
+        text: "mincing"
+    },
+    {
+        text: "Bernard Arnault"
+    },
+    {
+        text: "Martin Bormann"
+    },
+    {
+        text: "Jes\xfas Gil"
+    },
+    {
+        text: "Jose Maria Aznar"
+    },
+    {
+        text: "nancy"
+    },
+    {
+        text: "Bill Cosby"
+    },
+    {
+        text: "Wilhelm Keitel"
+    },
+    {
+        text: "Natividad J\xe1uregui"
+    },
+    {
+        text: "Jordi Cuixart"
+    },
+    {
+        text: "pansy"
+    },
+    {
+        text: "Brahim Abdeslam"
+    },
+    {
+        text: "Alfred Jodl"
+    },
+    {
+        text: "Mar\xeda Josefa Garc\xeda S\xe1nchez"
+    },
+    {
+        text: "Jordi S\xe1nchez"
+    },
+    {
+        text: "queen"
+    },
+    {
+        text: "Brett Kavanaugh"
+    },
+    {
+        text: "Joachim von Ribbentrop"
+    },
+    {
+        text: "Juan Jes\xfas Narv\xe1ez Go\xf1i"
+    },
+    {
+        text: "Oriol Junqueras"
+    },
+    {
+        text: "transsexual"
+    },
+    {
+        text: "Brigitte Macron"
+    },
+    {
+        text: "Walther Funk"
+    },
+    {
+        text: "Primo de Rivera"
+    },
+    {
+        text: "Joaquim Forn"
+    },
+    {
+        text: "bent"
+    },
+    {
+        text: "Camilla Parker Bowles"
+    },
+    {
+        text: "Eva Braun"
+    },
+    {
+        text: "Bildu"
+    },
+    {
+        text: "Dolors Bassa"
+    },
+    {
+        text: "bummer"
+    },
+    {
+        text: "Chakib Akrouh"
+    },
+    {
+        text: "Andreas Baader"
+    },
+    {
+        text: "Josu Ternera"
+    },
+    {
+        text: "Ra\xfcl Romeva"
+    },
+    {
+        text: "fag"
+    },
+    {
+        text: "Charles Manson"
+    },
+    {
+        text: "Ulrike Meinhof"
+    },
+    {
+        text: "Dienteputo"
+    },
+    {
+        text: "Jordi Turull"
+    },
+    {
+        text: "homo"
+    },
+    {
+        text: "Ch\xe9rif Kouachi"
+    },
+    {
+        text: "Gudrun Ensslin"
+    },
+    {
+        text: "Corinna Larsen"
+    },
+    {
+        text: "Josep Rull"
+    },
+    {
+        text: "lezza"
+    },
+    {
+        text: "David Koresh"
+    },
+    {
+        text: "Horst Mahler"
+    },
+    {
+        text: "G\xfcrtel"
+    },
+    {
+        text: "Antoni Com\xedn"
+    },
+    {
+        text: "ponce"
+    },
+    {
+        text: "Dieudonn\xe9"
+    },
+    {
+        text: "Uwe Mundlos"
+    },
+    {
+        text: "Rita Barber\xe1"
+    },
+    {
+        text: "Lluis Puig"
+    },
+    {
+        text: "poof"
+    },
+    {
+        text: "Dominique Strauss-Kahn"
+    },
+    {
+        text: "Uwe B\xf6hnhardt"
+    },
+    {
+        text: "Luis B\xe1rcenas"
+    },
+    {
+        text: "Meritxell Serret"
+    },
+    {
+        text: "queer"
+    },
+    {
+        text: "\xc9mile Louis"
+    },
+    {
+        text: "Beate Zsch\xe4pe"
+    },
+    {
+        text: "Gregorio Guerra"
+    },
+    {
+        text: "Clara Ponsat\xed"
+    },
+    {
+        text: "that’s gay"
+    },
+    {
+        text: "Francis Heaulme"
+    },
+    {
+        text: "Adolf von Thadden"
+    },
+    {
+        text: 'Jos\xe9 Luis "Pepote" Ballester'
+    },
+    {
+        text: "Anna Gabriel"
+    },
+    {
+        text: "dyke"
+    },
+    {
+        text: "Fr\xe8res Kouachi"
+    },
+    {
+        text: "Abou-Chaker"
+    },
+    {
+        text: "Carlos Fabra"
+    },
+    {
+        text: "Marta Rovira"
+    },
+    {
+        text: "fudge packer"
+    },
+    {
+        text: "Gr\xe9gory Villemin"
+    },
+    {
+        text: "Wladimir Putin"
+    },
+    {
+        text: "Jos\xe9 Antonio Gri\xf1\xe1n"
+    },
+    {
+        text: "Pablo H\xe1sel"
+    },
+    {
+        text: "gender bender"
+    },
+    {
+        text: "Guy Georges"
+    },
+    {
+        text: "Frauke Petry"
+    },
+    {
+        text: "Peque\xf1o Nicol\xe1s"
+    },
+    {
+        text: "Valt\xf2nyc"
+    },
+    {
+        text: "muff diver"
+    },
+    {
+        text: "Harvey Weinstein"
+    },
+    {
+        text: "Tino Chrupalla"
+    },
+    {
+        text: "Franco"
+    },
+    {
+        text: "Mariano Rajoy"
+    },
+    {
+        text: "rug muncher"
+    },
+    {
+        text: "Heinrich Himmler"
+    },
+    {
+        text: "Alice Weidel"
+    },
+    {
+        text: "Blesa"
+    },
+    {
+        text: "Javier Ortega Smith"
+    },
+    {
+        text: "she-male"
+    },
+    {
+        text: "Hermann G\xf6ring"
+    },
+    {
+        text: "Stephan Brandner"
+    },
+    {
+        text: "Francisco Correa"
+    },
+    {
+        text: "Pablo Motos"
+    },
+    {
+        text: "shirt-lifter"
+    },
+    {
+        text: "Jeffrey Dahmer"
+    },
+    {
+        text: "Peter Boehringer"
+    },
+    {
+        text: "\xc1lvaro Lapuerta"
+    },
+    {
+        text: "Iv\xe1n Espinosa de los Monteros"
+    },
+    {
+        text: "trannie"
+    },
+    {
+        text: "Jeffrey Epstein"
+    },
+    {
+        text: "Mariana Harder-K\xfchnel"
+    },
+    {
+        text: "ETA"
+    },
+    {
+        text: "Macarena Olona"
+    },
+    {
+        text: "arsemonger"
+    },
+    {
+        text: "Jonathann Daval"
+    },
+    {
+        text: "Hans-Holger Malcome\xdf"
+    },
+    {
+        text: "Juan Antonio Roca"
+    },
+    {
+        text: "Roc\xedo Monasterio"
+    },
+    {
+        text: "arse-licker"
+    },
+    {
+        text: "Joseph Goebbels"
+    },
+    {
+        text: "Carsten H\xfctter"
+    },
+    {
+        text: "Jaume Matas"
+    },
+    {
+        text: "Cristina Segu\xed"
+    },
+    {
+        text: "chuffer"
+    },
+    {
+        text: "Joseph Staline"
+    },
+    {
+        text: "Alexander Gauland"
+    },
+    {
+        text: "Eduardo Zaplana"
+    },
+    {
+        text: "Hermann Tertsch"
+    },
+    {
+        text: "fop"
+    },
+    {
+        text: "Kate Middleton"
+    },
+    {
+        text: "J\xf6rg Meuthen"
+    },
+    {
+        text: "el Bigotes"
+    },
+    {
+        text: "Pedro S\xe1nchez"
+    },
+    {
+        text: "foppish"
+    },
+    {
+        text: "Kevin Spacey"
+    },
+    {
+        text: "Bj\xf6rn H\xf6cke"
+    },
+    {
+        text: "Luis Pineda"
+    },
+    {
+        text: "Pere Aragon\xe8s"
+    },
+    {
+        text: "get bent"
+    },
+    {
+        text: "Lady Diana"
+    },
+    {
+        text: "Sahra Wagenknecht"
+    },
+    {
+        text: "Farruquito"
+    },
+    {
+        text: "Rei Felipe"
+    },
+    {
+        text: "mingebag"
+    },
+    {
+        text: "Lee Harvey Oswald"
+    },
+    {
+        text: "Erich Honecker"
+    },
+    {
+        text: "Mayte Zald\xedvar"
+    },
+    {
+        text: "Rei Juan Carlos"
+    },
+    {
+        text: "cretin"
+    },
+    {
+        text: "Marc Dutroux"
+    },
+    {
+        text: "Egon Krenz"
+    },
+    {
+        text: "Arnaldo Otegi"
+    },
+    {
+        text: "Reina Letizia"
+    },
+    {
+        text: "deaf"
+    },
+    {
+        text: "Mark David Chapman"
+    },
+    {
+        text: "Walter Ulbricht"
+    },
+    {
+        text: "Mario Conde"
+    },
+    {
+        text: "Reina Sof\xeda"
+    },
+    {
+        text: "cripple"
+    },
+    {
+        text: "Meghan Markle"
+    },
+    {
+        text: "Armin Meiwes"
+    },
+    {
+        text: "I\xf1aki Urdangarin"
+    },
+    {
+        text: "Infanta Leonor"
+    },
+    {
+        text: "div"
+    },
+    {
+        text: "Michel Fourniret"
+    },
+    {
+        text: "Karl Denke"
+    },
+    {
+        text: "Rosal\xeda Iglesias"
+    },
+    {
+        text: "Infanta Elena de Borb\xf3"
+    },
+    {
+        text: "handicapped"
+    },
+    {
+        text: "Nordahl Lelandais"
+    },
+    {
+        text: "Fritz Haarmann"
+    },
+    {
+        text: "a tomar por culo"
+    },
+    {
+        text: "Borbons"
+    },
+    {
+        text: "looney"
+    },
+    {
+        text: "Oussama Ben Laden"
+    },
+    {
+        text: "Peter K\xfcrten"
+    },
+    {
+        text: "a tomar por saco"
+    },
+    {
+        text: "Infanta Sof\xeda"
+    },
+    {
+        text: "mental"
+    },
+    {
+        text: "Patrice Al\xe8gre"
+    },
+    {
+        text: "Adolf Seefeldt"
+    },
+    {
+        text: "anda a cagar"
+    },
+    {
+        text: "Jordi Pujol"
+    },
+    {
+        text: "mentally challenged"
+    },
+    {
+        text: "Patrick Dils"
+    },
+    {
+        text: "Rudolf Pleil"
+    },
+    {
+        text: "apestar"
+    },
+    {
+        text: "Artur Mas"
+    },
+    {
+        text: "tone"
+    },
+    {
+        text: "Petit Gr\xe9gory"
+    },
+    {
+        text: "Joachim Kroll"
+    },
+    {
+        text: "asesinar"
+    },
+    {
+        text: "Pablo Iglesias"
+    },
+    {
+        text: "deafo"
+    },
+    {
+        text: "Pierre Palmade"
+    },
+    {
+        text: "Werner Pinzner"
+    },
+    {
+        text: "bastardo"
+    },
+    {
+        text: "Irene Montero"
+    },
+    {
+        text: "wheelchair bound"
+    },
+    {
+        text: "R. Kelly"
+    },
+    {
+        text: "Niels H\xf6gel"
+    },
+    {
+        text: "basura"
+    },
+    {
+        text: "Bad Gyal"
+    },
+    {
+        text: "dumb"
+    },
+    {
+        text: "Roman Polanski"
+    },
+    {
+        text: "Volker Eckert"
+    },
+    {
+        text: "cabr\xf3n"
+    },
+    {
+        text: "Isabel D\xedaz Ayuso"
+    },
+    {
+        text: "dwarf"
+    },
+    {
+        text: "Saddam Hussein"
+    },
+    {
+        text: "Stephan Letter"
+    },
+    {
+        text: "cagar"
+    },
+    {
+        text: "Xavier Garc\xeda Albiol"
+    },
+    {
+        text: "flid"
+    },
+    {
+        text: "Sa\xefd Kouachi"
+    },
+    {
+        text: "Christoph Metzelder"
+    },
+    {
+        text: "calientapollas"
+    },
+    {
+        text: "In\xe9s Arrimadas Garc\xeda"
+    },
+    {
+        text: "midget"
+    },
+    {
+        text: "Ted Bundy"
+    },
+    {
+        text: "Schei\xdfe"
+    },
+    {
+        text: "campo de exterminio"
+    },
+    {
+        text: "Ignacio Garriga"
+    },
+    {
+        text: "moron"
+    },
+    {
+        text: "Thierry Paulin"
+    },
+    {
+        text: "Schei\xdf"
+    },
+    {
+        text: "capullo"
+    },
+    {
+        text: "Carlos Carrizosa Torres"
+    },
+    {
+        text: "psycho"
+    },
+    {
+        text: "Timothy McVeigh"
+    },
+    {
+        text: "Kotzbrocken"
+    },
+    {
+        text: "cara de culo"
+    },
+    {
+        text: "Roger Torrent"
+    },
+    {
+        text: "invalid"
+    },
+    {
+        text: "Vincent Bollor\xe9"
+    },
+    {
+        text: "Hurenkind"
+    },
+    {
+        text: "gilipollas"
+    },
+    {
+        text: "bardaix"
+    },
+    {
+        text: "mong"
+    },
+    {
+        text: "Woody Allen"
+    },
+    {
+        text: "Bastard"
+    },
+    {
+        text: "hijo de perra"
+    },
+    {
+        text: "bollera"
+    },
+    {
+        text: "retard"
+    },
+    {
+        text: "Xavier Dupont de Ligonn\xe8s"
+    },
+    {
+        text: "Behinderter"
+    },
+    {
+        text: "hijo de puta"
+    },
+    {
+        text: "travesti"
+    },
+    {
+        text: "schizo"
+    },
+    {
+        text: "88"
+    },
+    {
+        text: "Behindi"
+    },
+    {
+        text: "holocausto"
+    },
+    {
+        text: "mitja merda"
+    },
+    {
+        text: "spastic"
+    },
+    {
+        text: "Al-Qaida"
+    },
+    {
+        text: "Spast"
+    },
+    {
+        text: "hostia"
+    },
+    {
+        text: "imb\xe8cil"
+    },
+    {
+        text: "window licker"
+    },
+    {
+        text: "Apartheid"
+    },
+    {
+        text: "Spasti"
+    },
+    {
+        text: "huev\xf3n"
+    },
+    {
+        text: "idiota"
+    },
+    {
+        text: "tard"
+    },
+    {
+        text: "Aryen"
+    },
+    {
+        text: "Bl\xf6dmann"
+    },
+    {
+        text: "idiota"
+    },
+    {
+        text: "sabatot"
+    },
+    {
+        text: "cack-handed"
+    },
+    {
+        text: "Attentat"
+    },
+    {
+        text: "Dummkopf"
+    },
+    {
+        text: "imb\xe9cil"
+    },
+    {
+        text: "marieta"
+    },
+    {
+        text: "eejit"
+    },
+    {
+        text: "Babtou"
+    },
+    {
+        text: "Schwachkopf"
+    },
+    {
+        text: "j\xf3dete"
+    },
+    {
+        text: "negrata"
+    },
+    {
+        text: "shambles"
+    },
+    {
+        text: "Bamboula"
+    },
+    {
+        text: "Vollpfosten"
+    },
+    {
+        text: "la madre que te pari\xf3"
+    },
+    {
+        text: "pelacanyes"
+    },
+    {
+        text: "ligger"
+    },
+    {
+        text: "B\xe2tard"
+    },
+    {
+        text: "Depp"
+    },
+    {
+        text: "maldito"
+    },
+    {
+        text: "botifler"
+    },
+    {
+        text: "lummox"
+    },
+    {
+        text: "Blackface"
+    },
+    {
+        text: "Idiot"
+    },
+    {
+        text: "malparido"
+    },
+    {
+        text: "xarnego"
+    },
+    {
+        text: "nitwit"
+    },
+    {
+        text: "Boche"
+    },
+    {
+        text: "Schwein"
+    },
+    {
+        text: "mam\xf3n"
+    },
+    {
+        text: "pixapins"
+    },
+    {
+        text: "poxy"
+    },
+    {
+        text: "Bolcho"
+    },
+    {
+        text: "Trottel"
+    },
+    {
+        text: "marica"
+    },
+    {
+        text: "bleda"
+    },
+    {
+        text: "shitfer brains"
+    },
+    {
+        text: "Bombe"
+    },
+    {
+        text: "Affe"
+    },
+    {
+        text: "maric\xf3n"
+    },
+    {
+        text: "carallot"
+    },
+    {
+        text: "skiver"
+    },
+    {
+        text: "Bougnoul"
+    },
+    {
+        text: "schwule Sau"
+    },
+    {
+        text: "mariconazo"
+    },
+    {
+        text: "capsigrany"
+    },
+    {
+        text: "Chinetoque"
+    },
+    {
+        text: "Tunte"
+    },
+    {
+        text: "mariquita"
+    },
+    {
+        text: "sid\xf3s"
+    },
+    {
+        text: "Chintok"
+    },
+    {
+        text: "Tucke"
+    },
+    {
+        text: "masacre"
+    },
+    {
+        text: "merd\xf3s"
+    },
+    {
+        text: "Colonialiste"
+    },
+    {
+        text: "Fresse"
+    },
+    {
+        text: "matanza"
+    },
+    {
+        text: "moro"
+    },
+    {
+        text: "Con"
+    },
+    {
+        text: "Hackfresse"
+    },
+    {
+        text: "matar"
+    },
+    {
+        text: "caca"
+    },
+    {
+        text: "Connard"
+    },
+    {
+        text: "Maul"
+    },
+    {
+        text: "me cago en la hostia"
+    },
+    {
+        text: "cagarro"
+    },
+    {
+        text: "Connasse"
+    },
+    {
+        text: "Asi"
+    },
+    {
+        text: "me cago en ti"
+    },
+    {
+        text: "cabron\xe0s"
+    },
+    {
+        text: "EI"
+    },
+    {
+        text: "Assi"
+    },
+    {
+        text: "m\xe9tetelo por el culo"
+    },
+    {
+        text: "ruc"
+    },
+    {
+        text: "Encul\xe9"
+    },
+    {
+        text: "Hornochse"
+    },
+    {
+        text: "mierda"
+    },
+    {
+        text: "ruca"
+    },
+    {
+        text: "ETA"
+    },
+    {
+        text: "Hammel"
+    },
+    {
+        text: "mongolo"
+    },
+    {
+        text: "cardo"
+    },
+    {
+        text: "Facho"
+    },
+    {
+        text: "Lauch"
+    },
+    {
+        text: "Nigga"
+    },
+    {
+        text: "cret\xed"
+    },
+    {
+        text: "Fascisme"
+    },
+    {
+        text: "Pisser"
+    },
+    {
+        text: "pistola"
+    },
+    {
+        text: "cretina"
+    },
+    {
+        text: "Femmelette"
+    },
+    {
+        text: "Pissnelke"
+    },
+    {
+        text: "puta madre"
+    },
+    {
+        text: "malfollada"
+    },
+    {
+        text: "Gaucho"
+    },
+    {
+        text: "Rindvieh"
+    },
+    {
+        text: "puto"
+    },
+    {
+        text: "malfollat"
+    },
+    {
+        text: "Gros"
+    },
+    {
+        text: "Ratte"
+    },
+    {
+        text: "retard"
+    },
+    {
+        text: "gallimarsot"
+    },
+    {
+        text: "Handicap\xe9"
+    },
+    {
+        text: "Sau"
+    },
+    {
+        text: "soplapollas"
+    },
+    {
+        text: "merda"
+    },
+    {
+        text: "Homophobe"
+    },
+    {
+        text: "Walross"
+    },
+    {
+        text: "tarado"
+    },
+    {
+        text: "moc\xf3s"
+    },
+    {
+        text: "IRA"
+    },
+    {
+        text: "Wurm"
+    },
+    {
+        text: "tonto"
+    },
+    {
+        text: "mocosa"
+    },
+    {
+        text: "KKK"
+    },
+    {
+        text: "Mistkerl"
+    },
+    {
+        text: "tontopollas"
+    },
+    {
+        text: "mindundi"
+    },
+    {
+        text: "Ku Klux Klan"
+    },
+    {
+        text: "Hund"
+    },
+    {
+        text: "violar"
+    },
+    {
+        text: "pocapena"
+    },
+    {
+        text: "Macaque"
+    },
+    {
+        text: "Schei\xdfkerl"
+    },
+    {
+        text: "tarambana"
+    },
+    {
+        text: "Mein Kampf"
+    },
+    {
+        text: "Speichellecker"
+    },
+    {
+        text: "poll\xf3s"
+    },
+    {
+        text: "Merde"
+    },
+    {
+        text: "Pfeife"
+    },
+    {
+        text: "pollosa"
+    },
+    {
+        text: "Nain"
+    },
+    {
+        text: "Lusche"
+    },
+    {
+        text: "porreta"
+    },
+    {
+        text: "Nazi"
+    },
+    {
+        text: "Schei\xdfdreck"
+    },
+    {
+        text: "porro"
+    },
+    {
+        text: "N\xe8gre"
+    },
+    {
+        text: "Schwachmat"
+    },
+    {
+        text: "sodomitzat"
+    },
+    {
+        text: "N\xe9gro"
+    },
+    {
+        text: "Dummschw\xe4tzer"
+    },
+    {
+        text: "baliga-balaga"
+    },
+    {
+        text: "N\xe9onazi"
+    },
+    {
+        text: "Mistst\xfcck"
+    },
+    {
+        text: "br\xe8tol"
+    },
+    {
+        text: "Nippon"
+    },
+    {
+        text: "Kacke"
+    },
+    {
+        text: "br\xe8tola"
+    },
+    {
+        text: "Noiraud"
+    },
+    {
+        text: "geil"
+    },
+    {
+        text: "galifardeu"
+    },
+    {
+        text: "NSDAP"
+    },
+    {
+        text: "Schweinehund"
+    },
+    {
+        text: "enze"
+    },
+    {
+        text: "Outreau"
+    },
+    {
+        text: "Schweinepriester"
+    },
+    {
+        text: "t\xf2til"
+    },
+    {
+        text: "PKK"
+    },
+    {
+        text: "Vollidiot"
+    },
+    {
+        text: "t\xf2tila"
+    },
+    {
+        text: "Psycho"
+    },
+    {
+        text: "Fixer"
+    },
+    {
+        text: "tanoca"
+    },
+    {
+        text: "Putain"
+    },
+    {
+        text: "Kokser"
+    },
+    {
+        text: "tal\xf2s"
+    },
+    {
+        text: "Raciste"
+    },
+    {
+        text: "talossa"
+    },
+    {
+        text: "Sacrifice"
+    },
+    {
+        text: "cap de suro"
+    },
+    {
+        text: "Skinhead"
+    },
+    {
+        text: "abusananos"
+    },
+    {
+        text: "Supr\xe9maciste"
+    },
+    {
+        text: "pederasta"
+    },
+    {
+        text: "Toubab"
+    },
+    {
+        text: "cagadubtes"
+    },
+    {
+        text: "Tuer"
+    },
+    {
+        text: "poca-solta"
+    },
+    {
+        text: "X\xe9nophobe"
+    },
+    {
+        text: "cal\xe7asses"
+    },
+    {
+        text: "Yakou"
+    },
+    {
+        text: "beneit"
+    },
+    {
+        text: "beneita"
+    }
+];
+
+
+const $830906fbec755fd6$var$getVariant = ()=>new URL(window.location.href).searchParams.get("variant");
+const $830906fbec755fd6$var$debounce = (fn, delay)=>{
+    let timer;
+    return (...args)=>{
+        clearTimeout(timer);
+        timer = setTimeout(()=>{
+            fn(...args);
+        }, delay);
+    };
+};
+class $830906fbec755fd6$var$CustomizableProduct {
+    constructor(){
+        this.url = new URL(window.location.href);
+        this.pathname = this.url.pathname;
+        this.mode = 1 // 1: 'player || 2: 'custom'
+        ;
+        this.fictitiousProduct = new $830906fbec755fd6$var$FictitiousProduct(this.url.pathname);
+        this.customProduct = new $830906fbec755fd6$var$CustomProduct();
+        this.players = new $830906fbec755fd6$var$Players();
+        this.badges = new $830906fbec755fd6$var$Badges();
+        this.customizationTabs = new (0, $87c3128c623f6bf1$export$2e2bcd8739ae039)(document.querySelector("#customization-tabs"));
+        this.customizationTabsBtn = Array.from(document.querySelectorAll(".fcb-product__tabs button"));
+        this.priceWrapper = document.querySelector("#customization-price-wrapper");
+        this.totalPrice = document.querySelector("#total-price-container");
+        this.price = customizationProductPrice;
+        window.removeFictitiousProduct = ()=>{
+            this.players.setAndSelect(undefined);
+            this.players.updateBuyFormInput(false);
+            this.fictitiousProduct.remove();
+            this._updateSearchParams();
+            this._updateTotalPricing();
+        };
+        this.onLoad();
+        this.onChangePlayer();
+        this.onChangeBadge();
+        this.onChangeTab();
+    }
+    onLoad() {
+        this._getSearchParams();
+        this.fictitiousProduct.insert({
+            player: this.players.playerHandle,
+            badge: this.badges.badgeHandle
+        });
+        this._addCustomizationPrice();
+        this._updateTotalPricing();
+    }
+    onChangePlayer() {
+        if (!this.players.selectElement) return;
+        this.players.selectElement.addEventListener("change", ()=>{
+            this.badges.enableByGender(this.players.getGenderOfSelectedOption());
+            this.players.setByHandle(this.players.selectElement.value === "none" ? undefined : this.players.selectElement.value);
+            this.fictitiousProduct.insert({
+                player: this.players.playerHandle,
+                badge: this.badges.badgeHandle
+            });
+            this.players.updateBuyFormInput(this.players.selectElement.value !== "none");
+            this._updateSearchParams();
+            this._updateTotalPricing();
+        });
+    }
+    onChangeBadge() {
+        if (!this.badges.options) return;
+        for (const option of this.badges.options)option.addEventListener("change", ()=>{
+            this.players.enableByGender(option.dataset.gender);
+            this.badges.set(option);
+            this.fictitiousProduct.insert({
+                player: this.players.playerHandle,
+                badge: this.badges.badgeHandle
+            });
+            this._updateSearchParams();
+            this._updateTotalPricing();
+        });
+    }
+    onChangeTab() {
+        this.customizationTabsBtn.forEach((tab)=>{
+            tab.addEventListener("active", (ev)=>{
+                if (ev.target.id === "customization-tab-choose-player") {
+                    this.mode = 1 // Player
+                    ;
+                    // this.customProduct.removeVisual()
+                    this.fictitiousProduct.insert({
+                        player: this.players.playerHandle,
+                        badge: this.badges.badgeHandle
+                    });
+                    this.players.updateBuyFormInput(this.players.playerHandle ? true : false);
+                    this._updateSearchParams();
+                } else {
+                    this.mode = 2 // Custom
+                    ;
+                    // this.fictitiousProduct.removeVisual()
+                    this.players.setAndSelect(undefined);
+                    this.badges.enableByGender(false);
+                    this.fictitiousProduct.insert({
+                        player: this.players.playerHandle,
+                        badge: this.badges.badgeHandle
+                    });
+                    this.customProduct.insert();
+                    this.customProduct.updateBuyFormInput();
+                    this._updateSearchParams(false);
+                }
+                this._updateTotalPricing();
+            });
+        });
+    }
+    _getSearchParams() {
+        const urlPlayer = this.url.searchParams.get("player");
+        const urlCompetition = this.url.searchParams.get("competition");
+        if (urlPlayer && urlPlayer !== "none" && this.players.isSelectable(urlPlayer)) {
+            this.players.setAndSelect(urlPlayer);
+            this.players.updateBuyFormInput(true);
+            this.badges.enableByGender(this.players.getGenderOfSelectedOption());
+        }
+        if (urlCompetition && urlCompetition !== "none" && this.badges.isSelectable(urlCompetition)) this.badges.setAndSelect(urlCompetition);
+        else this.badges.setAndSelect(1); // Select the first enabled badge
+        this.players.enableByGender(this.badges.getGenderOfSelectedOption());
+    }
+    _updateSearchParams(bool = true) {
+        const variant = $830906fbec755fd6$var$getVariant();
+        variant ? this.url.searchParams.set("variant", variant) : this.url.searchParams.delete("variant");
+        if (bool) {
+            this.players.playerHandle ? this.url.searchParams.set("player", this.players.playerHandle) : this.url.searchParams.delete("player");
+            this.badges.badgeHandle ? this.url.searchParams.set("competition", this.badges.badgeHandle) : this.url.searchParams.delete("competition");
+        } else {
+            this.url.searchParams.delete("player");
+            this.url.searchParams.delete("competition");
+        }
+        window.history.pushState({}, "", this.url);
+    }
+    _addCustomizationPrice() {
+        this.priceWrapper.textContent = `+${this.price}`;
+    }
+    _updateTotalPricing() {
+        const basePrice = parseFloat(this.totalPrice.dataset.productPrice);
+        const badgePrice = this.badges.price ? parseFloat(this.badges.price.replace("€", "").replace(",", "."), 10) * 100 : undefined;
+        const customizationPrice = this.players.playerHandle || this.mode === 2 ? parseFloat(this.price.replace("€", "").replace(",", "."), 10) * 100 : undefined;
+        const totalPrice = basePrice + (badgePrice ?? 0) + (customizationPrice ?? 0);
+        const totalPriceFormatted = (0, $b8a262db10f72208$export$2e2bcd8739ae039)(totalPrice);
+        this.totalPrice.textContent = totalPriceFormatted;
+    }
+}
+class $830906fbec755fd6$var$Players {
+    constructor(){
+        this.selectElement = document.querySelector("#select_player");
+        this.options = this.selectElement ? Array.from(this.selectElement.querySelectorAll("option")) : undefined;
+        this.buyFormInput = document.querySelector("#product-form-customization-input");
+        this.playerData = [
+            undefined,
+            undefined
+        ];
+    }
+    isSelectable(handle) {
+        if (!this.options) return;
+        return this.options.some((option)=>option.value === handle && option.disabled !== true);
+    }
+    setByHandle(handle) {
+        this.playerHandle = handle;
+        this.setData();
+    }
+    setAndSelect(handle) {
+        if (!this.selectElement) return;
+        const targetOption = handle ? this.selectElement.querySelector(`option[value="${handle}"]`) : undefined;
+        if (targetOption?.disabled === true) return;
+        this.setByHandle(handle);
+        this.selectElement.value = this.playerHandle || this.options[0].value;
+    }
+    setData() {
+        if (this.playerHandle) {
+            const selectedOption = this.selectElement.querySelector(`option[value="${this.playerHandle}"]`);
+            this.playerData = [
+                selectedOption.dataset.name,
+                selectedOption.dataset.number
+            ];
+        } else this.playerData = [
+            undefined,
+            undefined
+        ];
+    }
+    updateBuyFormInput(enabled) {
+        if (!this.buyFormInput) return;
+        this.buyFormInput.disabled = !enabled;
+        this.buyFormInput.dataset.name = this.playerData[0] ? this.playerData[0] : "";
+        this.buyFormInput.dataset.number = this.playerData[1] ? this.playerData[1] : "";
+        this.buyFormInput.dataset.nameType = this.playerData[0] ? "selected" : "";
+    }
+    enableByGender(gender) {
+        if (!this.options) return;
+        this.options.forEach((item)=>{
+            if (item.value === "none") return;
+            const disable = gender ? item.dataset.gender !== gender : false;
+            item.disabled = disable;
+        });
+    }
+    getGenderOfSelectedOption() {
+        return this.selectElement ? this.selectElement.selectedOptions[0].dataset.gender : false;
+    }
+}
+class $830906fbec755fd6$var$Badges {
+    constructor(){
+        this.group = document.querySelector("#select_patch");
+        this.options = this.group ? Array.from(this.group.querySelectorAll('input[type="radio"], input[type="hidden"]')) : undefined;
+        this.priceWrapper = document.querySelector("#badge-price-wrapper");
+        this.formInput = document.querySelector("#product-form-badge-input");
+    }
+    isSelectable(badge) {
+        return this.options ? this.options.some((option)=>option.value === `competition-${badge}` && option.disabled !== true) : false;
+    }
+    set(option) {
+        this.badgeHandle = option.value === "none" ? undefined : option.value.slice(12) // 12 to remove 'competition-'
+        ;
+        this._updatePricing(option.value === "none" ? undefined : option.dataset.price);
+        this._enableOnCart(option.value !== "none", option.dataset.id);
+    }
+    setAndSelect(targetOption) {
+        if (!this.options) return;
+        const selectedOption = this.options.find((option)=>{
+            return option.disabled !== true && (targetOption === 1 || option.value === `competition-${targetOption}`);
+        });
+        if (!selectedOption) return;
+        selectedOption.checked = true;
+        this.set(selectedOption);
+    }
+    getGenderOfSelectedOption() {
+        return this.options ? this.options.find((opt)=>opt.checked === true).dataset.gender : false;
+    }
+    _updatePricing(price) {
+        if (!this.price && !this.priceWrapper) return;
+        this.price = price;
+        this.priceWrapper.textContent = price ? `+${price}` : "";
+    }
+    _enableOnCart(bool, id) {
+        if (!this.formInput) return;
+        this.formInput.value = bool ? id : "";
+        this.formInput.disabled = !bool;
+    }
+    enableByGender(gender) {
+        if (!this.options) return;
+        this.options.forEach((item)=>{
+            if (item.value === "none") return;
+            const disable = gender ? item.dataset.gender !== gender : false;
+            item.disabled = disable;
+            if (item.checked === true && disable) {
+                item.checked = false;
+                this.setAndSelect(1);
+            }
+        });
+    }
+}
+class $830906fbec755fd6$var$FictitiousProduct {
+    constructor(pathname){
+        this.path = pathname;
+        this.title = Array.from(document.querySelectorAll(".js-product-title-label"));
+        this.originalTitle = this.title[0].textContent;
+        this.mediaGallery = document.querySelector("media-gallery ul");
+        this.originalBaseThumbnails = Array.from(this.mediaGallery.querySelectorAll("li")).filter((li)=>!li.classList.contains("fcb-desktop-render-image"));
+        this.mediaModal = document.querySelector(".product-media-modal__content");
+        this.originalBaseModalImages = Array.from(this.mediaModal.querySelectorAll("li"));
+        this.mainImageWrapper = document.querySelector("#customization__main-image__base-wrapper");
+        this.productFormMainInput = document.querySelector("#product-form-main-input");
+    }
+    insert({ player: player , badge: badge  }) {
+        if (player || badge) {
+            this.player = player || undefined;
+            this.badge = badge || undefined;
+            const playerSegment = this.player ? `-player-${this.player}` : "";
+            const competitionSegment = this.badge ? `-competition-${this.badge}` : "";
+            const handle = `${this.path}${playerSegment}${competitionSegment}`;
+            this._get(handle).then((response)=>{
+                this.remove();
+                return response;
+            }).then((response)=>{
+                const [data, media, badgeTemplate] = response;
+                this.data = data;
+                this.media = media;
+                this.badgeTemplate = badgeTemplate;
+                this._insertData();
+                this._insertMedia();
+                this._insertBadgeTemplate();
+            });
+        } else this.remove();
+    }
+    remove() {
+        this._removeData();
+        this.removeVisual();
+        this._removeBadgeTemplate();
+    }
+    _get(handle) {
+        return Promise.all([
+            this._getData(handle),
+            this._getMedia(handle),
+            this._getBadgeTemplate(`${handle}?view=data-badge-template`)
+        ]).then((response)=>response).catch((reason)=>console.log(reason));
+    }
+    _getData(handle) {
+        return fetch(`${handle}.js`).then((response)=>{
+            if (!response.ok) throw new Error("Not JSON response", {
+                cause: response
+            });
+            return response.json();
+        }).then((data)=>data).catch((reason)=>console.log(reason));
+    }
+    _getMedia(handle) {
+        return fetch(handle).then((response)=>{
+            if (!response.ok) throw new Error("Not DOM response", {
+                cause: response
+            });
+            return response.text();
+        }).then((responseText)=>{
+            const html = new DOMParser().parseFromString(responseText, "text/html");
+            const mediaGallery = html.querySelector("media-gallery");
+            const modal = html.querySelector(".product-media-modal__content");
+            const media = {
+                thumbnails: Array.from(mediaGallery.querySelectorAll("li")),
+                imagesModal: Array.from(modal.querySelectorAll("img"))
+            };
+            return media;
+        }).catch((reason)=>console.log(reason));
+    }
+    _getBadgeTemplate(handle) {
+        return fetch(handle).then((response)=>{
+            if (!response.ok) throw new Error("Not DOM response", {
+                cause: response
+            });
+            return response.text();
+        }).then((responseText)=>{
+            const html = new DOMParser().parseFromString(responseText, "text/html");
+            if (!html.body.innerHTML) throw new Error("No innerHTML found in body element");
+            const badgeTemplate = JSON.parse(html.body.innerHTML);
+            return badgeTemplate.metafield_template_badge ? badgeTemplate : undefined;
+        }).catch((reason)=>console.log(reason));
+    }
+    _insertData() {
+        if (this.data) this.title.forEach((title)=>title.innerText = this.data.title);
+    }
+    _removeData() {
+        this.data = undefined;
+    }
+    _insertMedia() {
+        if (this.media) {
+            this.thumbnails = this.media.thumbnails?.reverse();
+            this.imagesModal = this.media.imagesModal?.reverse();
+            this.mainImage = this.media.thumbnails[0]?.querySelector("img");
+            this.originalBaseThumbnails.slice(0, this.thumbnails.length).forEach((element)=>element.hidden = true);
+            this.thumbnails.forEach((image)=>{
+                this.mediaGallery.insertBefore(image, this.mediaGallery.firstChild);
+            });
+            this.originalBaseModalImages.slice(0, this.thumbnails.length).forEach((element)=>element.hidden = true);
+            this.imagesModal.forEach((image)=>{
+                this.mediaModal.insertBefore(image, this.mediaModal.firstChild);
+            });
+            this.mainImageWrapper.appendChild(this.mainImage);
+            this.mainImageWrapper.hidden = false;
+        }
+    }
+    _insertBadgeTemplate() {
+        if (!this.productFormMainInput || !this.badgeTemplate) return;
+        this.productFormMainInput.dataset.badgeTemplate = this.badgeTemplate.metafield_template_badge;
+    }
+    _removeBadgeTemplate() {
+        if (!this.productFormMainInput) return;
+        this.productFormMainInput.dataset.badgeTemplate = undefined;
+    }
+    removeVisual() {
+        this.title.forEach((title)=>title.innerText = this.originalTitle);
+        this.thumbnails?.forEach((image)=>image.remove());
+        this.originalBaseThumbnails.forEach((element)=>element.hidden = false);
+        this.imagesModal?.forEach((image)=>image.remove());
+        this.originalBaseModalImages.forEach((element)=>element.hidden = false);
+        this.mainImageWrapper.textContent = "";
+        this.mainImageWrapper.hidden = true;
+        this.media = undefined;
+    }
+}
+class $830906fbec755fd6$var$CustomProduct {
+    constructor(){
+        this.mobileRenderImageWrapper = document.querySelector("#customization__main-image__render-wrapper");
+        this.mobileRenderImage = this.mobileRenderImageWrapper.querySelector("img")?.cloneNode();
+        this.desktopRenderImageWrapper = document.querySelector(".fcb-desktop-render-image");
+        this.mediaGallery = document.querySelector("media-gallery ul");
+        this.desktopNameBox = this.desktopRenderImageWrapper?.querySelector("#fcb-desktop-render-image__name");
+        this.desktopNumberBox = this.desktopRenderImageWrapper?.querySelector("#fcb-desktop-render-image__number");
+        this.mobileNameBox = this.mobileRenderImageWrapper.querySelector("#fcb-mobile-render-image__name");
+        this.mobileNumberBox = this.mobileRenderImageWrapper.querySelector("#fcb-mobile-render-image__number");
+        // this.existsRenderImage = this.mobileRenderImageWrapper && this.mobileRenderImage && this.desktopRenderImageWrapper ? true : false
+        this.form = document.querySelector("#customized_form");
+        this.buyFormInput = document.querySelector("#product-form-customization-input");
+        this.nameInput = document.querySelector("#customization-name-input");
+        this.numberInput = document.querySelector("#customization-number-input");
+        this.nameInputChars = document.querySelector("#customization-name-input-chars");
+        this.numberInputChars = document.querySelector("#customization-number-input-chars");
+        this.maxNameLength = this.nameInput.maxLength;
+        this.maxNumberLength = this.numberInput.maxLength;
+        this.numberRegExp = window.getConstant().numberRegExp;
+        this.nameRegExp = window.getConstant().nameRegExp;
+        this.onLoad();
+    }
+    onLoad() {
+        if (this.existsRenderImage) this._repositionDesktopImage();
+        this._onType();
+        this._setMaxChars();
+        this._updateChars();
+        this._onMaxCharsChange();
+    }
+    _onMaxCharsChange() {
+        const mutationCallback = (mutationsList)=>{
+            for (const mutation of mutationsList)if (mutation.type === "attributes" && mutation.attributeName === "maxlength") {
+                this.maxNameLength = this.nameInput.maxLength;
+                this.maxNumberLength = this.numberInput.maxLength;
+                this._setMaxChars();
+                this._cropChars();
+                this._updateChars();
+            }
+        };
+        const observer = new MutationObserver(mutationCallback);
+        observer.observe(this.nameInput, {
+            attributes: true
+        });
+    }
+    insert() {
+        if (this.existsRenderImage) this._showMedia();
+    }
+    removeVisual() {
+        if (this.existsRenderImage) this._removeMedia();
+    }
+    _setMaxChars() {
+        this.nameInputChars.dataset.maxchars = this.maxNameLength;
+        this.numberInputChars.dataset.maxchars = this.maxNumberLength;
+    }
+    _repositionDesktopImage() {
+        const allImages = Array.from(this.mediaGallery.querySelectorAll("li"));
+        const normalImages = allImages.filter((image)=>image != this.desktopRenderImageWrapper);
+        normalImages[1].before(this.desktopRenderImageWrapper);
+    }
+    _showMedia() {
+        this.mobileRenderImageWrapper.hidden = false;
+        this.desktopRenderImageWrapper.hidden = false;
+    }
+    _removeMedia() {
+        this.mobileRenderImageWrapper.hidden = true;
+        this.desktopRenderImageWrapper.hidden = true;
+    }
+    _checkBlacklist() {
+        if ((0, $03969527f5f7f562$export$2e2bcd8739ae039).some((item)=>item.text.toLowerCase() === this.nameInput.value.toLowerCase())) this.nameInput.value = "";
+    }
+    _debouncedCheckBlacklist = $830906fbec755fd6$var$debounce(()=>{
+        this._checkBlacklist();
+    }, 1500);
+    _onType() {
+        this.nameInput.addEventListener("input", ()=>{
+            const nameInputValueArr = Array.from(this.nameInput.value);
+            const uppercaseNameInputValue = nameInputValueArr.map((char)=>char === "č" || char === "ć" || char === "\xe7" ? char : char.toUpperCase());
+            this.nameInput.value = uppercaseNameInputValue.join("");
+            if (!this.nameRegExp.test(this.nameInput.value)) this.nameInput.value = "";
+            this._debouncedCheckBlacklist();
+            this.name = this.nameInput.value;
+            if (this.existsRenderImage) this._printNameOnImg(this.name);
+            this._updateChars();
+            this.updateBuyFormInput();
+        });
+        this.numberInput.addEventListener("input", (ev)=>{
+            if (this.numberInput.value.length > 2) this.numberInput.value = this.numberInput.value.slice(0, 2);
+            if (!this.numberRegExp.test(ev.data)) this.numberInput.value = "";
+            this.number = this.numberInput.value;
+            if (this.existsRenderImage) this._printNumberOnImg(this.number);
+            this._updateChars();
+            this.updateBuyFormInput();
+        });
+    }
+    updateBuyFormInput() {
+        this.buyFormInput.disabled = this.name?.length > 0 || this.number?.length > 0 ? false : true;
+        this.buyFormInput.dataset.name = this.name ? this.name : "";
+        this.buyFormInput.dataset.number = this.number ? this.number : "";
+        this.buyFormInput.dataset.nameType = this.name ? "custom" : "";
+    }
+    _updateChars() {
+        this.nameInputChars.dataset.chars = this.name ? this.name.length : 0;
+        this.numberInputChars.dataset.chars = this.number ? this.number.length : 0;
+    }
+    _cropChars() {
+        this.nameInput.value = this.nameInput.value.substring(0, this.maxNameLength);
+        this.name = this.nameInput.value;
+    }
+    _printNameOnImg(text) {
+        this.desktopNameBox.textContent = text;
+        this.mobileNameBox.textContent = text;
+    }
+    _printNumberOnImg(number) {
+        if (number > 99) number = 99;
+        if (number < 0) number = 0;
+        this.desktopNumberBox.textContent = number;
+        this.mobileNumberBox.textContent = number;
+    }
+}
+new $830906fbec755fd6$var$CustomizableProduct();
+
+})();
+//# sourceMappingURL=template-product.js.map

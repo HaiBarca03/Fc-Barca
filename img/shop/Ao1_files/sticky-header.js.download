@@ -1,0 +1,38 @@
+/** Shopify CDN: Minification failed
+
+Line 15:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 16:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 17:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 18:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 20:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 21:0 Transforming let to the configured target environment ("es5") is not supported yet
+Line 23:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 24:4 Transforming const to the configured target environment ("es5") is not supported yet
+
+**/
+(() => {
+const $b3b3b6c4b1f8aaf4$var$body = document.body;
+const $b3b3b6c4b1f8aaf4$var$header = document.querySelector(".fcb-header");
+const $b3b3b6c4b1f8aaf4$var$main = document.querySelector("#MainContent");
+const $b3b3b6c4b1f8aaf4$var$announcementBar = document.querySelector("#shopify-section-announcement-bar");
+const $b3b3b6c4b1f8aaf4$var$isSectionHero = document.querySelector(".js-header-transparent");
+const $b3b3b6c4b1f8aaf4$var$getElementHeight = (item)=>item.getBoundingClientRect().height;
+let $b3b3b6c4b1f8aaf4$var$stickyHeight = $b3b3b6c4b1f8aaf4$var$getElementHeight($b3b3b6c4b1f8aaf4$var$announcementBar);
+if ($b3b3b6c4b1f8aaf4$var$isSectionHero) $b3b3b6c4b1f8aaf4$var$header.classList.add("is-transparent");
+const $b3b3b6c4b1f8aaf4$var$handleScroll = ()=>{
+    const windowsWidth = window.innerWidth;
+    if (window.scrollY > $b3b3b6c4b1f8aaf4$var$stickyHeight) {
+        $b3b3b6c4b1f8aaf4$var$body.classList.add("is-sticky");
+        if (!$b3b3b6c4b1f8aaf4$var$isSectionHero || windowsWidth < 1024) $b3b3b6c4b1f8aaf4$var$main.style.paddingTop = `${$b3b3b6c4b1f8aaf4$var$getElementHeight($b3b3b6c4b1f8aaf4$var$header)}px`;
+    } else {
+        $b3b3b6c4b1f8aaf4$var$body.classList.remove("is-sticky");
+        if (!$b3b3b6c4b1f8aaf4$var$isSectionHero || windowsWidth < 1024) $b3b3b6c4b1f8aaf4$var$main.style.paddingTop = "0";
+        if (windowsWidth > 1024) $b3b3b6c4b1f8aaf4$var$main.style.paddingTop = "0";
+    }
+};
+window.addEventListener("scroll", ()=>$b3b3b6c4b1f8aaf4$var$handleScroll());
+window.addEventListener("resize", ()=>$b3b3b6c4b1f8aaf4$var$handleScroll());
+
+})();
+//# sourceMappingURL=sticky-header.js.map

@@ -1,0 +1,3167 @@
+(function() {
+    window.spObj = (function() {
+        function spObj() {}
+        spObj.bidding_form_loaded = false;
+        spObj.loadSocketScript = false;
+        spObj.general_config = (typeof wk_general_config != 'undefined') ? wk_general_config : false;
+        spObj.auction_config = (typeof wk_auction_config != 'undefined') ? wk_auction_config : false;
+        spObj.widget_config = (typeof wk_widget_config != 'undefined') ? wk_widget_config : false;
+        spObj.theme_colors = (typeof wk_theme_colors != 'undefined') ? wk_theme_colors : false;
+        spObj.labels = (typeof wk_labels != 'undefined') ? wk_labels : false;
+        spObj.room;
+        spObj.autopay_secure_url;
+        spObj.loadjQuery = function(afterLoad) {
+            return spObj.loadScript("https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js", function() {
+                spObj.$ = jQuery.noConflict(true);
+                return afterLoad();
+            });
+        }; 
+
+        spObj.loadSocket = function() {
+            // return spObj.loadScript("https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js", function() {
+            //     spObj.loadSocketScript = true;
+            // });
+            if(typeof spcObj == 'undefined' || !spcObj.loadSocketScript)
+            {
+                console.log("socket loaded");
+                return spObj.loadScript("https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js", function() {
+                    spObj.loadSocketScript = true;
+                });
+            }
+            spObj.loadSocketScript = true;
+            return true;
+        };
+
+
+        spObj.loadScript = function(url, callback) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+
+            if (script.readyState) {
+                script.onreadystatechange = function() {
+                    if (script.readyState === "loaded" || script.readyState === "complete") {
+                        script.onreadystatechange = null;
+                        return callback();
+                    }
+                };
+            } else {
+                script.onload = function() {
+                    return callback();
+                };
+            }
+
+            script.src = url;
+            return document.getElementsByTagName("head")[0].appendChild(script);
+        };
+
+        spObj.loadSecondaryScript = function(url, cOrigin) {
+            var script = document.createElement("script");
+            script.crossorigin = cOrigin;
+            script.src = url;
+            return document.getElementsByTagName("head")[0].appendChild(script);
+        }
+
+        spObj.showBiddingForm = function(prod_id, cust_id) {
+            spObj.loadScript(spObj.api_url + "js/jquery.countdown.min.js", function() {
+                // spObj.loadSecondaryScript("https://kit.fontawesome.com/753aac760e.js","anonymous");
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    jsonpCallback: "biddingform",
+                    cache: false,
+                    async: false,
+                    dataType: "jsonp",
+                    data: { shop_name: spObj.shop_name, prod_id: prod_id, cust_id: cust_id, page: spObj.page ? spObj.page : spObj.product_handle, timediff: spObj.timediff, general_config: spObj.general_config, auction_config: spObj.auction_config, widget_config: spObj.widget_config, theme_colors: spObj.theme_colors },
+                    success: function(response) {
+                        if (response == "unavailable") {
+                            jQuery("body").find(".wk_hide_element").show();
+                            console.log("no auction details available");
+                        } else {
+                            jQuery("#wk-auction").append(response);
+
+                            spObj.bidding_form_loaded = true;
+                            spObj.connectSocket();
+
+                            if (show_add_to_cart == 1) {
+                                jQuery("body").find(".wk_hide_element").show();
+                            } else {
+                                jQuery("body").find(".wk_hide_element").hide();
+                            }
+
+                            var timr_status = jQuery("#wk-auction").find("#pa-timer-status");
+
+                            if (timr_status.val() == "00000000") {
+                                var id = jQuery("#wk-auction").find("#pa-timer-status").attr("auction");
+
+                                if (timr_status.is('.for-pending'))
+                                    spObj.startAuction(id);
+                                else
+                                    spObj.finishAuction(id);
+                            }
+                        }
+                    },
+                    error: function(response) {
+                        console.log("Something went wrong");
+                    },
+                    complete: function() {
+
+                        jQuery("#wk-auction").find(".wk-loader").hide();
+
+                        var bid = Number(spObj.getRequestParam('bid')); // normal bid amount
+                        var quantity = Number(spObj.getRequestParam('quantity')); // normal bid amount
+                        var pbid = Number(spObj.getRequestParam('pbid')); // proxy bid amount
+                        var cust_id = jQuery("#wk-auction").attr("cust-id");
+                        var join_now = spObj.getRequestParam('join_now');
+                        var tnc = spObj.getRequestParam('tnc');
+                        var username = spObj.getRequestParam('username')?spObj.getRequestParam('username'):'';
+                        var checkout_session_id = spObj.getRequestParam('cko-session-id')?spObj.getRequestParam('cko-session-id'):''
+                        console.log('username ', username);
+                        console.log('pbid', pbid);
+                        console.log('checkout_session_id ', checkout_session_id);
+                        if (bid > 0 && cust_id > 0) {
+                            var pub = Number(spObj.getRequestParam('pub'));
+                            spObj.submitBid(false, bid, pub, quantity ? quantity : 0, false, 0, username, 0, checkout_session_id);
+                            window.history.replaceState(null, null, location.href.split('?')[0]);
+                        } else if (pbid > 0 && cust_id > 0) {
+                            spObj.placeProxyBid(false, pbid, 0, 0, username, 0, checkout_session_id);
+                            window.history.replaceState(null, null, location.href.split('?')[0]);
+                        }else if(join_now == 1 && cust_id > 0){
+                            if(tnc == 1){
+                                jQuery("#terms_and_conditions").hide();
+                            }
+                            joiningFeePaymentPageRedirect(tnc);
+                            window.history.replaceState(null, null, location.href.split('?')[0]);
+                        }
+                    }
+                });
+
+            });
+        }
+
+        spObj.checkAuctionBidder = function(cust_id, divSelector = "#wk-auction") {
+            var cemail = jQuery("#wk-customer-email").val();
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "bidderStatus",
+                cache: false,
+                dataType: "jsonp",
+                data: { shop_name: spObj.shop_name, cust_id: cust_id, page: spObj.page, timediff: spObj.timediff, theme_colors: spObj.theme_colors },
+                success: function(res) {
+                    if (res != "nab") {
+                        jQuery(divSelector).html(res);
+                    } else {
+                        console.log("not a bidder");
+                        jQuery(divSelector).empty();
+                    }
+                },
+                error: function() {
+                    console.log("oops error (shopify-auction) ..");
+                }
+            });
+        }
+
+        spObj.finishAuction = function(id) {
+            jQuery('#wk-auction').find('.wk_rm-on-end').remove();
+            jQuery('#wk-auction').find('.pa-finished-msg').show();
+            jQuery("#auction-timer").countdown('pause');
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "finishAuction",
+                cache: false,
+                dataType: "jsonp",
+                data: { shop_name: spObj.shop_name, id: id, page: spObj.page, timediff: spObj.timediff },
+                success: function(res) {
+                    if (res == "finished")
+                        console.log("auction finished successfully");
+                },
+                error: function() {
+                    console.log("oops error (shopify-auction) ..");
+                }
+            });
+        }
+
+        spObj.startAuction = function(id) {
+            var prod_id = jQuery("#wk-auction").attr("prod-id");
+            var cust_id = jQuery("#wk-auction").attr("cust-id");
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "startAuction",
+                cache: false,
+                dataType: "jsonp",
+                data: { shop_name: spObj.shop_name, id: id, page: spObj.page, timediff: spObj.timediff },
+                success: function(res) {
+                    if (res == "error")
+                        console.log("auction can't start currently..");
+                    else if (res == "success") {
+                        jQuery("#wk-auction").empty();
+                        spObj.showBiddingForm(prod_id, cust_id);
+                    }
+                },
+                error: function() {
+                    console.log("oops error (shopify-auction) ..");
+                }
+            });
+        }
+
+        spObj.beforeProductOnAuctionSubmit = function(e) {
+            e.preventDefault();
+            var location = window.location.href;
+            location_split = location.split("?");
+            var url = new URL(location);
+            location = location_split[0];
+            var t = (spObj.getRequestParam('t') != 1 && spObj.getRequestParam('t') != 2) ? 1 : spObj.getRequestParam('t');
+            var sort_by = spObj.getRequestParam('sort_by');
+            var search = spObj.getRequestParam('s');
+            var tag = spObj.getRequestParam('tag');
+            var select_sort_by = jQuery("#products_on_auction").find('select[name=\'sort_by\']').val();
+            var input_search = jQuery("#products_on_auction").find('input[name=\'s\']').val();
+            location += (t != '' && t != null && t != 0)?'?t='+t:'?t=1';
+            location += (select_sort_by != '' && select_sort_by != null)?'&sort_by='+encodeURIComponent(select_sort_by):'&sort_by=';
+            //location += (tag != '' && tag != null)?'&tag='+encodeURIComponent(tag):'&tag=';
+            
+            if(t == 1){
+                location += (tag != '' && tag != null)?'&tag='+tag:'&tag=';
+                location += (input_search != '')?"&s="+encodeURIComponent(input_search):'&s=';
+            }else if(t == 2){
+                location += (input_search != '')?"&s="+encodeURIComponent(input_search):'&s=';
+            }
+            
+            if(sort_by == 0 && select_sort_by == '' && search == 0 && input_search == ''){}
+            else
+            {
+                window.location.href = location;
+            }
+        }
+
+        spObj.showProductOnAuction = function(tag=Array(), tagsAjax = 0) {
+            var type = Number(spObj.getRequestParam('t'));
+            var search = spObj.getRequestParam('s');
+            search = search ? search : '';
+            var sort_by = spObj.getRequestParam('sort_by');
+            var page = spObj.getRequestParam('page');
+            sort_by = sort_by ? sort_by : '';
+            var tagLength = tag.length;
+            if(tag.length != 0){
+                tag = tag ? tag : '';
+            }else{
+                var tag = spObj.getRequestParam('tag');
+                tag = tag ? tag : '';
+            }
+            spObj.loadScript(spObj.api_url + "js/jquery.countdown.min.js", function() {
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getProductsOnAuction",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: { shop_name: spObj.shop_name, timediff: spObj.timediff, type: type, offset: 0, search: search, tag: tag, sort_by: sort_by, page:page, general_config: spObj.general_config, auction_config: spObj.auction_config, theme_colors: spObj.theme_colors, tags_ajax: tagsAjax },
+                    success: function(res) {
+                        jQuery('body').find('.pa-loader').hide();
+                        if(tagLength != 0){
+                            jQuery('#products_on_auction').html('');
+                            jQuery('#products_on_auction').html(res);
+                        }else{
+                            jQuery('#products_on_auction').html('');
+                            jQuery('#products_on_auction').html(res);
+                        }
+                        
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        jQuery('body').find('.pa-loader').hide();
+                    }
+                });
+            });
+        }
+
+
+        spObj.getBiddingDetails = function() {
+            var page = jQuery('#wk_bidding_details').attr('page');
+            var cust = jQuery('#wk_bidding_details').attr('cust');
+            var type = Number(spObj.getRequestParam('t'));
+            var filter = Number(spObj.getRequestParam('f'));
+            var p_no = Number(spObj.getRequestParam('p'));
+            var customer = spObj.product_handle;
+            if (cust == "" || !cust) {
+                var checkout_url = window.location.href;
+
+                if (typeof(Storage) !== 'undefined') {
+                    localStorage.setItem("checkout_url", checkout_url);
+                    window.location.href = localStorage.getItem("checkout_url");
+                }
+
+                window.location.href = "/account/login?checkout_url=" + encodeURIComponent(checkout_url);
+            } else if (customer != cust || isNaN(type) || isNaN(p_no))
+                window.location.href = "/404";
+            else {
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getCustomerBiddingDetails",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        type: type,
+                        page: p_no,
+                        filter: filter,
+                        customer: customer,
+                        timediff: spObj.timediff,
+                        page_name: page,
+                        shop_name: spObj.shop_name,
+                        auction_config: spObj.auction_config,
+                        theme_colors: spObj.theme_colors,
+                    },
+                    success: function(res) {
+                        if (res == 'sww')
+                            window.location.href = '/404';
+                        else
+                            jQuery('#wk_bidding_details').append(res);
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        jQuery('body').find('.pa-loader').hide();
+                    }
+                });
+            }
+        }
+
+        spObj.getUpcomingAuctions = function() {
+            spObj.loadScript(spObj.api_url + "js/jquery.countdown.min.js", function() {
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getUpcomingAuctions",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        timediff: spObj.timediff,
+                        shop_name: spObj.shop_name,
+                        auction_config: spObj.auction_config,
+                        theme_colors: spObj.theme_colors,
+                    },
+                    success: function(res) {
+                        if (res == 'sww')
+                            window.location.href = '/404';
+                        else {
+                            jQuery('.main__content').after(jQuery('#wk_upcoming_auction_block').append(res));
+                        }
+                    },
+                    error: function() {
+                        //jQuery('#wk_upcoming_auction_block').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        //jQuery('body').find('.pa-loader').hide();
+                    }
+                });
+            });
+        }
+
+        spObj.authorizeCreditCardSubmit = function() {
+            var card_number = $("input[name=card_number]").val();
+            var card_exp_month = $("input[name=card_exp_month]").val();
+            var card_exp_year = $("input[name=card_exp_year]").val();
+            var main_cust_id = $("input[name=main_cust_id]").val();
+            var bid_type = $("input[name=bid_type]").val();
+            var billing_address = $("select[name=billing_address]").val();
+            var shipping_address = $("select[name=shipping_address]").val();
+            
+            if(!billing_address){
+                jQuery('#credit_card_error').html('Please select billing address');
+                jQuery('.authorize-card-error').removeClass('pa-hide');
+                return false;
+            }
+
+            if(!shipping_address){
+                jQuery('#credit_card_error').html('Please select shipping address');
+                jQuery('.authorize-card-error').removeClass('pa-hide');
+                return false;
+            }
+
+            jQuery('.authorize-card-error').addClass('pa-hide');
+
+            var btn = jQuery('body').find(".wk_submit_bid");
+            if (bid_type == 'proxy') {
+                btn = jQuery('body').find(".wk_proxy_submit");
+            }
+
+            var card_submit_button = jQuery('body').find(".add-card-btn");
+            card_submit_button.addClass("pa-btn-loader").prop("disabled", true);
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=authorize_payment",
+                type: "POST",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "creditCardSubmit",
+                cache: false,
+                dataType: "jsonp",
+                data: {
+                    shop: spObj.shop_name,
+                    card_number: card_number,
+                    card_exp_month: card_exp_month,
+                    card_exp_year: card_exp_year,
+                    main_cust_id: main_cust_id,
+                    billing_address: billing_address,
+                    shipping_address: shipping_address
+                },
+                success: function(res) {
+                    jQuery('#credit_card_error').html('');
+                    var target = jQuery(".pa-add-card-icon-close").parents(".pa-area");
+                    if (res['success']){
+                        target.fadeOut(function() {
+                            checkModal(target);
+                        });
+
+                        $('.authorize-card-error').addClass('pa-hide');
+                        if (bid_type == 'normal')
+                            spObj.submitBid(btn, false, false, false, false, 1);
+                        else if (bid_type == 'proxy')
+                            spObj.placeProxyBid(btn, false, 1);
+
+                    }else if(res == "sww"){
+                        jQuery('#credit_card_error').html('Something went wrong');
+                        jQuery('.authorize-card-error').removeClass('pa-hide');
+                    }
+                    else {
+                        jQuery('#credit_card_error').html(res['message']);
+                        jQuery('.authorize-card-error').removeClass('pa-hide');
+                    }
+                },
+                error: function() {
+                    //jQuery('#wk_upcoming_auction_block').append("Oops! unable to get data");
+                },
+                complete: function() {
+                    card_submit_button.removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            });
+        }
+
+        spObj.saveCheckoutTokenDetails = function(token) {
+            var main_cust_id = $("input[name=main_cust_id]").val();
+            var bid_type = $("input[name=bid_type]").val();
+            var btn = jQuery('body').find(".wk_submit_bid");
+            if (bid_type == 'proxy') {
+                btn = jQuery('body').find(".wk_proxy_submit");
+            }
+            console.log('spObj.autopay_secure_url ', spObj.autopay_secure_url);
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "POST",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "updateCheckoutDetails",
+                cache: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    main_cust_id: main_cust_id,
+                    checkout_token: token,
+                    autopay_secure_url: spObj.autopay_secure_url
+                },
+                beforeSend: function(){
+                    jQuery('#pay-button').addClass("pa-btn-loader").prop("disabled", true);
+                },
+                success: function(res) {
+                    console.log('response', res);
+                    var target = jQuery(".pa-add-card-icon-close").parents(".pa-area");
+                    if(res['status'] == "success"){
+                        target.fadeOut(function() {
+                            checkModal(target);
+                        });
+                        if (bid_type == 'normal')
+                            spObj.submitBid(btn, false, false, false, false, 1);
+                        else if (bid_type == 'proxy')
+                            spObj.placeProxyBid(btn, false, 1);
+                    }
+                    else if(res['status'] == "3ds")
+                    {   
+                        window.location.href = res['secure_link'];
+                    }
+                    else if(res['status'] == "error")
+                    {
+                        jQuery('.error-message__checkout').html(res['message']);
+                        setTimeout(function() {
+                            target.fadeOut(function() {
+                                checkModal(target);
+                            });
+                        }, 3000);
+                    }
+                },
+                error: function() {
+                    //jQuery('#wk_upcoming_auction_block').append("Oops! unable to get data");
+                },
+                complete: function() {
+                    jQuery('#pay-button').removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            });
+        }
+        
+        spObj.showAuthorizeForm = function(e) {
+            var btn = jQuery(e);
+            // var cust_id = Number(btn.parents('#wk-auction').attr('cust-id'));
+            var cust_id = fetchCustomerId();
+            if (cust_id > 0 && !isNaN(cust_id)) {
+
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getAuthorizeForm",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        cust_id: cust_id,
+                        shop_name: spObj.shop_name
+                    },
+                    beforeSend: function() {
+                        btn.addClass("pa-btn-loader").prop("disabled", true);
+                    },
+                    success: function(res) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(res);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(res);
+                        }
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    }
+                });
+            }
+        }
+
+        spObj.showUsername = function(e) {
+            var btn = jQuery(e);
+            // var cust_id = Number(btn.parents('#wk-auction').attr('cust-id'));
+            var main_cust_id = fetchCustomerId();
+            if (main_cust_id > 0 && !isNaN(main_cust_id)) {
+
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "fetchUsername",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        main_cust_id: main_cust_id,
+                        shop_name: spObj.shop_name
+                    },
+                    beforeSend: function() {
+                        btn.addClass("pa-btn-loader").prop("disabled", true);
+                    },
+                    success: function(res) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(res);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(res);
+                        }
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    }
+                });
+            }
+        }
+
+        jQuery('body').on('click', '.upd-username', function(e) {
+            e.preventDefault();
+            var bidding_username = $("input[name='bidding_username']").val();
+            //emozis validation
+            bidding_username = bidding_username.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+            bidding_username = bidding_username.trim();
+            $("input[name='bidding_username']").val(bidding_username);
+
+            var main_cust_id = $("#username_main_cust_id").val();
+            jQuery('#username-error').addClass('pa-hide');
+            if(bidding_username == '' || bidding_username == 'undefined'){
+                jQuery("#bidding_username").focus().addClass("username-has-error");
+                return false;
+            }   
+            jQuery('#username-invalid').addClass('pa-hide');
+            if(bidding_username.match(/\s\s+/gi)){
+                jQuery('#username-invalid').removeClass('pa-hide');
+                return;
+            }
+            
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "POST",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "updateUsername",
+                cache: false,
+                dataType: "jsonp",
+                data: { shop_name: spObj.shop_name, main_cust_id: main_cust_id, bidding_username: bidding_username},
+                beforeSend: function() {
+                    jQuery('.upd-username').addClass("pa-btn-loader").prop("disabled", true);
+                },
+                success: function(res) {
+                    jQuery('#credit_card_error').html('');
+                    $('#username-error').addClass('pa-hide');
+                    jQuery('#username-error').html('');
+                    if (res['status'] == 'success') {
+                        // $('#username-error').addClass('pa-hide');
+                        // jQuery('#username-error').html('');
+                        jQuery("#wk_username_box").find(".pa-form-box").addClass("pa-hide");
+                        jQuery("#wk_username_box").find(".pa-username-success-box").removeClass("pa-hide");
+
+                        jQuery("#wk_username_box").delay(2000).fadeOut(function() {
+                            jQuery(this).remove();
+                        });
+                        // window.location.reload();
+                    }else if (res['msg'] == "username_already_exists") {
+                        jQuery('#username-error').html(res['username_msg']);
+                        jQuery('#username-error').removeClass('pa-hide');
+                    }else if (res['msg'] == "username_not_allowed") {
+                        jQuery('#username-error').html(res['username_msg']);
+                        jQuery('#username-error').removeClass('pa-hide');
+                    }else{
+                        if(res['error']){
+                            jQuery('#username-error').html(res['message']);
+                            jQuery('#username-error').removeClass('pa-hide');
+                        }
+                    }
+                },
+                error: function() {
+                    console.log("Something went wrong..");
+                },
+                complete: function() {
+                    jQuery('.upd-username').removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            });
+        });
+
+        spObj.showCheckoutForm = function(e) {
+            var btn = jQuery(e);
+            // var cust_id = Number(btn.parents('#wk-auction').attr('cust-id'));
+            var cust_id = fetchCustomerId();
+            console.log('customer', cust_id);
+            if (cust_id > 0 && !isNaN(cust_id)) {
+
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getCheckoutForm",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        cust_id: cust_id,
+                        shop_name: spObj.shop_name
+                    },
+                    beforeSend: function() {
+                        btn.addClass("pa-btn-loader").prop("disabled", true);
+                    },
+                    success: function(res) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(res);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(res);
+                        }
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    }
+                });
+            }
+        }
+
+        spObj.showShippingForm = function(e) {
+            var btn = jQuery(e);
+            // var cust_id = Number(btn.parents('#wk-auction').attr('cust-id'));
+            var cust_id = fetchCustomerId();
+            if (cust_id > 0 && !isNaN(cust_id)) {
+
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getShippingMethod",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        cust_id: cust_id,
+                        shop_name: spObj.shop_name
+                    },
+                    beforeSend: function() {
+                        btn.addClass("pa-btn-loader").prop("disabled", true);
+                    },
+                    success: function(res) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(res);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(res);
+                        }
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    }
+                });
+            }
+        }
+    
+        spObj.submitBid = function(btn, bid, pub, quantity, proxy = false, customer_card_exists = 0, username_field_val = '', confirm_proxy=0, checkout_session_id='') {
+            if (!btn) {
+                btn = jQuery('body').find(".wk_submit_bid");
+                btn.parents("form").find("#bid_amount").val(bid);
+                btn.parents("form").find("#prod_quantity").val(quantity);
+
+                if (pub == 0)
+                    btn.parents("form").find("#is_private").prop("checked", true);
+            }
+            var form = btn.parents("form");
+            var customer_card_exists = customer_card_exists?customer_card_exists:form.siblings("#customer_card_exists").val();
+            var popcorn_bidding = form.siblings("#popcorn_bidding").val();
+            var cust_id = Number(jQuery("#wk-auction").attr("cust-id"));
+            var bid_amount = Number(form.find("#bid_amount").val().trim());
+            if(form.find("#username_field").length>0 && username_field_val == ''){
+                var username_field_val = form.find("#username_field").val();
+            }
+            //emozis validation
+            username_field_val = username_field_val.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+
+            username_field_val = username_field_val.trim();
+            $("#username_field").val(username_field_val);
+
+            if(form.find("#username_field").length>0 && (username_field_val == ''  || username_field_val.length > 255)){
+                form.find("#username_field").focus().addClass("has-error");
+                return;
+            }
+
+            if(username_field_val.match(/\s\s+/gi) ){
+                form.find("#username_field").focus().addClass("has-error");
+                form.find(".pa-username-invalid").fadeIn(function() {
+                    jQuery(this).fadeOut(5000);
+                });
+                return;
+            }
+            var is_public = parseInt(form.find("#is_private:checked").val()) ? 0 : 1;
+            var is_private = parseInt(form.find("#is_private:checked").val()) ? 1 : 0;
+            
+            var prod_quantity;
+            var quantity_field = form.find('#prod_quantity').length;
+            if (quantity_field > 0) {
+                prod_quantity = parseInt(form.find('#prod_quantity').val().trim());
+            }
+            if (bid_amount == "" || bid_amount <= 0 || bid_amount < min_bid_amount || isNaN(bid_amount)) {
+                form.find("#bid_amount").focus().addClass("has-error");
+                form.find("#label_bid_amt .min_bid_amt").addClass('color-red');
+                return false;
+            }
+           
+            if (sell_multiple_units) {
+                if (prod_quantity == "" || prod_quantity <= 0 || isNaN(prod_quantity)) {
+                    form.find("#prod_quantity").focus().addClass("has-error");
+                    return false;
+                }
+                var stock = form.find("#max_prod_quantity").val();
+                if (stock < prod_quantity) {
+                    alert("You can bid for maximum " + stock + " quantity.");
+                    form.find("#prod_quantity").focus().addClass("has-error");
+                    return false;
+                }
+            }
+
+            var checkout_url = window.location.href;
+            // var query_string = window.location.search.substring(1);
+
+            if (checkout_url.search("&bid") >= 0)
+                checkout_url = checkout_url.split("&bid")[0];
+            else if (checkout_url.search("\\?bid") >= 0)
+                checkout_url = checkout_url.split("?bid")[0];
+
+            if (checkout_url.split("?").length > 1){
+                username_field_val
+                if(username_field_val != ''){
+                    checkout_url += "&bid=" + bid_amount + "&pub=" + is_public + "&quantity=" + prod_quantity + "&username=" + username_field_val + "#wk-auction";
+                }else{
+                    checkout_url += "&bid=" + bid_amount + "&pub=" + is_public + "&quantity=" + prod_quantity + "#wk-auction";
+                }
+                
+            }
+            else{
+                if(username_field_val != ''){
+                    checkout_url += "?bid=" + bid_amount + "&pub=" + is_public + "&quantity=" + prod_quantity + "&username=" + username_field_val +"#wk-auction";
+                }else{
+                    checkout_url += "?bid=" + bid_amount + "&pub=" + is_public + "&quantity=" + prod_quantity + "#wk-auction";
+                }
+                
+            }
+            spObj.autopay_secure_url = checkout_url;
+
+            if (!cust_id > 0 && bid <= 0) {
+
+                btn.removeClass('font-bold').html('Redirecting...');
+
+                if (typeof(Storage) !== 'undefined') {
+                    localStorage.setItem("checkout_url", checkout_url);
+                    window.location.href = localStorage.getItem("checkout_url");
+                }
+                // console.log('checkout_url', ); return;
+                window.location.href = "/account/login?checkout_url=" + encodeURIComponent(checkout_url);
+
+                return false;
+            } else {
+                if (!proxy && (jQuery('#normal_as_proxy').val() == 1 || jQuery('#normal_as_proxy_config').val() == 1)) {
+                    if (typeof(jQuery('#bidding_rules').val()) != 'undefined') {
+                        var bidding_rules = JSON.parse(jQuery('#bidding_rules').val());
+                        if(min_bid_amount == '' || min_bid_amount == undefined){
+                            min_bid_amount = jQuery(".min_bid_amt").text();
+                            min_bid_amount = min_bid_amount.replace(/[^\d\.]/g, '');
+                            }
+                        console.log('min_bid_amount ', min_bid_amount);
+                        if(min_bid_amount == '' || min_bid_amount == undefined){
+                            min_bid_amount = jQuery(".min_bid_amt").text();
+                            min_bid_amount = min_bid_amount.replace(/[^\d\.]/g, '');
+                        }
+                        var check_proxy_amount = min_bid_amount;
+                        bidding_rules.forEach(element => {
+                            if (bid_amount >= parseFloat(element.bid_to)) {
+                                check_proxy_amount = parseFloat(min_bid_amount) + parseFloat(element.rate);
+                                return false;
+                            } else if (bid_amount <= parseFloat(element.bid_to) && bid_amount > parseFloat(element.bid_from)) {
+                                check_proxy_amount = parseFloat(min_bid_amount) + parseFloat(element.rate);
+                                return false;
+                            } else
+                                check_proxy_amount = parseFloat(min_bid_amount) + parseFloat(element.rate);
+                        });
+                        console.log('check_proxy_amount ', check_proxy_amount);
+                        if (bid_amount >= check_proxy_amount) {
+                            proxy = true;
+                        }
+                    }
+                } else
+                    proxy = false;
+                var auction_id = form.siblings("#auction_id").val();
+                form.find(".pa-success").fadeOut();
+                btn.addClass("pa-btn-loader").prop("disabled", true);
+                form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+                console.log('proxy', proxy);
+                if (proxy) {
+                    var popcorn_enddate = '';
+                    btn.addClass("pa-btn-loader").prop("disabled", true);
+                    form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+                    if(popcorn_bidding == 1){
+                        spObj.savePopcornBid(cust_id, bid_amount, auction_id, customer_card_exists, function(response) {
+                            if (response == "sww") {
+                                console.log("something went wrong");
+                            } else if (response == "maintanance") {
+                                form.find(".pa-maintanance").fadeIn();
+                            } else if (response['msg'] == "success") {
+                                popcorn_enddate = response['popcorn_enddate'];
+                                //code for testing popcorn time update [Start]
+                                if (spObj.connected_to_socket) {
+                                    var data = {
+                                        room: spObj.room,
+                                        currency: '',
+                                        bid_count: '',
+                                        min_bid_amount: '',
+                                        current_bid: '',
+                                        popcorn_enddate: popcorn_enddate,
+                                        highest_bidder_Id: response['highest_bidder_Id'],
+                                        show_start_or_current_bid: response['show_start_or_current_bid']
+                                    }
+                                    spObj.socket.emit('placeBid', data);
+
+                                }
+                                if (popcorn_enddate) {
+                                    timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                                }
+                                //code for testing popcorn time update [end]
+                                console.log('success');
+                            }
+                        });
+                    }
+                    
+                    spObj.saveProxyBidFunc(cust_id, bid_amount, auction_id, is_private, 'normal', username_field_val, confirm_proxy, checkout_session_id, function(response) {
+                        console.log('response ', response);
+                        if (response == "sww") {
+                            spObj.submitBid(btn, bid, pub, quantity, true);
+                            console.log("something went wrong");
+                        } else if (response['msg'] == "maintanance") {
+                            form.find(".pa-maintanance").fadeIn();
+                        } else if (response['msg'] == "username_already_exists") {
+                            form.find("#username_field").focus().addClass("has-error");
+                            form.find(".pa-username-exists").fadeIn(function() {
+                                jQuery(this).fadeOut(5000);
+                            });
+                        } else if (response['msg'] == "username_not_allowed") {
+                            form.find("#username_field").focus().addClass("has-error");
+                            form.find(".pa-username-not-allowed").fadeIn(function() {
+                                jQuery(this).fadeOut(5000);
+                            });
+                        } else if (response['msg'] == "invalid_bid") {
+                            spObj.submitBid(btn, bid, pub, quantity, true);
+                        } else if (response['msg'] == "bt_not_found") {
+                            jQuery("#wk-auction").append(response['bt_form']);
+                        } else if (response['msg'] == "card_declined") {
+                            jQuery("#wk-auction").append(response['card_declined']);
+                        }else if (response['msg'] == "store_pickup_not_found") {
+                            jQuery("#wk-auction").append(response['wk_store_pickup']);
+                        } else if (response['msg'] == "shipping methods not found") {
+                            jQuery("#wk-auction").append(response['shipping methods']);
+                        } else if (response['msg'] == "add_not_found") {
+                            jQuery("#wk-auction").append(response['no_add_found']);
+                        } else if (response['msg'] == "invalid_bid_type") {
+                            jQuery("#pa_invalid_type_alert_modal").show();
+                            jQuery("#pa_invalid_type_alert_modal").removeClass("pa-hide");
+
+                            jQuery("#pa_invalid_type_alert_modal").delay(2000).fadeOut(function() {
+                                jQuery("#pa_invalid_type_alert_modal").addClass("pa-hide");
+                            });
+                        } else if (response['msg'] == "proxy_confirmation") {
+                            jQuery("#wk-auction").append(response['proxy_confirm']);
+                        } else if (response['msg'] == "3ds_failed"){
+                            form.find(".pa-3ds-invalid").fadeIn(function() {
+                                jQuery(this).fadeOut(5000);
+                            });
+                            form.find("#bid_amount").addClass('has-error');
+                        }else if (response['msg'] == "invalid_session_id"){
+                            form.find(".pa-checkout-session-invalid").fadeIn(function() {
+                                jQuery(this).fadeOut(5000);
+                            });
+                            form.find("#bid_amount").addClass('has-error');
+                        } else if (response['msg'] == "success") {
+                            form.find("#bid_amount").val('');
+                            if (quantity_field > 0) {
+                                prod_quantity = form.find('#prod_quantity').val('1');
+                            }
+                            min_bid_amount = response['min_bid_amount'];
+                            customer_bid_amt = jQuery("#bid_amount").val();
+                            if(username_field_val != ''){
+                                jQuery("#username_span").hide();
+                                // jQuery("#username_field").val(username_field_val);
+                            }
+                            if(typeof integer_bid_only && integer_bid_only)
+                            {
+                                if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                    jQuery("#bid_amount").val(Math.ceil(min_bid_amount.toString().replace(/,/g, '')));
+                                }
+                                form.find("#label_bid_amt .min_bid_amt").html([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))].join(''));
+                                if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                    if (layout_type == 1) {
+                                        jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"  (",you_label,")"].join(''));
+                                    } else {
+                                        jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid']),"   <strong>(",you_label,")</strong>"].join(''));
+                                    }
+
+                                    if(jQuery('#display_proxy_bid_amount').length > 0 && parseFloat(response['current_bid']) < parseFloat(bid_amount))
+                                    {
+                                        jQuery("#display_proxy_bid_amount").html([response['currency']," ",Math.ceil(bid_amount.toString().replace(/,/g, ''))].join(''));
+                                        jQuery("#proxy_bid_span").attr('hidden', false);
+                                    }
+                                    else
+                                        jQuery("#proxy_bid_span").attr('hidden', true);
+                                } else
+                                {
+                                    if(response['is_customer_bided'])
+                                        jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')).toString(),outbid_label].join(''));
+                                    else    
+                                        jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')).toString()].join(''));
+
+                                    if(jQuery("#proxy_bid_span").length > 0)
+                                        jQuery("#proxy_bid_span").attr('hidden', true);
+                                }
+                            }
+                            else
+                            {
+                                if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                    jQuery("#bid_amount").val(min_bid_amount.toString().replace(/,/g, ''));
+                                }
+                                form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+                                if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                    if (layout_type == 1) {
+                                        jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "  (" + you_label + ")");
+                                    } else {
+                                        jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>(" + you_label + ")</strong>");
+                                    }
+    
+                                    if(jQuery('#display_proxy_bid_amount').length > 0 && parseFloat(response['current_bid']) < parseFloat(bid_amount))
+                                    {
+                                        jQuery("#display_proxy_bid_amount").html(response['currency'] + " " + bid_amount.toString().replace(/,/g, ''));
+    
+                                        jQuery("#proxy_bid_span").attr('hidden', false);
+                                    }
+                                    else
+                                        jQuery("#proxy_bid_span").attr('hidden', true);
+                                } else
+                                {
+                                    if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                                        jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>" + outbid_label + "</strong>");
+                                    else
+                                        jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString());
+                                    
+                                    if(jQuery("#proxy_bid_span").length > 0)
+                                        jQuery("#proxy_bid_span").attr('hidden', true);
+                                }
+                            }
+                            jQuery("#current_bid_span").attr("hidden", false);
+                            if (response['show_start_or_current_bid'] == 1 && response['bid_count'] > 0)
+                                jQuery("#start_bid").attr("hidden", true);
+                            // if(Number(response['bid_count']) == 1)
+                            // 	form.parent().find("#show_bids").html("1 Bid(s)");
+                            // else if (Number(response['bid_count']) > 0)
+                            // 	form.parent().find("#show_bids").html(response['bid_count'] + " Bid(s)");
+                            if (Number(response['bid_count']) > 0)
+                                changeBidCount(form.parent().find("#show_bids"), response['bid_count']);
+
+                            // Show Msg For Reserve Price Met or Not
+                            showReservePriceMsg(response['current_bid']);
+
+                            changeHighlightBidProductPage(response['highest_bidder_Id']);
+
+                            if (spObj.connected_to_socket) {
+                                var data = {
+                                    room: spObj.room,
+                                    currency: response['currency'],
+                                    bid_count: response['bid_count'],
+                                    current_bid: response['current_bid'],
+                                    min_bid_amount: response['min_bid_amount'],
+                                    popcorn_enddate: popcorn_enddate,
+                                    highest_bidder_Id: response['highest_bidder_Id'],
+                                    show_start_or_current_bid: response['show_start_or_current_bid']
+                                }
+                                spObj.socket.emit('placeBid', data);
+
+                            }
+                            if (popcorn_enddate) {
+                                timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                            }
+                            if (response['show_add_to_cart'] == 0) {
+                                jQuery("body").find(".wk_hide_element").hide();
+                            } else {
+                                jQuery("body").find(".wk_hide_element").show();
+                            }
+
+                            form.find(".pa-success").fadeIn(function() {
+                                jQuery(this).fadeOut(3200);
+                            });
+                        } else if (response == "ended") {
+                            spObj.finishAuction(auction_id);
+                        }
+                    }, function(response) {
+                        // spObj.submitBid(btn, bid, pub, quantity, false);
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    });
+                }
+                if (!proxy) {
+                    var popcorn_enddate = '';
+                    //popcorn bid
+                    if(popcorn_bidding == 1){
+                        jQuery.ajax({
+                            url: spObj.api_url + "index.php?p=wk_ajax_process",
+                            type: "GET",
+                            crossDomain: true,
+                            jsonpCallback: "popcornbid",
+                            cache: false,
+                            async: false,
+                            dataType: "jsonp",
+                            data: {
+                                cust_id: cust_id,
+                                is_public: is_public,
+                                shop_name: spObj.shop_name,
+                                bid_amount: bid_amount,
+                                auction_id: auction_id,
+                                customer_card_exists: customer_card_exists,
+                                prod_quantity: prod_quantity,
+                                general_config: spObj.general_config,
+                                auction_config: spObj.auction_config,
+                            },
+                            success: function(response) {
+                                if (response == "sww") {
+                                    console.log("something went wrong");
+                                } else if (response == "maintanance") {
+                                    form.find(".pa-maintanance").fadeIn();
+                                } else if (response['msg'] == "success") {
+                                    popcorn_enddate = response['popcorn_enddate'];
+                                    console.log('success');
+                                    //code for testing popcorn time update [Start]
+                                    if (spObj.connected_to_socket) {
+                                        var data = {
+                                            room: spObj.room,
+                                            currency: '',
+                                            bid_count: '',
+                                            min_bid_amount: '',
+                                            current_bid: '',
+                                            popcorn_enddate: popcorn_enddate,
+                                            highest_bidder_Id: response['highest_bidder_Id'],
+                                            show_start_or_current_bid: response['show_start_or_current_bid']
+                                        }
+                                        spObj.socket.emit('placeBid', data);
+    
+                                    }
+                                    if (popcorn_enddate) {
+                                        timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                                    }
+                                    //code for testing popcorn time update [end]
+                                }
+                            }
+                        });
+                    }
+                    //persist bid       
+                    jQuery.ajax({
+                        url: spObj.api_url + "index.php?p=wk_ajax_process",
+                        type: "GET",
+                        crossDomain: true,
+                        jsonpCallback: "persistbid",
+                        cache: false,
+                        async: false,
+                        dataType: "jsonp",
+                        data: {
+                            timediff: spObj.timediff,
+                            cust_id: cust_id,
+                            is_public: is_public,
+                            shop_name: spObj.shop_name,
+                            username: username_field_val,
+                            bid_amount: bid_amount,
+                            auction_id: auction_id,
+                            prod_quantity: prod_quantity,
+                            general_config: spObj.general_config,
+                            auction_config: spObj.auction_config,
+                            theme_colors: spObj.theme_colors,
+                            checkout_url: checkout_url,
+                            product_page: true,
+                            checkout_session_id: checkout_session_id
+                        },
+                        beforeSend: function() {
+                            btn.addClass("pa-btn-loader").prop("disabled", true);
+                            form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+                        },
+                        success: function(response) {
+                            if (response == "sww") {
+                                console.log("something went wrong");
+                            } else if (response == "maintanance") {
+                                form.find(".pa-maintanance").fadeIn();
+                            } else if (response['msg'] == "username_already_exists") {
+                                form.find("#username_field").focus().addClass("has-error");
+                                form.find(".pa-username-exists").fadeIn(function() {
+                                    jQuery(this).fadeOut(5000);
+                                });
+                            } else if (response['msg'] == "username_not_allowed") {
+                                form.find("#username_field").focus().addClass("has-error");
+                                form.find(".pa-username-not-allowed").fadeIn(function() {
+                                    jQuery(this).fadeOut(5000);
+                                });
+                            }else if (response['msg'] == "user_is_banned") {
+                                jQuery("#wk_banned_bidder_msg").fadeIn();
+                            }else if (response['msg'] == "invalid_bid") {
+                                form.find("#bid_amount").addClass('has-error');
+                                min_bid_amount = response['min_bid_amount'];
+                                form.find("#label_bid_amt .min_bid_amt").addClass('color-red').html([response['currency']," ",response['min_bid_amount'].toString()].join(''));
+                                // if(Number(response['bid_count']) == 1)
+                                // 	form.parent().find("#show_bids").html("1 Bid(s)");
+                                // else if (Number(response['bid_count']) > 0)
+                                // 	form.parent().find("#show_bids").html(response['bid_count']+" Bid(s)");
+                                if (Number(response['bid_count']) > 0)
+                                    changeBidCount(form.parent().find("#show_bids"), response['bid_count']);
+                            } else if (response['msg'] == "invalid_bid_type") {
+                                min_bid_amount = response['min_bid_amount'];
+                                if (Number(response['bid_count']) > 0)
+                                    changeBidCount(form.parent().find("#show_bids"), response['bid_count']);
+
+                                jQuery("#pa_invalid_type_alert_modal").show();
+                                jQuery("#pa_invalid_type_alert_modal").removeClass("pa-hide");
+
+                                jQuery("#pa_invalid_type_alert_modal").delay(2000).fadeOut(function() {
+                                    jQuery("#pa_invalid_type_alert_modal").addClass("pa-hide");
+                                });
+                            } else if (response['msg'] == "bt_not_found") {
+                                jQuery("#wk-auction").append(response['bt_form']);
+                            } else if(response['msg'] == "store_pickup_not_found"){
+                                jQuery("#wk-auction").append(response['wk_store_pickup']);
+                            } else if (response['msg'] == "shipping methods not found") {
+                                jQuery("#wk-auction").append(response['shipping methods']);
+                            } else if (response['msg'] == "add_not_found") {
+                                jQuery("#wk-auction").append(response['no_add_found']);
+                            } else if (response['msg'] == "card_declined") {
+                                jQuery("#wk-auction").append(response['card_declined']);
+                            }else if (response['msg'] == "3ds_failed"){
+                                form.find(".pa-3ds-invalid").fadeIn(function() {
+                                    jQuery(this).fadeOut(5000);
+                                });
+                                form.find("#bid_amount").addClass('has-error');
+                            }else if (response['msg'] == "invalid_session_id"){
+                                form.find(".pa-checkout-session-invalid").fadeIn(function() {
+                                    jQuery(this).fadeOut(5000);
+                                });
+                                form.find("#bid_amount").addClass('has-error');
+                            } else if (response['msg'] == "success") {
+                                is_customer_bided = 1;
+
+                                
+                                form.find("#bid_amount").val('');
+                                if (quantity_field > 0) {
+                                    prod_quantity = form.find('#prod_quantity').val('1');
+                                }
+                                if(username_field_val != ''){
+                                    jQuery("#username_span").hide();
+                                    // jQuery("#username_field").val(username_field_val);
+                                }
+                                min_bid_amount = response['min_bid_amount'].toString().replace(/,/g, '');
+                                customer_bid_amt = jQuery("#bid_amount").val();
+                                if(typeof integer_bid_only && integer_bid_only)
+                                {
+                                    if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                        jQuery("#bid_amount").val(Math.ceil(min_bid_amount));
+                                    }
+                                    form.find("#label_bid_amt .min_bid_amt").html([response['currency']," ",Math.ceil(min_bid_amount).toString()].join(''));
+                                    if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                        if (layout_type == 1) {
+                                            jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"  (",you_label,")"].join(''));
+                                        } else {
+                                            jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"   <strong>(",you_label,")</strong>"].join(''));
+                                        }
+                                    } else{
+                                        if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                                            jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"  ",outbid_label].join(''));
+                                        else
+                                            jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, ''))].join(''));
+                                    }
+                                }
+                                else
+                                {
+                                    if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                        jQuery("#bid_amount").val(min_bid_amount.toString().replace(/,/g, ''));
+                                    }
+                                    form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+                                    if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                        if (layout_type == 1) {
+                                            jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "  (" + you_label + ")");
+                                        } else {
+                                            jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>(" + you_label + ")</strong>");
+                                        }
+                                    } else{
+                                        if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                                            jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>" + outbid_label + "</strong>");
+                                        else
+                                            jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString());
+                                    }
+                                        
+                                }
+                                jQuery("#current_bid_span").attr("hidden", false);
+                                if (response['show_start_or_current_bid'] == 1 && response['bid_count'] > 0)
+                                    jQuery("#start_bid").attr("hidden", true);
+                                // if(Number(response['bid_count']) == 1)
+                                // 	form.parent().find("#show_bids").html("1 Bid(s)");
+                                // else if (Number(response['bid_count']) > 0)
+                                // 	form.parent().find("#show_bids").html(response['bid_count']+" Bid(s)");
+                                if (Number(response['bid_count']) > 0)
+                                    changeBidCount(form.parent().find("#show_bids"), response['bid_count']);
+
+                                // Show Msg For Reserve Price Met or Not
+                                showReservePriceMsg(response['current_bid']);
+
+                                changeHighlightBidProductPage(response['highest_bidder_Id']);
+
+                                if (spObj.connected_to_socket) {
+                                    var data = {
+                                        room: spObj.room,
+                                        currency: response['currency'],
+                                        bid_count: response['bid_count'],
+                                        current_bid: response['current_bid'],
+                                        min_bid_amount: response['min_bid_amount'],
+                                        popcorn_enddate: popcorn_enddate,
+                                        highest_bidder_Id: response['highest_bidder_Id'],
+                                        show_start_or_current_bid: response['show_start_or_current_bid']
+                                    }
+                                    spObj.socket.emit('placeBid', data);
+
+                                }
+                                if (popcorn_enddate) {
+                                    timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                                }
+                                if (response['show_add_to_cart'] == 0) {
+                                    jQuery("body").find(".wk_hide_element").hide();
+                                } else {
+                                    jQuery("body").find(".wk_hide_element").show();
+                                }
+
+                                form.find(".pa-success").fadeIn(function() {
+                                    jQuery(this).fadeOut(5000);
+                                });
+                            } else if (response == "ended") {
+                                spObj.finishAuction(auction_id);
+                            }
+                        },
+                        error: function(response) {
+                            // alert("failed");
+                            console.error("Somethindg Went Wrong, Unable to place Bid");
+                        },
+                        complete: function() {
+                            btn.removeClass("pa-btn-loader").prop("disabled", false);
+                        }
+                    });
+                }
+            }
+        }
+
+        spObj.placeProxyBid = function(btn, pbid, customer_card_exists=0, is_private=0, username_field_val='', confirm_proxy=0,checkout_session_id='') {
+            if (!btn) {
+                btn = jQuery('body').find(".wk_proxy_submit");
+                btn.parents("form").find("#proxy_bid_amount").val(pbid);
+            }
+            var form = btn.parents("form");
+            var popcorn_bidding = jQuery("#proxy_popcorn_bidding").val();
+            var customer_card_exists = customer_card_exists?customer_card_exists:jQuery("#proxy_customer_card_exists").val();
+            var cust_id = jQuery("#wk-auction").attr("cust-id");
+            if(jQuery("#username_field").length>0 && username_field_val == ''){
+                var username_field_val = jQuery("#username_field").val();
+            }
+            username_field_val = decodeURI(username_field_val);
+            //emozis validation
+            username_field_val = username_field_val.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '');
+            username_field_val = username_field_val.trim();
+            
+            $("#username_field").val(username_field_val);
+            
+            if(form.find("#username_field").length>0 && (username_field_val == ''  || username_field_val.length > 255)){
+                form.find("#username_field").focus().addClass("has-error");
+                return;
+            }
+            if(username_field_val.match(/\s\s+/gi) ){
+                form.find("#username_field").focus().addClass("has-error");
+                alert('only alphanumeric values are allowed');
+                return;
+            }
+            var proxy_bid_amount = Number(form.find("#proxy_bid_amount").val().trim());
+
+            var checkout_url = window.location.href;
+                // var query_string = window.location.search.substring(1);
+            if (checkout_url.search("&pbid") >= 0)
+                checkout_url = checkout_url.split("&pbid")[0];
+            else if (checkout_url.search("\\?pbid") >= 0)
+                checkout_url = checkout_url.split("?pbid")[0];
+
+            // if(query_string.length > 0)
+            if (checkout_url.split("?").length > 1){
+                if(username_field_val != '')
+                    checkout_url += "&pbid=" + proxy_bid_amount + "&username=" + username_field_val;
+                else
+                    checkout_url += "&pbid=" + proxy_bid_amount;
+            }
+                
+            else{
+                if(username_field_val != '')
+                    checkout_url += "?pbid=" + proxy_bid_amount + "&username=" + username_field_val;
+                else
+                    checkout_url += "?pbid=" + proxy_bid_amount;
+                
+            }
+            spObj.autopay_secure_url = checkout_url;
+
+            if (proxy_bid_amount == "" || proxy_bid_amount <= 0 || proxy_bid_amount < min_bid_amount || isNaN(proxy_bid_amount)) {
+                jQuery('body').find('#pa_proxy_form').fadeIn();
+                form.find("#proxy_bid_amount").focus().addClass("has-error");
+                return false;
+            } else if (!cust_id > 0) {
+
+                var checkout_url = window.location.href;
+                // var query_string = window.location.search.substring(1);
+
+                if (checkout_url.search("&pbid") >= 0)
+                    checkout_url = checkout_url.split("&pbid")[0];
+                else if (checkout_url.search("\\?pbid") >= 0)
+                    checkout_url = checkout_url.split("?pbid")[0];
+
+                // if(query_string.length > 0)
+                if (checkout_url.split("?").length > 1){
+                    if(username_field_val != '')
+                        checkout_url += "&pbid=" + proxy_bid_amount + "&username=" + username_field_val;
+                    else
+                        checkout_url += "&pbid=" + proxy_bid_amount;
+                }
+                    
+                else{
+                    if(username_field_val != '')
+                        checkout_url += "?pbid=" + proxy_bid_amount + "&username=" + username_field_val;
+                    else
+                        checkout_url += "?pbid=" + proxy_bid_amount;
+                    
+                }
+
+                btn.removeClass('font-bold').html('Redirecting...');
+
+                if (typeof(Storage) !== 'undefined') {
+                    localStorage.setItem("checkout_url", checkout_url);
+                    window.location.href = localStorage.getItem("checkout_url");
+                }
+
+                location.href = "/account/login?checkout_url=" + encodeURIComponent(checkout_url);
+
+                return false;
+            } else {
+                btn.addClass("pa-btn-loader").prop("disabled", true);
+                var auction_id = form.find("input[name='auction_id']").val();
+                console.log('hello', cust_id+' '+proxy_bid_amount+' '+auction_id);
+                var popcorn_enddate = '';
+                if(popcorn_bidding == 1){
+                    jQuery.ajax({
+                        url: spObj.api_url + "index.php?p=wk_ajax_process",
+                        type: "GET",
+                        crossDomain: true,
+                        jsonpCallback: "popcornbid",
+                        cache: false,
+                        async: false,
+                        dataType: "jsonp",
+                        data: {
+                            timediff: spObj.timediff,
+                            cust_id: cust_id,
+                            bid_amount: proxy_bid_amount,
+                            auction_id: auction_id,
+                            shop_name: spObj.shop_name,
+                            customer_card_exists: customer_card_exists,
+                            general_config: spObj.general_config,
+                            auction_config: spObj.auction_config,
+                            theme_colors: spObj.theme_colors
+                        },
+                        success: function(response) {
+                            if (response == "sww") {
+                                console.log("something went wrong");
+                            } else if (response == "maintanance") {
+                                form.find(".pa-maintanance").fadeIn();
+                            } else if (response['msg'] == "success") {
+                                popcorn_enddate = response['popcorn_enddate'];
+                                //code for testing popcorn time update [Start]
+                                if (spObj.connected_to_socket) {
+                                    var data = {
+                                        room: spObj.room,
+                                        currency: '',
+                                        bid_count: '',
+                                        min_bid_amount: '',
+                                        current_bid: '',
+                                        popcorn_enddate: popcorn_enddate,
+                                        highest_bidder_Id: response['highest_bidder_Id'],
+                                        show_start_or_current_bid: response['show_start_or_current_bid']
+                                    }
+                                    spObj.socket.emit('placeBid', data);
+
+                                }
+                                if (popcorn_enddate) {
+                                    timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                                }
+                                //code for testing popcorn time update [End]
+                                console.log('success');
+                            }
+                        }
+                    });
+                }
+                
+                spObj.saveProxyBidFunc(cust_id, proxy_bid_amount, auction_id, is_private, 'proxy', username_field_val, confirm_proxy, checkout_session_id, function(response) {
+                    if (response == "sww") {
+                        console.log("something went wrong");
+                    } else if (response['msg'] == "maintanance") {
+                        alert(response['message']);
+                    } else if (response['msg'] == "username_already_exists") {
+                        jQuery('#pa_proxy_form').fadeOut();
+                        let bidding_form = jQuery("#wk-auction").find('#bidding-form');
+                        bidding_form.find("#username_field").focus().addClass("has-error");
+                        bidding_form.find(".pa-username-exists").fadeIn(function() {
+                            jQuery(this).fadeOut(5000);
+                        });
+                    } else if (response['msg'] == "username_not_allowed") {
+                        form.find("#username_field").focus().addClass("has-error");
+                        form.find(".pa-username-not-allowed").fadeIn(function() {
+                            jQuery(this).fadeOut(5000);
+                        });
+                    } else if (response['msg'] == "card_declined") {
+                        jQuery("#wk-auction").append(response['card_declined']);
+                    } else if (response['msg'] == "invalid_bid") {
+                        min_bid_amount = response['min_bid_amount'];
+
+                        let bidding_form = jQuery("#wk-auction").find('#bidding-form');
+                        bidding_form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+                        // if(Number(response['bid_count']) == 1)
+                        // 	bidding_form.parent().find("#show_bids").html("1 Bid(s)");
+                        // else if (Number(response['bid_count']) > 0)
+                        // 	bidding_form.parent().find("#show_bids").html(response['bid_count']+" Bid(s)");
+                        if (Number(response['bid_count']) > 0)
+                            changeBidCount(jQuery("#show_bids"), response['bid_count']);
+
+                        if (response['proxy_allowed'])
+                            alert("Minimum proxy bidding amount allowed " + response['proxy_allowed']);
+                        else
+                            alert("This proxy amount is already reserved.");
+                    } else if (response['msg'] == "invalid_bid_type") {
+                        min_bid_amount = response['min_bid_amount'];
+
+                        let bidding_form = jQuery("#wk-auction").find('#bidding-form');
+                        if(typeof integer_bid_only && integer_bid_only)
+                            bidding_form.find("#label_bid_amt .min_bid_amt").html([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))].join(''));
+                        else
+                            bidding_form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+
+                        if (Number(response['bid_count']) > 0)
+                            changeBidCount(jQuery("#show_bids"), response['bid_count']);
+
+                        jQuery("#pa_proxy_form").fadeOut(function() {
+                            jQuery("#pa_proxy_form").find(".pa-form-box").removeClass("pa-hide");
+                            jQuery("#pa_proxy_form").find(".pa-success-box").addClass("pa-hide");
+                        });
+                        jQuery("#pa_invalid_type_alert_modal").show();
+                        jQuery("#pa_invalid_type_alert_modal").removeClass("pa-hide");
+
+                        jQuery("#pa_invalid_type_alert_modal").delay(2000).fadeOut(function() {
+                            jQuery("#pa_invalid_type_alert_modal").addClass("pa-hide");
+                        });
+                    } else if (response['msg'] == "bt_not_found") {
+                        jQuery("#wk-auction").append(response['bt_form']);
+                    } else if (response['msg'] == "store_pickup_not_found") {
+                        jQuery("#wk-auction").append(response['wk_store_pickup']);
+                    }   else if (response['msg'] == "shipping methods not found") {
+                        jQuery("#wk-auction").append(response['shipping methods']);
+                    } else if (response['msg'] == "add_not_found") {
+                        jQuery("#wk-auction").append(response['no_add_found']);
+                    } else if (response['msg'] == "proxy_confirmation") {
+                        jQuery("#wk-auction").append(response['proxy_confirm']);
+                    } else if (response['msg'] == "3ds_failed"){
+                        alert('Card Authentication Failed');
+                    } else if (response['msg'] == "invalid_session_id"){
+                        alert('Checkout session id is invalid');
+                    } else if (response['msg'] == "success") {
+                        is_customer_bided = 1;
+                        if (pbid > 0)
+                            jQuery('body').find('#pa_proxy_form').show();
+
+                        jQuery("#pa_proxy_form").find(".pa-form-box").addClass("pa-hide");
+                        jQuery("#pa_proxy_form").find(".pa-success-box").removeClass("pa-hide");
+
+                        jQuery("#pa_proxy_form").delay(2000).fadeOut(function() {
+                            jQuery("#pa_proxy_form").find(".pa-form-box").removeClass("pa-hide");
+                            jQuery("#pa_proxy_form").find(".pa-success-box").addClass("pa-hide");
+                        });
+                        form.find("#proxy_bid_amount").val('');
+
+                        var bidding_form = jQuery("#wk-auction").find('#bidding-form');
+
+                        min_bid_amount = response['min_bid_amount'];
+                        customer_bid_amt = jQuery("#bid_amount").val();
+
+                        if(username_field_val != ''){
+                            jQuery("#username_span").hide();
+                            // jQuery("#username_field").val(username_field_val);
+                        }
+
+                        if(typeof integer_bid_only && integer_bid_only)
+                        {
+                            if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                jQuery("#bid_amount").val(Math.ceil(min_bid_amount.toString().replace(/,/g, '')));
+                            }
+                            bidding_form.find("#label_bid_amt .min_bid_amt").html([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))].join(''));
+                            jQuery("#current_bid_span").attr("hidden", false);
+                            if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                if (layout_type == 1) {
+                                    jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"  (",you_label,")"].join(''));
+                                } else {
+                                    jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')),"   <strong>(",you_label,")</strong>"].join(''));
+                                }
+
+                                if(jQuery('#display_proxy_bid_amount').length > 0 && parseFloat(response['current_bid']) < parseFloat(proxy_bid_amount))
+                                {
+                                    jQuery("#display_proxy_bid_amount").html([response['currency']," ",Math.ceil(proxy_bid_amount.toString().replace(/,/g, ''))].join(''));
+
+                                    jQuery("#proxy_bid_span").attr('hidden', false);
+                                }
+                                else
+                                    jQuery("#proxy_bid_span").attr('hidden', true);
+                            } else
+                            {
+                                if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                                    jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, '')), outbid_label].join(''));
+                                else
+                                    jQuery("#current_bid").html([response['currency']," ",Math.ceil(response['current_bid'].toString().replace(/,/g, ''))].join(''));
+                                
+                                if(jQuery("#proxy_bid_span").length > 0)
+                                    jQuery("#proxy_bid_span").attr('hidden', true);
+                            }
+                        }
+                        else
+                        {
+                            if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                                jQuery("#bid_amount").val(min_bid_amount.toString().replace(/,/g, ''));
+                            }
+                            bidding_form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+                            jQuery("#current_bid_span").attr("hidden", false);
+                            if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                                if (layout_type == 1) {
+                                    jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "  (" + you_label + ")");
+                                } else {
+                                    jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>(" + you_label + ")</strong>");
+                                }
+    
+                                if(jQuery('#display_proxy_bid_amount').length > 0 && parseFloat(response['current_bid']) < parseFloat(proxy_bid_amount))
+                                {
+                                    jQuery("#display_proxy_bid_amount").html(response['currency'] + " " + proxy_bid_amount.toString().replace(/,/g, ''));
+    
+                                    jQuery("#proxy_bid_span").attr('hidden', false);
+                                }
+                                else
+                                    jQuery("#proxy_bid_span").attr('hidden', true);
+                            } else
+                            {
+                                if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                                    jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString() + "   <strong>" + outbid_label + "</strong>");
+                                else
+                                    jQuery("#current_bid").html(response['currency'] + " " + response['current_bid'].toString());
+                                
+                                if(jQuery("#proxy_bid_span").length > 0)
+                                    jQuery("#proxy_bid_span").attr('hidden', true);
+                            }
+                        }
+                        if (response['show_start_or_current_bid'] == 1 && response['bid_count'] > 0)
+                            jQuery("#start_bid").attr("hidden", true);
+                        // if(Number(response['bid_count']) == 1)
+                        // 	bidding_form.parent().find("#show_bids").html("1 Bid(s)");
+                        // else if (Number(response['bid_count']) > 0)
+                        // 	bidding_form.parent().find("#show_bids").html(response['bid_count']+" Bid(s)");
+                        if (Number(response['bid_count']) > 0)
+                            changeBidCount(jQuery("#show_bids"), response['bid_count']);
+
+                        // Show Msg For Reserve Price Met or Not
+                        showReservePriceMsg(response['current_bid']);
+
+                        changeHighlightBidProductPage(response['highest_bidder_Id']);
+
+                        if (spObj.connected_to_socket) {
+                            var data = {
+                                room: spObj.room,
+                                currency: response['currency'],
+                                bid_count: response['bid_count'],
+                                current_bid: response['current_bid'],
+                                min_bid_amount: response['min_bid_amount'],
+                                popcorn_enddate: popcorn_enddate,
+                                highest_bidder_Id: response['highest_bidder_Id'],
+                                show_start_or_current_bid: response['show_start_or_current_bid']
+                            }
+                            spObj.socket.emit('placeBid', data);
+                        }
+                        if (popcorn_enddate) {
+                            timer_end_date.setTime(new Date(popcorn_enddate).getTime());
+                        }
+
+                        if (response['show_add_to_cart'] == 0) {
+                            jQuery("body").find(".wk_hide_element").hide();
+                        } else {
+                            jQuery("body").find(".wk_hide_element").show();
+                        }
+                    } else if (response == "ended") {
+                        spObj.finishAuction(auction_id);
+                    }
+                }, function(res) {
+                    if (typeof(res) != 'undefined') {
+                        // alert("failed");
+                        console.error("Something Went Wrong, Unable to place Proxy Bid");
+                    } else {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                        btn.show();
+                    }
+                });
+
+            }
+        }
+
+        spObj.saveProxyBidFunc = function(cust_id, proxy_bid_amount, auction_id, is_private, bid_type, username='', confirm_proxy=0, checkout_session_id, success, complete) {
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "saveproxybid",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id,
+                    auction_id: auction_id,
+                    proxy_bid_amount: proxy_bid_amount,
+                    timediff: spObj.timediff,
+                    bid_type: bid_type,
+                    is_private: is_private,
+                    username: username,
+                    general_config: spObj.general_config,
+                    auction_config: spObj.auction_config,
+                    theme_colors: spObj.theme_colors,
+                    confirm_proxy: confirm_proxy,
+                    checkout_session_id: checkout_session_id,
+                    product_page: true
+                },
+                success: function(response) {
+                    console.log('response proxy ', response);
+                    if(response['msg'] == 'user_is_banned'){
+                        jQuery('#pa_proxy_form').hide();
+                        jQuery('#wk_banned_bidder_msg').fadeIn();
+                        return;
+                    }
+                    success(response);
+                },
+                error: function(response) {
+                    console.log('response proxy ', response);
+                    complete(true)
+                        // alert("failed");
+                    console.error("Something Went Wrong, Unable to place Proxy Bid");
+                },
+                complete: function() {
+                    console.log('response proxy complete');
+                    complete();
+                }
+            });
+        }
+
+        spObj.savePopcornBid = function(cust_id, proxy_bid_amount, auction_id, customer_card_exists, success, complete) {
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "popcornbid",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    timediff: spObj.timediff,
+                    cust_id: cust_id,
+                    shop_name: spObj.shop_name,
+                    bid_amount: proxy_bid_amount,
+                    auction_id: auction_id,
+                    customer_card_exists: customer_card_exists,
+                    general_config: spObj.general_config,
+                    auction_config: spObj.auction_config,
+                    theme_colors: spObj.theme_colors
+                },
+                success: function(response) {
+                    success(response);
+                },
+                error: function(response) {
+                    complete(true)
+                        // alert("failed");
+                    console.error("Something Went Wrong, Unable to place Proxy Bid");
+                },
+                complete: function() {
+                    complete();
+                }
+            });
+        }
+
+        spObj.getRequestParam = function(req_param) {
+            var params = window.location.search.substring(1).split("&");
+            for (var i = 0; i < params.length; i++) {
+                param = params[i].split("=");
+                if (param[0] == req_param) {
+                    return param[1];
+                }
+            }
+            return 0;
+        }
+
+        spObj.addBraintreeDetails = function(nonce, bid_type) {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+
+            var btn = jQuery('body').find(".wk_submit_bid");
+            if (bid_type == 'proxy') {
+                jQuery('body').find('#pa_proxy_form').fadeIn();
+                btn = jQuery('body').find(".wk_proxy_submit");
+            }
+
+            btn.addClass('pa-btn-loader');
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "addBraintreeCustomer",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id,
+                    nonce: nonce
+                },
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response == 'success') {
+                        if (bid_type == 'normal')
+                            spObj.submitBid(btn, false, false, false, false);
+                        else if (bid_type == 'proxy')
+                            spObj.placeProxyBid(btn, false);
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Add Card");
+                }
+            });
+        }
+
+        spObj.showBraintreeForm = function(e) {
+            var btn = jQuery(e);
+            // var cust_id = Number(btn.parents('#wk-auction').attr('cust-id'));
+            var cust_id = fetchCustomerId();
+            if (cust_id > 0 && !isNaN(cust_id)) {
+
+                jQuery.ajax({
+                    url: spObj.api_url + "index.php?p=wk_ajax_process",
+                    type: "GET",
+                    crossDomain: true,
+                    async: false,
+                    jsonpCallback: "getBraintreeForm",
+                    cache: false,
+                    dataType: "jsonp",
+                    data: {
+                        cust_id: cust_id,
+                        shop_name: spObj.shop_name
+                    },
+                    beforeSend: function() {
+                        btn.addClass("pa-btn-loader").prop("disabled", true);
+                    },
+                    success: function(res) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(res);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(res);
+                        }
+                    },
+                    error: function() {
+                        jQuery('#products_on_auction').append("Oops! unable to get data");
+                    },
+                    complete: function() {
+                        btn.removeClass("pa-btn-loader").prop("disabled", false);
+                    }
+                });
+            }
+        }
+        spObj.addPaymentMethod = function() {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+            var card_number = $("input[name=upd_card_number]").val();
+            var card_exp_month = $("input[name=upd_card_exp_month]").val();
+            var card_exp_year = $("input[name=upd_card_exp_year]").val();
+            var billing_address = $("select[name=billing_address]").val();
+            var shipping_address = $("select[name=shipping_address]").val();
+
+            if(!billing_address){
+                jQuery('#credit_card_error').html('Please select billing address');
+                jQuery('.authorize-card-error').removeClass('pa-hide');
+                return false;
+            }
+
+            if(!shipping_address){
+                jQuery('#credit_card_error').html('Please select shipping address');
+                jQuery('.authorize-card-error').removeClass('pa-hide');
+                return false;
+            }
+
+            var update_card_button = jQuery('body').find('.anet_btn');
+            update_card_button.addClass("pa-btn-loader").prop("disabled", true);
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "updateCardDetails",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id,
+                    card_number: card_number,
+                    card_exp_month: card_exp_month,
+                    card_exp_year: card_exp_year,
+                    billing_address: billing_address,
+                    shipping_address: shipping_address
+                },
+                success: function(response) {
+                    jQuery('#credit_card_error').html('');
+                    if (response == 'success') {
+                        $('.authorize-card-error').addClass('pa-hide');
+                        jQuery("#wk_anet_box").find(".pa-form-box").addClass("pa-hide");
+                        jQuery('.pa-modal-container .pa-modal-content').removeClass('scroll-card-update');
+                        jQuery("#wk_anet_box").find(".pa-success-box").removeClass("pa-hide");
+
+                        jQuery("#wk_anet_box").delay(2000).fadeOut(function() {
+                            jQuery(this).remove();
+                        });
+                        window.location.reload();
+                    }else{
+                        if(response['customError']){
+                            jQuery('#credit_card_error').html(response['message']);
+                            jQuery('.authorize-card-error').removeClass('pa-hide');
+                        }
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Update Card");
+                },
+                complete: function() {
+                    update_card_button.removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            });
+        }
+
+        spObj.removeBtDetails = function(btn) {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "removeBraintreeDetails",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id
+                },
+                beforeSend: function() {
+                    btn.addClass('pa-btn-loader').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response == 'success') {
+                        jQuery("#wk_bt_box").find(".pa-form-box").addClass("pa-hide");
+                        jQuery("#wk_bt_box").find(".pa-success-box").removeClass("pa-hide").children().text('Card Removed Successfully');
+
+                        jQuery("#wk_bt_box").delay(2000).fadeOut(function() {
+                            jQuery(this).remove();
+                        });
+                        window.location.reload();
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Remove Card");
+                }
+            });
+        }
+
+        spObj.removeAnetDetails = function(btn) {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "removeAuthorizeDetails",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id
+                },
+                beforeSend: function() {
+                    btn.addClass('pa-btn-loader').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response == 'success') {
+                        jQuery("#wk_anet_box").find(".pa-form-box").addClass("pa-hide");
+                        jQuery("#wk_anet_box").find(".pa-remove-card-box").removeClass("pa-hide");
+
+                        jQuery("#wk_anet_box").delay(2000).fadeOut(function() {
+                            jQuery(this).remove();
+                        });
+                        window.location.reload();
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Remove Card");
+                }
+            });
+        }
+
+        spObj.removeCheckoutDetails = function(btn) {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "removeCheckoutDetails",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id
+                },
+                beforeSend: function() {
+                    btn.addClass('pa-btn-loader').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response == 'success') {
+                        jQuery("#wk_checkout_box").find(".pa-form-box").addClass("pa-hide");
+                        jQuery("#wk_checkout_box").find(".pa-remove-card-box").removeClass("pa-hide");
+
+                        jQuery("#wk_checkout_box").delay(2000).fadeOut(function() {
+                            jQuery(this).remove();
+                        });
+                        window.location.reload();
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Remove Card");
+                }
+            });
+        }
+
+        //store pickup
+        spObj.storePickupSubmit = function() {
+            let want_product_as = $("input[name='want_product_as']:checked").val();
+            let address = $("#store_pickup_address").val();
+            let id_address = $("#store_pickup_address").find(':selected').data("id");
+            let location_name = $("#store_pickup_address").find(':selected').data("name");
+            let id_auction = $("input[name=id_auction]").val();
+            let main_id_product = $("input[name=main_id_product]").val();
+            var main_cust_id = $("input[name=main_cust_id]").val();
+            var bid_type = $("input[name=bid_type]").val();
+            var auction_store_pickup = $("input[name=auction_store_pickup]").val();
+
+            var btn = jQuery('body').find(".wk_submit_bid");
+            if (bid_type == 'proxy') {
+                btn = jQuery('body').find(".wk_proxy_submit");
+            }
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "POST",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "storePickupSubmit",
+                cache: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    address: address,
+                    id_address: id_address,
+                    location_name: location_name,
+                    id_auction: id_auction,
+                    main_id_product: main_id_product,
+                    main_cust_id: main_cust_id,
+                    want_product_as: want_product_as,
+                    auction_store_pickup: auction_store_pickup
+                },
+                beforeSend:function(){
+                    jQuery('.store_pickup_submit').addClass("pa-btn-loader").prop("disabled", true);
+                },
+                success: function(res) {
+                    jQuery('#credit_card_error').html('');
+                    var target = jQuery(".store-pickup-close").parents(".pa-area");
+                        target.fadeOut(function() {
+                            checkModal(target);
+                        });
+
+                        $('.store-pickup-error').addClass('pa-hide');
+                        if (bid_type == 'normal')
+                            spObj.submitBid(btn, false, false, false, false, 1);
+                        else if (bid_type == 'proxy')
+                            spObj.placeProxyBid(btn, false, 1);
+                },
+                error: function() {
+                    jQuery('#store_pickup_error').append("Oops! unable to save data");
+                },
+                complete: function() {
+                    // jQuery('.store_pickup_submit').removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            });
+        }
+
+        spObj.fetchAllShippingMethods = function(btn) {
+            // var cust_id = jQuery("#wk-auction").attr("cust-id");
+            var cust_id = fetchCustomerId();
+
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                jsonpCallback: "fetchAllShippingMethods",
+                cache: false,
+                async: false,
+                dataType: "jsonp",
+                data: {
+                    shop_name: spObj.shop_name,
+                    cust_id: cust_id
+                },
+                beforeSend: function() {
+                    btn.addClass('pa-btn-loader').prop('disabled', true);
+                },
+                success: function(response) {
+                    if (response['shipping methods']) {
+                        if(jQuery('#wk-auction').length > 0){
+                            jQuery('#wk-auction').append(response['shipping methods']);
+                        }
+                        else if(jQuery('#wk-view-bidding-detail').length > 0){
+                            jQuery('#wk-view-bidding-detail').append(response['shipping methods']);
+                        }
+                        var target = jQuery(".pa-shipping-method-icon-close").parents(".pa-area");
+                        target.fadeOut(function() {
+                            checkModal(target);
+                        });
+                    }else{
+                        console.error("Shipping Method Not Found");
+                    }
+                },
+                error: function(response) {
+                    // alert("failed");
+                    console.error("Something Went Wrong, Unable to Remove Card");
+                }
+            });
+        }
+
+        return spObj;
+    })();
+
+    spObj.path = window.location.pathname.split('/');
+    spObj.order_handle = spObj.path[2];
+    spObj.shop_name = Shopify.shop;
+    spObj.product_handle = spObj.path.pop(-1);
+    spObj.page = spObj.path.pop(-2);
+    spObj.api_url = document.currentScript.src.split('js/')[0];
+    spObj.timediff = new Date().getTimezoneOffset();
+    // functions-call root
+    spObj.loadjQuery(function() {
+        spObj.$.ajaxSetup({
+            cache: false
+        });
+        if (spObj.page == "products" || spObj.product_handle == "products_preview") {
+            if (jQuery("#wk-auction").length > 0) {
+                var prod_id = jQuery("#wk-auction").attr("prod-id");
+                var cust_id = jQuery("#wk-auction").attr("cust-id");
+
+                if (prod_id)
+                    spObj.showBiddingForm(prod_id, cust_id);
+                else
+                    console.log("product unidentified");
+            } else {
+                console.log("add code for product page refer configure-fron in app");
+            }
+        }
+        
+        if (spObj.product_handle == "thank_you" || spObj.order_handle == "orders") {
+            var wk_joining_redirect_url = localStorage.getItem("wk_joining_redirect_url");
+            var wk_joining_redirect_url_checkout = wk_joining_redirect_url;
+            if (wk_joining_redirect_url_checkout) {
+                localStorage.removeItem("wk_joining_redirect_url");
+                window.location.href = wk_joining_redirect_url_checkout;
+            }
+        }
+
+        if (spObj.product_handle == "account" && jQuery("#wk-auction").length > 0) {
+
+            if (typeof(Storage) !== 'undefined') {
+                if (url = localStorage.getItem('checkout_url')) {
+                    localStorage.removeItem('checkout_url');
+                    window.location.href = url;
+                }
+            }
+            spObj.page = "account";
+            var cust_id = jQuery("#wk-auction").attr("cust-id");
+            spObj.checkAuctionBidder(cust_id);
+        }
+        else if(jQuery("#wk-view-bidding-detail").length > 0){
+            let view_bidding_detail_selector = "#wk-view-bidding-detail";
+            var cust_id = jQuery(view_bidding_detail_selector).attr("cust-id");
+            spObj.checkAuctionBidder(cust_id, view_bidding_detail_selector);
+        }
+    });
+
+    spObj.loadSocket();
+    spObj.connectSocket = function(trytoconnect = 0) {
+
+        if (trytoconnect < 3) {
+            if (spObj.loadSocketScript && spObj.bidding_form_loaded) {
+                spObj.connectSocketSuceess();
+            } else {
+                var i = 0
+                var x = window.setInterval(function() {
+                    if (spObj.loadSocketScript && spObj.bidding_form_loaded) {
+                        spObj.connectSocketSuceess();
+                        clearInterval(x);
+                    } else {
+                        i++;
+                        if (i == 10) {
+                            spObj.loadSocket();
+                            clearInterval(x);
+                            spObj.connectSocket(trytoconnect++);
+                        }
+                    }
+                }, 10000)
+
+            }
+        }
+    };
+
+    spObj.connectSocketSuceess = function() {
+
+        spObj.room = "wk_auction_" + jQuery("#auction_id").val();
+
+        spObj.socket = io('https://app-sp.webkul.com:8000/',{
+			'reconnection': true,
+			'reconnectionDelay': 1000,
+			'reconnectionDelayMax': 5000,
+			'reconnectionAttempts': 5,
+			transports: ['websocket']
+		 });
+
+        spObj.socket.on('connect', () => {
+            spObj.socket.emit('joinAuction', spObj.room)
+        });
+        spObj.socket.on('placeBid', (response) => {
+            current_bid = response['current_bid'].toString().replace(/,/g, '');
+            min_bid_amount = response['min_bid_amount'];
+            customer_bid_amt = jQuery("#bid_amount").val();
+            if (min_bid_amount) {
+                if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && parseFloat(customer_bid_amt.toString().replace(/,/g, '')) < parseFloat(min_bid_amount.toString().replace(/,/g, ''))) || customer_bid_amt == '')) {
+                    if(typeof integer_bid_only && integer_bid_only)
+                        jQuery("#bid_amount").val(Math.ceil(min_bid_amount.toString().replace(/,/g, '')));
+                    else
+                        jQuery("#bid_amount").val(min_bid_amount.toString().replace(/,/g, ''));
+                }
+                if(typeof integer_bid_only && integer_bid_only)
+                    jQuery(".min_bid_amt").html([response.currency," ",Math.ceil(response.min_bid_amount.toString().replace(/,/g, ''))].join(''));
+                else
+                    jQuery(".min_bid_amt").html(response.currency + " " + response.min_bid_amount.toString());
+            }
+            // if(Number(response.bid_count) == 1)
+            //   jQuery("#show_bids").html("1 Bid(s)");                         
+            // else if (Number(response.bid_count) > 0) 		
+            //    jQuery("#show_bids").html(response.bid_count+" Bid(s)");
+            if (Number(response.bid_count) > 0)
+                changeBidCount(jQuery("#show_bids"), response.bid_count);
+            // popcorn bid code
+            if (response['popcorn_enddate']) {
+                timer_end_date.setTime(new Date(response['popcorn_enddate']).getTime());
+            }
+            if (current_bid) {
+                // Show Msg For Reserve Price Met or Not
+                showReservePriceMsg(response['current_bid']);
+                jQuery("#current_bid_span").attr("hidden", false);
+                if(typeof integer_bid_only && integer_bid_only)
+                {
+                    if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                        if (layout_type == 1) {
+                            jQuery("#current_bid").html([response.currency," ",Math.ceil(current_bid),"  (",you_label,")"].join(''));
+                        } else {
+                            jQuery("#current_bid").html([response.currency," ",Math.ceil(current_bid),"   <strong>(",you_label,")</strong>"].join(''));
+                        }
+                    } else{
+                        if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                            jQuery("#current_bid").html([response.currency," ",Math.ceil(current_bid),"   <strong>",outbid_label,"</strong>"].join(''));
+                        else
+                            jQuery("#current_bid").html([response.currency," ",Math.ceil(current_bid)].join(''));
+                    }
+                }
+                else
+                {
+                    if (response['highest_bidder_Id'] == jQuery('#wk-auction').attr("cust-id")) {
+                        if (layout_type == 1) {
+                            jQuery("#current_bid").html(response.currency + " " + current_bid.toString() + "  (" + you_label + ")");
+                        } else {
+                            jQuery("#current_bid").html(response.currency + " " + current_bid.toString() + "   <strong>(" + you_label + ")</strong>");
+                        }
+                    } else{
+                        if(outbid_label !=''  && is_customer_bided && response['highest_bidder_Id'] != jQuery('#wk-auction').attr("cust-id"))
+                            jQuery("#current_bid").html(response.currency + " " + current_bid.toString() + "   <strong>" + outbid_label + "</strong>");
+                        else
+                            jQuery("#current_bid").html(response.currency + " " + current_bid.toString());
+                    }
+                }
+
+                changeHighlightBidProductPage(response['highest_bidder_Id']);
+            }
+            if (response['show_start_or_current_bid'] == 1 && Number(response.bid_count) > 0)
+                jQuery("#start_bid").attr("hidden", true);
+        });
+        spObj.connected_to_socket = true;
+    }
+
+
+
+
+    jQuery('body').on('keypress', '.validate-decimal', function(event) {
+        if ((event.which != 8 && event.which != 0) && (event.which != 46 || jQuery(this).val().indexOf('.') != -1) && ((event.which < 48 || event.which > 57) && event.which != 13)) {
+            event.preventDefault();
+            jQuery(this).addClass('has-error');
+            return false;
+        } else {
+            jQuery(this).removeClass('has-error');
+            return true;
+        }
+    });
+
+    jQuery('body').on('click', '.pa-success', function() {
+        jQuery(this).hide();
+        // jQuery(this).fadeOut();
+    })
+    jQuery('body').on('click', '.pa-maintanance', function() {
+        jQuery(this).fadeOut();
+    })
+    jQuery('body').on('click', '.pa-username-exists', function() {
+        jQuery(this).hide();
+        // jQuery(this).fadeOut();
+    })
+    jQuery('body').on('click', '.pa-username-invalid', function() {
+        jQuery(this).hide();
+        // jQuery(this).fadeOut();
+    })
+    jQuery('body').on('click', '.pa-username-not-allowed', function() {
+        jQuery(this).hide();
+        // jQuery(this).fadeOut();
+    })
+
+    jQuery('body').on('click', '#wk_banned_bidder', function() {
+        jQuery('#wk_banned_bidder_msg').fadeIn();
+        // jQuery(this).fadeOut();
+    })
+
+    jQuery('body').on('keypress', '.validate-integer', function(event) {
+        if ((event.which != 8 && event.which != 0) && ((event.which < 48 || event.which > 57) && event.which != 13)) {
+            event.preventDefault();
+            jQuery(this).addClass('has-error');
+            return false;
+        } else {
+            jQuery(this).removeClass('has-error');
+            return true;
+        }
+    });
+
+    jQuery('body #wk-auction').on('keyup', '#bid_amount, #prod_quantity', function(e) {
+        if (e.keyCode == 13) {
+            jQuery(this).parents('form').find('.wk_submit_bid').trigger('click');
+        }
+    });
+
+    jQuery('body #wk-auction').on('keyup', '#proxy_bid_amount', function(e) {
+        if (e.keyCode == 13) {
+            jQuery(this).parents('form').find('.wk_proxy_submit').trigger('click');
+        }
+    });
+
+    jQuery('body  #wk-auction').on("click", "#popcorn_bidding_modal_enable", function() {
+        jQuery("#popcorn_bidding_modal_enabled").show();
+    });
+
+    jQuery('body  #wk-auction').on("click", "#wk-pa-close", function() {
+        jQuery("#popcorn_bidding_modal_enabled").hide();
+    });
+
+    jQuery('body #wk-auction').on('keyup', '#username_field', function(e) {
+        if(jQuery(this).hasClass('has-error')){
+            jQuery(this).removeClass('has-error');
+        }
+    });
+
+    jQuery('body ').on("click", ".wk_submit_bid", function() {
+        console.log(confirmation_for_bid);
+        if (confirmation_for_bid == 1) {
+            var bid = Number(jQuery("body #wk-auction").find('#bid_amount').val().trim());
+            if (bid == "" || bid <= 0 || isNaN(bid)) {
+                console.log(bid);
+                jQuery("body #wk-auction").find("#bid_amount").focus().addClass("has-error");
+                jQuery("body #wk-auction").find("#label_bid_amt .min_bid_amt").addClass('color-red');
+            } else
+                jQuery("#pa_confirm_bid_modal").fadeIn();
+        } else
+            spObj.submitBid(jQuery(this), false, false, false, false);
+    });
+
+    jQuery("body").on("click", ".pa-submit-bid-modal", function() {
+        spObj.submitBid(jQuery(".wk_submit_bid"), false, false, false, false);
+        jQuery("body #wk-auction #pa_confirm_bid_modal").find('.pa-button-close').trigger('click');
+    });
+
+    jQuery('body').on("click", ".wk_proxy_submit", function() {
+        var is_private = Number(jQuery("#is_private:checked").val()) ? 1 : 0;
+
+        spObj.placeProxyBid(jQuery(this), false, 0, is_private);
+    });
+
+    jQuery('body').on("click", "#show_bids.active", function() {
+        var btn = jQuery(this);
+        form = btn.parents('#wk-auction').find("form#bidding-form");
+
+        var total_bids = btn.html().trim();
+        if (total_bids == no_bids)
+            return false;
+
+        var cust_id = jQuery("#wk-auction").attr("cust-id");
+
+        // if(!cust_id > 0) {
+        // 	var login = confirm("You are required to login to view bids.");
+        // 	if(login == true)
+        // 	{
+        // 		var checkout_url = window.location.href;
+
+        // 		location.href = "/account/login?checkout_url="+checkout_url;
+
+        // 	}
+        // 	return false;
+        // }
+        // else {
+
+        var auction_id = jQuery("#wk-auction").find("input[name='auction_id']").val();
+
+        jQuery.ajax({
+            url: spObj.api_url + "index.php?p=wk_ajax_process",
+            type: "GET",
+            crossDomain: true,
+            jsonpCallback: "show_bids",
+            cache: false,
+            async: false,
+            dataType: "jsonp",
+            data: { shop_name: spObj.shop_name, auction_id: auction_id, cust_id: cust_id, page: spObj.page, timediff: spObj.timediff, auction_config: spObj.auction_config, widget_config: spObj.widget_config },
+            beforeSend: function() {
+                if (form.length == 1)
+                    form.find("#label_bid_amt .min_bid_amt").removeClass('color-red');
+
+                btn.hide();
+                btn.after("<img class='wk-spinner-xs' src='" + spObj.api_url + "images/spinner-xs.gif' alt='...'>");
+            },
+            success: function(response) {
+                if (form.length == 1 && response['min_bid_amount'] != 'unchanged') {
+                    customer_bid_amt = jQuery("#bid_amount").val();
+                    if(typeof integer_bid_only && integer_bid_only)
+                    {
+                        if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && customer_bid_amt < response['min_bid_amount']) || customer_bid_amt == '')) {
+                            jQuery("#bid_amount").val(Math.ceil(min_bid_amount.toString().replace(/,/g, '')));
+                        }
+                        form.find("#label_bid_amt .min_bid_amt").html([response['currency']," ",Math.ceil(response['min_bid_amount'].toString().replace(/,/g, ''))].join(''));
+                    }
+                    else
+                    {
+                        if (autofill_minimum_bid == "1" && ((customer_bid_amt != '' && customer_bid_amt < response['min_bid_amount']) || customer_bid_amt == '')) {
+                            jQuery("#bid_amount").val(min_bid_amount.toString().replace(/,/g, ''));
+                        }
+                        form.find("#label_bid_amt .min_bid_amt").html(response['currency'] + " " + response['min_bid_amount'].toString());
+                    }
+                }
+
+                console.log(form.length);
+
+                if (Number(response['bid_count']) > 0) {
+                    changeBidCount(btn, response['bid_count']);
+                    // if(form.length == 1)
+                    // {
+                    // 	if(Number(response['bid_count']) == 1)
+                    // 		btn.html("1 Bid(s)");
+                    // 	else
+                    // 		btn.html(response['bid_count']+" Bid(s)");
+                    // }
+
+
+                    jQuery("#wk-auction").append(response['bidders']);
+                }
+            },
+            error: function(response) {
+                // alert("failed");
+                console.error("Something Went Wrong, Unable to Show Bids");
+            },
+            complete: function() {
+                btn.show();
+                jQuery("body").find(".wk-spinner-xs").remove();
+            }
+        });
+        // }
+    });
+
+    if (jQuery('#products_on_auction').length == 1) {
+        spObj.showProductOnAuction();
+    }
+
+
+    if (jQuery('#wk_bidding_details').length == 1) {
+        spObj.getBiddingDetails();
+    }
+
+    if (jQuery('#wk_upcoming_auction_block').length == 1) {
+        spObj.getUpcomingAuctions();
+    }
+
+    jQuery("body").on("click", ".pa-show-modal", function() {
+        var target = jQuery(this).data("toggle");
+        jQuery(target).fadeIn();
+    });
+
+    jQuery("body").on("click", ".pa-modal-container", function(e) {
+        if (jQuery(e.target).is(".pa-modal-container") && !jQuery(this).is('.close-by-icon')) {
+            jQuery(this).fadeOut(function() {
+                checkModal(jQuery(this));
+            });
+        }
+    });
+
+    jQuery("body").on("click", ".pa-icon-close, .pa-button-close, .pa-shipping-method-icon-close, .proxy-confirm-close", function() {
+        var target = jQuery(this).parents(".pa-area");
+        target.fadeOut(function() {
+            checkModal(target);
+        });
+    });
+
+    jQuery('body').on("click", ".wk_join_auction", function() {
+        var cust_id = Number(jQuery("#wk-auction").attr("cust-id"));
+        var joining_type = jQuery(this).attr("data-joining-type");
+        var joining_tag_amount = jQuery(this).attr("data-joining-tag-amount");
+        var joining_tag = jQuery(this).attr("data-joining-tag");
+        var joining_policy = jQuery(this).attr("data-joining-policy");
+        var terms_handle_check = jQuery('#terms-handle-check').prop("checked");
+        //store joining product url into session storage
+        var wk_joining_redirect_url = localStorage.getItem("wk_joining_redirect_url");
+        if(wk_joining_redirect_url == null){
+            wk_joining_redirect_url = window.location.href;
+        }
+        localStorage.setItem("wk_joining_redirect_url", wk_joining_redirect_url);
+        if(terms_handle){
+            if(!terms_handle_check){
+                terms_error
+                jQuery('#terms_error').removeClass("terms-error-none");
+                // alert('Please agree terms and conditions to join auction !!');
+                return;
+            }
+            jQuery('#terms_error').addClass("terms-error-none");
+        }
+        if (!cust_id > 0) {
+            var checkout_url = window.location.href;
+
+            if (checkout_url.search("&join_now") >= 0)
+                checkout_url = checkout_url.split("&join_now")[0];
+            else if (checkout_url.search("\\?join_now") >= 0)
+                checkout_url = checkout_url.split("?join_now")[0];
+
+            if (checkout_url.split("?").length > 1)
+                checkout_url += "&join_now=1&tnc=1";
+            else
+                checkout_url += "?join_now=1&tnc=1";
+
+                jQuery(this).removeClass('font-bold').html('Redirecting...');
+
+            if (typeof(Storage) !== 'undefined') {
+                localStorage.setItem("checkout_url", checkout_url);
+                window.location.href = localStorage.getItem("checkout_url");
+            }
+            window.location.href = "/account/login?checkout_url=" + encodeURIComponent(checkout_url);
+
+            return false;
+        } else {
+            var auction_id = jQuery(this).attr("data-auction-id");
+            var joining_prod = jQuery(this).attr("data-joining-product");
+            if (joining_type == 2)
+                joiningAuctionCallBack(auction_id, cust_id);
+            else if (joining_type == 3 && joining_policy == 'once_per_customer')
+                joiningAuctionCallBack(auction_id, cust_id, joining_tag_amount, joining_tag);
+            else if (joining_type == 3 && joining_policy == 'once_per_auction')
+                joiningAuctionCallBack(auction_id, cust_id, joining_tag_amount);
+            else
+            {
+                if(typeof(tax_on_joining) != "undefined" && tax_on_joining.value == 1 && tax_on_joining.extra_field == 2)
+                {
+                    joiningAuctionCallBack(auction_id, cust_id);
+                }
+                else
+                {
+                   buyNow(joining_prod, jQuery(this), auction_id,cust_id);
+                }
+            }
+        }
+    });
+
+    jQuery('body').on("click", ".wk_buy_now", function() {
+        var cust_id = Number(jQuery("#wk-auction").attr("cust-id"));
+
+        if (!cust_id > 0) {
+            var checkout_url = window.location.href;
+            jQuery(this).removeClass('font-bold').html('Redirecting...');
+
+            if (typeof(Storage) !== 'undefined') {
+                localStorage.setItem("checkout_url", checkout_url);
+                window.location.href = localStorage.getItem("checkout_url");
+            }
+
+            window.location.href = "/account/login?checkout_url=" + encodeURIComponent(checkout_url);
+            return false;
+        } else {
+            var auction_id = jQuery(this).attr("data-auction-id");
+            var booking_prod = jQuery(this).attr("data-booking-product");
+            addToCart(booking_prod, jQuery(this), auction_id, 1,cust_id);
+        }
+    });
+
+    jQuery('body').on('click', '.upd-anet-details', function() {
+        jQuery('.pa-modal-container .pa-modal-content').addClass('scroll-card-update');
+        jQuery('body').find('.anet-form-box').show();
+        jQuery(this).parent().hide();
+    });
+
+    jQuery('body').on('click', '.show_storePickup', function() {
+        var address = $(this).attr('data-address');
+        var name = $(this).attr('data-location-name');
+        jQuery('body').find('#sname').html(name);
+        jQuery('body').find('#sadd').html(address);
+        jQuery('body').find('#wk_store_pickup').removeClass('pa-hide');
+    });
+     
+    jQuery('body').on('click', '.pa-icon-close2', function() {
+        jQuery('body').find('#wk_store_pickup').addClass('pa-hide');
+    });
+
+    jQuery('body').on('click', '.cancel-anet-update', function() {
+        jQuery('.pa-modal-container .pa-modal-content').removeClass('scroll-card-update');
+        jQuery('body').find('.anet-form-box').hide();
+        jQuery('body').find('.anet-btn-box').show();
+    });
+
+    jQuery('body').on('click', '.rm-bt-details', function() {
+        spObj.removeBtDetails(jQuery(this));
+    });
+
+    jQuery('body').on('click', '.rm-anet-details', function() {
+        spObj.removeAnetDetails(jQuery(this));
+    });
+     
+    jQuery('body').on('click', '.go-to-admin', function() {
+        jQuery("#go_to_admin").removeClass("pa-hide");
+        jQuery("#wk_anet_box").addClass("pa-hide");
+    });
+
+    jQuery('body').on('click', '#requst_admin', function() {
+        jQuery("#go_to_admin").addClass("pa-hide");
+        jQuery("#success_msg").show().delay(3000).queue(function(n) {
+            $(this).hide(); n();
+          });
+        //   var main_cust_id = $("input[name=shipping_main_cust_id]").val();
+
+          var label1 = jQuery("#mail_sent").html();
+          var label2 = jQuery("#contact_you_soon").html();
+          var label3 = jQuery("#ok").html();
+          var cust_id = Number(jQuery("#wk-view-bidding-detail").attr("cust-id"));
+
+          jQuery.ajax({
+            url: spObj.api_url + "index.php?p=wk_ajax_process",
+            type: "GET",
+            crossDomain: true,
+            async: false,
+            jsonpCallback: "bidderStatus",
+            cache: false,
+            dataType: "jsonp",
+            data: { action: 'admin_mail_for_card_remove', shop_name: spObj.shop_name, cust_id: cust_id, page: spObj.page, timediff: spObj.timediff, theme_colors: spObj.theme_colors },
+            success: function(res) {
+                swal({title:label1, text:label2,confirmButtonText:label3})
+                // swal(label1, label2);
+                console.log("mail Sent");
+            },
+            error: function() {
+                swal("mail not sent!", "Something Went Wrong", "error");
+                console.log("Mail Not Sent");
+
+            }
+        });
+    });
+
+    jQuery('body').on('click', '.rm-checkout-details', function() {
+        spObj.removeCheckoutDetails(jQuery(this));
+    });
+
+    jQuery('body').on('click', '.update-shipping-details', function() {
+        spObj.fetchAllShippingMethods(jQuery(this));
+    });
+    
+    //by karan 4-5-18
+    jQuery('body').on('change', '#wk-type-1-filter select', function() {
+        window.open(jQuery(this).val(), '_top');
+    });
+    
+    jQuery('body').on('click', '#shipping-button', function(e) {
+        e.preventDefault();
+        var bid_type = $("input[name=bid_type]").val();
+    
+        console.log('bid type', bid_type);
+        var btn = jQuery('body').find(".wk_submit_bid");
+        if (bid_type == 'proxy') {
+            btn = jQuery('body').find(".wk_proxy_submit");
+        }
+        var shipping_methods = $("input[name='shippingRate']:checked").attr("data-json-shipping");
+        var main_cust_id = $("input[name=shipping_main_cust_id]").val();
+    
+        jQuery.ajax({
+            url: spObj.api_url + "index.php?p=wk_ajax_process",
+            type: "POST",
+            crossDomain: true,
+            async: false,
+            jsonpCallback: "addShippingMethods",
+            cache: false,
+            dataType: "jsonp",
+            data: { shipping_methods: shipping_methods, shop_name: spObj.shop_name, auction_config: spObj.auction_config,main_cust_id: main_cust_id },
+            success: function(res) {
+                if (bid_type == 'normal')
+                    spObj.submitBid(btn, false, false, false, false, 1);
+                else if (bid_type == 'proxy')
+                    spObj.placeProxyBid(btn, false, 1);
+                else
+                    window.location.reload();
+    
+                var target = jQuery(".pa-shipping-icon-close").parents(".pa-area");
+                target.fadeOut(function() {
+                    checkModal(target);
+                });
+            },
+            error: function() {
+                console.log("Something went wrong..");
+            }
+        });
+    });
+
+    //karan
+    
+    //abhishek joining fee redirect to payment page
+    function joiningFeePaymentPageRedirect(tnc){
+        var cust_id = Number(jQuery("#wk-auction").attr("cust-id"));
+        var joining_type = jQuery(".wk_join_auction").attr("data-joining-type");
+        var joining_tag_amount = jQuery(".wk_join_auction").attr("data-joining-tag-amount");
+        var joining_tag = jQuery(".wk_join_auction").attr("data-joining-tag");
+        var joining_policy = jQuery(".wk_join_auction").attr("data-joining-policy");
+        var terms_handle_check = 1;
+        if(tnc!=1){
+            terms_handle_check = 0;
+        }
+        if(terms_handle){
+            if(!terms_handle_check){
+                terms_error
+                jQuery('#terms_error').removeClass("terms-error-none");
+                // alert('Please agree terms and conditions to join auction !!');
+                return;
+            }
+            jQuery('#terms_error').addClass("terms-error-none");
+        }
+        if(cust_id > 0) {
+            var auction_id = jQuery('.wk_join_auction').attr("data-auction-id");
+            var joining_prod = jQuery('.wk_join_auction').attr("data-joining-product");
+            if(!joining_type || !auction_id)
+                return false;
+
+            if (joining_type == 2)
+                joiningAuctionCallBack(auction_id, cust_id);
+            else if (joining_type == 3 && joining_policy == 'once_per_customer')
+                joiningAuctionCallBack(auction_id, cust_id, joining_tag_amount, joining_tag);
+            else if (joining_type == 3 && joining_policy == 'once_per_auction')
+                joiningAuctionCallBack(auction_id, cust_id, joining_tag_amount);
+            else
+            {
+                if(typeof(tax_on_joining) != "undefined" && tax_on_joining.value == 1 && tax_on_joining.extra_field == 2)
+                {
+                    joiningAuctionCallBack(auction_id, cust_id);
+                }
+                else
+                {
+                   buyNow(joining_prod, jQuery(this), auction_id);
+                }
+            }
+        }
+    }
+    
+    //by karan 7-8-18
+    jQuery('body').on('click', '#load-more-running-auctions', function() {
+        var self = jQuery(this);
+        var type = Number(spObj.getRequestParam('t'));
+        var search = spObj.getRequestParam('s');
+        var sort_by = spObj.getRequestParam('sort_by');
+        var tag = spObj.getRequestParam('tag');
+        tag = tag ? tag : '';
+        search = search ? search : '';
+        // jQuery('body').find('.pa-loader').show();
+        spObj.loadScript(spObj.api_url + "js/jquery.countdown.min.js", function() {
+            jQuery.ajax({
+                url: spObj.api_url + "index.php?p=wk_ajax_process",
+                type: "GET",
+                crossDomain: true,
+                async: false,
+                jsonpCallback: "getPartProductsOnAuction",
+                cache: false,
+                dataType: "jsonp",
+                data: { shop_name: spObj.shop_name, timediff: spObj.timediff, type: type, offset: jQuery('.wkrow .wkgrid').length, search: search, sort_by: sort_by, general_config: spObj.general_config, auction_config: spObj.auction_config, theme_colors: spObj.theme_colors, tag: tag },
+                success: function(res) {
+                    jQuery(self).parents('.wkrow').first().append(res);
+                    jQuery(self).parents('span').first().remove();
+                    jQuery('body').find('.pa-loader').hide();
+                },
+                error: function() {
+                    jQuery(self).parents('span').first().append("Oops! unable to get data");
+                },
+                complete: function() {
+                    jQuery('body').find('.pa-loader').hide();
+                }
+            });
+        });
+    });
+
+}).call(this);
+
+function buyNow(variant, element, auction_id,cust_id) {
+    jQuery(element).addClass("pa-btn-loader").prop("disabled", true);
+    // 	jQuery.post('/cart/clear.js');
+    // 	setTimeout(function(){
+    // 		jQuery.post('/cart/add.js', {
+    // 		  quantity: quantity,
+    // 		  id: variant,
+    // 		  properties: {
+    // 		    aid: auction_id
+    // 		  }
+    // 		});
+    // 	},800);
+    // 	setTimeout(function(){
+    // 		window.open("/cart","_top");
+    // 	},2400);
+    jQuery.ajax({
+        url: spObj.api_url + "index.php?p=wk_ajax_process",
+        type: "POST",
+        crossDomain: true,
+        async: false,
+        jsonpCallback: "joiningAuction",
+        cache: false,
+        dataType: "jsonp",
+        data: { aid: auction_id, shop_name: spObj.shop_name, cust_id: cust_id,action:'is_banned'},
+        success: function(res) {
+             if(res['msg'] == 'user_is_banned'){
+                jQuery('#wk_banned_bidder_msg').fadeIn();
+                jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+                return;
+            } else {
+                window.open('/cart/' + variant + ':1?attributes[aid]=' + auction_id, '_top');
+            }
+        },
+        error: function() {
+            alert("Something went wrong..");
+            jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+        }
+    });
+}
+
+function addToCart(variant, element, auction_id, quantity,cust_id) {
+    jQuery(element).addClass("pa-btn-loader").prop("disabled", true);
+    jQuery.ajax({
+        url: spObj.api_url + "index.php?p=wk_ajax_process",
+        type: "POST",
+        crossDomain: true,
+        async: false,
+        jsonpCallback: "joiningAuction",
+        cache: false,
+        dataType: "jsonp",
+        data: { aid: auction_id, shop_name: spObj.shop_name, cust_id: cust_id,action:'is_banned'},
+        success: function(res) {
+             if(res['msg'] == 'user_is_banned'){
+                jQuery('#wk_banned_bidder_msg').fadeIn();
+                jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+                return;
+            } else {
+                jQuery.post('/cart/update.js', 'updates[' + variant + ']=' + quantity);
+                setTimeout(function() {
+                    window.open("/cart", "_top");
+                }, 2400);            }
+        },
+        error: function() {
+            alert("Something went wrong..");
+            jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+        }
+    });
+
+}
+
+function addToCartAll() {
+    var updates = "";
+    if ((jQuery("input:checkbox[class=wk_select_checkbox]:checked").length) > 0) {
+        jQuery("#wk_buy_all").addClass("pa-btn-loader").prop("disabled", true);
+        jQuery("input:checkbox[class=wk_select_checkbox]:checked").each(function() {
+            var variant = jQuery(this).attr('main_id_variant');
+            var quantity = jQuery(this).attr('quantity')
+            var auction_id = jQuery(this).attr('auction_id')
+            updates = updates + 'updates[' + variant + ']=' + quantity + '&';
+        });
+        jQuery.post('/cart/update.js', updates);
+        setTimeout(function() {
+            window.open("/cart", "_top");
+        }, 2400);
+    } else if ((jQuery("input:checkbox[class=wk_select_checkbox]:checked").length) > 0) {
+        jQuery("#wk_buy_all").addClass("pa-btn-loader").prop("disabled", true);
+        jQuery("input:checkbox[class=wk_select_checkbox]:checked").each(function() {
+            var variant = jQuery(this).attr('main_id_variant');
+            var quantity = jQuery(this).attr('quantity')
+            var auction_id = jQuery(this).attr('auction_id')
+            updates = updates + 'updates[' + variant + ']=' + quantity + '&';
+        });
+        jQuery.post('/cart/update.js', updates);
+        setTimeout(function() {
+            window.open("/cart", "_top");
+        }, 2400);
+    }
+}
+
+function makeOrder(element, auction_id, cid) {
+    jQuery(element).addClass("pa-btn-loader").prop("disabled", true ); 
+    jQuery.ajax({
+        url: spObj.api_url + "index.php?p=wk_ajax_process",
+        type: "POST",
+        crossDomain: true,
+        async: false,
+        jsonpCallback: "getInvoiceLink",
+        cache: false,
+        dataType: "jsonp",
+        data: { aid: auction_id, shop_name: spObj.shop_name, cust_id: cid, page: spObj.page, timediff: spObj.timediff },
+        success: function(res) {
+            if (res.status == "success") {
+                window.location.href = res.invoice_url;
+            } else {
+                if(res['msg'] == 'user_is_banned'){
+                    jQuery("#wk_banned_bidder_msg").fadeIn();
+                jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+
+                }else{
+                alert("Your request cann't be processed currently.");
+                jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+                }
+            }
+        },
+        error: function() {
+            alert("Something went wrong..");
+            jQuery(element).removeClass("pa-btn-loader").prop("disabled", false);
+        }
+    });
+}
+jQuery('body').on('click', '#wk_select_All', function() {
+    var checkedStatus = this.checked;
+    jQuery(".wk_select_checkbox:enabled").prop('checked', checkedStatus);
+    // jQuery(".wk_select_checkbox").prop('checked', checkedStatus);
+    if ((jQuery("input:checkbox[class=wk_select_checkbox]:checked").length) > 0) {
+        jQuery('#wk_buy_all').attr("disabled", false);
+    } else {
+        jQuery('#wk_buy_all').attr("disabled", true);
+    }
+})
+jQuery('body').on('change', ".wk_select_checkbox", function() {
+    var checkedStatus = this.checked;
+    var auction_id = jQuery(this).attr("auction_id");
+    jQuery("input[auction_id=" + auction_id + "]").attr('checked', checkedStatus);
+
+    if ((jQuery("input:checkbox[class=wk_select_checkbox]:checked").length) > 0) {
+        jQuery('#wk_buy_all').attr("disabled", false);
+    } else {
+        jQuery('#wk_buy_all').attr("disabled", true);
+    }
+});
+jQuery('body').on('click', '#wk_select_All_small', function() {
+    var checkedStatus = this.checked;
+    jQuery(".wk_select_checkbox:enabled").prop('checked', checkedStatus);
+    // jQuery(".wk_select_checkbox").prop('checked', checkedStatus);
+    if ((jQuery("input:checkbox[class=wk_select_checkbox]:checked").length) > 0) {
+        jQuery('#wk_buy_all').attr("disabled", false);
+    } else {
+        jQuery('#wk_buy_all').attr("disabled", true);
+    }
+});
+
+jQuery('body').on('click', '#confirm_proxy', function(e) {
+    e.preventDefault();
+    var bid_type = $("input[name=bid_type]").val();
+    var btn = jQuery('body').find(".wk_submit_bid");
+    if (bid_type == 'proxy') {
+        btn = jQuery('body').find(".wk_proxy_submit");
+    }
+
+    var target = jQuery(this).parents(".pa-area");
+    target.fadeOut();
+
+    if (bid_type == 'normal')
+        spObj.submitBid(btn, false, false, false, false, 0, '', 1);
+    else if (bid_type == 'proxy')
+        spObj.placeProxyBid(btn, false, 0, 0, '', 1);
+    else
+        window.location.reload();
+})
+
+jQuery('body').on('click', '.want_product_as', function() {
+    console.log(this.value);
+    if(this.value == 'store_pickup'){
+        jQuery('#store_pickup_address').removeClass('pa-hide');
+    }else{
+        jQuery('#store_pickup_address').addClass('pa-hide');
+    }
+})
+
+changeBidCount = (selector, bidCount) => {
+    var preValue = selector.attr("data-bids-label");
+    var newValue = preValue.toString().replace(/\d+/g, bidCount);
+    selector.html(newValue);
+}
+extractPrice = (a) => {
+    // console.log("value Price : " + a);
+    var regex = /[^0-9.]+/;
+    return parseFloat(a.toString().replace(regex, ''));
+}
+showReservePriceMsg = (currentBid) => {
+    // var reservePrice = parseFloat(jQuery("body").find("#reserve-price").val());
+    if (wkAuctionSale <= extractPrice(currentBid)) {
+        jQuery("body").find(".reserve-price-not-met-msg").hide();
+        jQuery("body").find(".reserve-price-met-msg").show();
+    } else {
+        jQuery("body").find(".reserve-price-met-msg").hide();
+        jQuery("body").find(".reserve-price-not-met-msg").show();
+    }
+}
+
+changeHighlightBidProductPage = (highestBidderId) => {
+    var customerId = jQuery("#wk-auction").attr("cust-id").trim();
+    var selector = jQuery("#wk-auction");
+    if (customerId != "" && customerId != 0) {
+        if (customerId == highestBidderId) {
+            selector.find("#current_bid").removeClass("customer_participated");
+            selector.find("#current_bid").removeClass("customer_not_participated");
+            selector.find("#current_bid").addClass("customer_highest_bidder");
+        } else {
+            if (!selector.find("#current_bid").hasClass("customer_not_participated")) {
+                selector.find("#current_bid").removeClass("customer_highest_bidder");
+                selector.find("#current_bid").addClass("customer_participated");
+            }
+        }
+    }
+}
+
+joiningAuctionCallBack = (auction_id, cust_id, joining_tag_amount='', joining_tag='') => {
+    jQuery.ajax({
+        url: spObj.api_url + "index.php?p=wk_ajax_process",
+        type: "GET",
+        crossDomain: true,
+        async: false,
+        jsonpCallback: "joiningAuction",
+        cache: false,
+        dataType: "jsonp",
+        data: { aid: auction_id, shop_name: spObj.shop_name, cust_id: cust_id, joining_tag_amount: joining_tag_amount, joining_tag: joining_tag, timediff: spObj.timediff, auction_config: spObj.auction_config },
+        beforeSend: function() {
+            jQuery(".wk_join_auction").addClass("pa-btn-loader").prop("disabled", true);
+        },
+        success: function(res) {
+            console.log(res);
+            // if(res['msg'] == 'user_is_banned'){
+            //     jQuery('#wk_banned_bidder_msg').fadeIn();
+            //     return;
+            // }
+            if (res == 'sww' || res == '' || typeof res == 'undefined')
+                alert("unable to join auction Something went wrong")
+            else
+                window.location.href = res;
+        },
+        error: function() {
+            console.log("Something went wrong..");
+        },
+        complete: function() {
+            jQuery(".wk_join_auction").removeClass("pa-btn-loader").prop("disabled", false);
+        }
+    });
+
+    return true;
+}
+
+jQuery('body').on('click', '#update_declined_card', function(){
+    let cust_id = Number(jQuery("#wk-auction").attr("cust-id"));
+    let payment_gateway = jQuery("#payment_gateway").val();
+    var bid_type = $("input[name=bid_type]").val();
+    jQuery.ajax({
+        url: spObj.api_url + "index.php?p=wk_ajax_process",
+        type: "GET",
+        crossDomain: true,
+        async: false,
+        jsonpCallback: "updateDeclinedCard",
+        cache: false,
+        dataType: "jsonp",
+        data: { shop_name: spObj.shop_name, timediff: spObj.timediff, auction_config: spObj.auction_config, cust_id: cust_id,payment_gateway: payment_gateway, bid_type: bid_type},
+        beforeSend: function() {
+            jQuery("#update_declined_card").addClass("pa-btn-loader").prop("disabled", true);
+        },
+        success: function(res) {
+            if(res['msg'] == 'checkout_not_found'){
+                var target = jQuery(".pa-icon-close.card-declined").parents(".pa-area");
+                target.fadeOut(function() {
+                    checkModal(target);
+                });
+                jQuery("#wk-auction").append(res['checkout_form']);
+            }else if(res['msg'] == 'authorize_not_found'){
+                var target = jQuery(".pa-icon-close.card-declined").parents(".pa-area");
+                target.fadeOut(function() {
+                    checkModal(target);
+                });
+                jQuery("#wk-auction").append(res['authorize_form']);
+            }else if (res == 'sww')
+                console.log("unable to update card checkout config not found");
+                
+            // else
+            //     window.location.href = res;
+        },
+        error: function() {
+            console.log("Something went wrong..");
+        },
+        complete: function() {
+            jQuery("#update_declined_card").removeClass("pa-btn-loader").prop("disabled", false);
+        }
+    });
+})
+function checkModal(modal) {
+    if (modal.is(".rm-on-fade-out")) {
+        modal.remove();
+    }
+}
+fetchCustomerId = () => {
+    if(jQuery('#wk-auction').length > 0){
+        return Number(jQuery('#wk-auction').attr('cust-id'));
+    }
+    else if(jQuery('#wk-view-bidding-detail').length > 0){
+        return Number(jQuery('#wk-view-bidding-detail').attr('cust-id'));
+    }
+    else{
+        return NaN;
+    }
+}

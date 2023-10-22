@@ -1,0 +1,299 @@
+/** Shopify CDN: Minification failed
+
+Line 17:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 18:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:0 Transforming class syntax to the configured target environment ("es5") is not supported yet
+Line 20:15 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 28:9 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 31:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 36:16 Transforming let to the configured target environment ("es5") is not supported yet
+Line 46:11 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 47:8 Transforming const to the configured target environment ("es5") is not supported yet
+Line 59:8 Transforming const to the configured target environment ("es5") is not supported yet
+... and 51 more hidden warnings
+
+**/
+(() => {
+const $87c3128c623f6bf1$var$isArrowRightKey = (ev)=>ev.key === "ArrowRight" || ev.keyCode === 39;
+const $87c3128c623f6bf1$var$isArrowLeftKey = (ev)=>ev.key === "ArrowLeft" || ev.keyCode === 37;
+class $87c3128c623f6bf1$export$2e2bcd8739ae039 {
+    constructor(element){
+        this.element = element;
+        this.tabList = this.element.querySelector('[role="tablist"]');
+        this.tabs = Array.from(this.tabList.querySelectorAll('[role="tab"]'));
+        this.tabPanels = Array.from(this.element.querySelectorAll('[role="tabpanel"]'));
+        this.current = new Object();
+        this.#init();
+    }
+    #init() {
+        this.tabs.forEach((tab)=>tab.addEventListener("click", ()=>this.#select(tab)));
+        // Check if any tab if pre-selected. Otherwise, select the first tab.
+        const preSelectedTab = this.tabs.find((tab)=>tab.getAttribute("aria-selected") === "true");
+        preSelectedTab ? this.#select(preSelectedTab) : this.#select(this.tabs[0]);
+        // Move with key arrows
+        this.tabList.addEventListener("keydown", (e)=>{
+            if ($87c3128c623f6bf1$var$isArrowLeftKey(e) || $87c3128c623f6bf1$var$isArrowRightKey(e)) {
+                let currentTabIndex = this.current.tabIndex;
+                $87c3128c623f6bf1$var$isArrowLeftKey(e) && currentTabIndex--;
+                $87c3128c623f6bf1$var$isArrowRightKey(e) && currentTabIndex++;
+                if (currentTabIndex < 0) currentTabIndex = this.tabs.length - 1;
+                if (currentTabIndex > this.tabs.length - 1) currentTabIndex = 0;
+                this.#select(this.tabs[currentTabIndex]);
+                this.tabs[currentTabIndex].focus();
+            }
+        });
+    }
+    #select(tab) {
+        const panel = this.tabPanels.find((panel)=>panel.id === tab.getAttribute("aria-controls"));
+        this.current.tab = tab;
+        this.current.tabIndex = this.tabs.findIndex((tab)=>tab === this.current.tab);
+        this.current.panel = panel;
+        // Active tab
+        tab.setAttribute("aria-selected", true);
+        tab.setAttribute("tabindex", 0);
+        tab.dispatchEvent(new CustomEvent("active"));
+        // Active panel
+        panel.hidden = false;
+        panel.setAttribute("aria-expanded", true);
+        // Unselect other tabs
+        const otherTabs = this.tabs.filter((el)=>el.id !== tab.id);
+        otherTabs.forEach((tab)=>{
+            tab.setAttribute("aria-selected", false);
+            tab.setAttribute("tabindex", -1);
+        });
+        // Hide other panels
+        const otherPanels = this.tabPanels.filter((panel)=>panel.id !== tab.getAttribute("aria-controls"));
+        otherPanels.forEach((panel)=>{
+            panel.hidden = true;
+            panel.setAttribute("aria-expanded", false);
+        });
+    }
+    selectById(tabId, focus = false) {
+        const tab = this.tabs.find((tab)=>tab.id === tabId);
+        if (tab) {
+            this.#select(tab);
+            focus && tab.focus();
+        } else throw new Error(`tab with id ${tabId} not found in this tablist.`);
+    }
+    selectByIndex(index, focus = false) {
+        if (typeof index === "number") {
+            let validIndex = index - 1;
+            if (index === 0) validIndex = 0;
+            else if (index < 0) Math.abs(index) > this.tabs.length ? validIndex = 0 : validIndex = this.tabs.length + index;
+            else if (index > this.tabs.length) validIndex = this.tabs.length - 1;
+            const tab = this.tabs[validIndex];
+            this.#select(tab);
+            focus && tab.focus();
+        } else throw new Error(`index must be a number.`);
+    }
+}
+
+
+// Socios y peñas
+class $2f262e4397557bd4$var$MembersClubsForm {
+    constructor(form, msg, discount, getSectionsToRender){
+        this.form = form;
+        this.data = undefined;
+        this.formElements = Array.from(this.form.elements);
+        this.msg = msg;
+        this.discount = discount;
+        this.getSectionsToRender = getSectionsToRender;
+        this.value = form.name;
+        this.submit = this.formElements.find((elemento)=>elemento.tagName === "BUTTON");
+        this.inputs = this.formElements.filter((elemento)=>elemento.tagName === "INPUT");
+        this.endpointUrl = "https://api.fcbarcelona.com/shopify/api/clubs-and-members/validate";
+        this.handleSubmit();
+    }
+    handleSubmit() {
+        this.submit.addEventListener("click", async (event)=>{
+            event.preventDefault();
+            this.submit.classList.add("is-loading");
+            const formData = this.getFormData();
+            const response = await this.validateData(formData);
+            if (response.token) this.addTokenToCart(response.token);
+            else if (response.code) this.addDiscountCode(response.code);
+            else if (response.error) {
+                this.msg.show("error", response.error);
+                this.submit.classList.remove("is-loading");
+            }
+        });
+    }
+    getFormData() {
+        const formData = new FormData(this.form);
+        return {
+            type: this.value,
+            key: formData.get("key"),
+            pin: formData.get("pin")
+        };
+    }
+    validateData(data) {
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        };
+        return fetch(this.endpointUrl, options).then((response)=>response.json()).then((responseData)=>{
+            // Manejar la respuesta de la solicitud
+            return responseData;
+        }).catch((error)=>{
+            // Manejar cualquier error
+            this.msg.show("error", "Connection error");
+            this.submit.classList.remove("is-loading");
+            console.error("Error:", error);
+        });
+    }
+    addTokenToCart(token) {
+        const data = {
+            attributes: {
+                "__discount_token": token
+            }
+        };
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                attributes: data.attributes,
+                sections: this.getSectionsToRender().map((section)=>section.section)
+            })
+        };
+        fetch(window.Shopify.routes.root + "cart/update.js", options).then((response)=>response.json()).then((responseData)=>{
+            this.msg.show("success", "A\xf1adido correctamente");
+            this.renderSections(responseData);
+        }).catch((error)=>{
+            console.error("Error:", error);
+        }).finally(()=>{
+            this.submit.classList.remove("is-loading");
+        });
+    }
+    addDiscountCode(discountCode) {
+        fetch(`/discount/${discountCode}`).then((response)=>{
+            this.msg.show("success", "A\xf1adido correctamente");
+            this.discount.show(this.value);
+        }).catch((error)=>{
+            // Manejar cualquier error
+            console.error("Error:", error);
+        }).finally(()=>{
+            this.submit.classList.remove("is-loading");
+        });
+    }
+    renderSections(data) {
+        this.getSectionsToRender().forEach((section)=>{
+            if (section.section) {
+                const elementToReplace = document.getElementById(section.id).querySelector(section.selector) || document.getElementById(section.id);
+                elementToReplace.innerHTML = this.getSectionInnerHTML(data.sections[section.section], section.selector);
+            }
+        });
+    }
+    getSectionInnerHTML(html, selector) {
+        return new DOMParser().parseFromString(html, "text/html").querySelector(selector).innerHTML;
+    }
+}
+class $2f262e4397557bd4$var$MembersClubs {
+    constructor(){
+        this.tabs = new (0, $87c3128c623f6bf1$export$2e2bcd8739ae039)(document.querySelector("#cart-footer-tabs"));
+        this.messageWrapper = this.tabs.element.querySelector(".fcb-cart-dropdown-msg");
+        this.discount = new $2f262e4397557bd4$var$Discount();
+        this._onLoad();
+    }
+    _onLoad() {
+        for (const form of this.tabs.tabPanels)new $2f262e4397557bd4$var$MembersClubsForm(form, this.msg, this.discount, this._getSectionsToRender);
+        for (const tab of this.tabs.tabs)tab.addEventListener("active", ()=>this.msg.hide());
+    // this._showExistantDiscount()
+    }
+    _showExistantDiscount() {
+        const discount = this.discount.getDiscountFromCookies();
+        if (discount) this.discount.show(discount.type);
+    }
+    _getSectionsToRender() {
+        return [
+            {
+                id: "fcb-cart-summary",
+                section: document.getElementById("fcb-cart-summary")?.dataset.sectionid,
+                selector: ".js-contents-footer-summary"
+            },
+            {
+                id: "fcb-cart-summary",
+                section: document.getElementById("fcb-cart-summary")?.dataset.sectionid,
+                selector: ".js-contents-footer-ctas"
+            },
+            {
+                id: "fcb-cart-notification-footer",
+                section: document.getElementById("fcb-cart-notification-footer")?.dataset.sectionid,
+                selector: "#cart_drawer"
+            }
+        ];
+    }
+    msg = {
+        show: (type, message)=>{
+            this.messageWrapper.hidden = false;
+            this.messageWrapper.classList.add(`is-${type}`);
+            this.messageWrapper.textContent = message;
+        },
+        hide: ()=>{
+            this.messageWrapper.hidden = true;
+            this.messageWrapper.classList.remove(`is-success`);
+            this.messageWrapper.classList.remove(`is-error`);
+            this.messageWrapper.textContent = "";
+        }
+    };
+}
+class $2f262e4397557bd4$var$Discount {
+    constructor(){
+        this.prices = JSON.parse(document.querySelector("#subtotal-price-discounts").textContent);
+    }
+    show(type) {
+        this.prices = JSON.parse(document.querySelector("#subtotal-price-discounts").textContent);
+        if (type === "member" || type === "club") {
+            this.pricing.show(type);
+            this.summary.show(type);
+        }
+    }
+    pricing = {
+        show: (type)=>{
+            const subtotalValueWrappers = Array.from(document.querySelectorAll(".js-subtotal-value"));
+            if (!subtotalValueWrappers || !this.prices) return;
+            const priceMapping = {
+                "member": this.prices.priceMember.total,
+                "club": this.prices.priceClub.total
+            };
+            for (const subtotalValueWrapper of subtotalValueWrappers)subtotalValueWrapper.textContent = priceMapping[type];
+        }
+    };
+    summary = {
+        show: (type)=>{
+            const discountWrapper = document.querySelector("#cart-summary-discount");
+            const discountValue = document.querySelector("#cart-summary-discount-value");
+            if (!discountWrapper || !discountValue || !this.prices) return;
+            const priceMapping = {
+                "member": this.prices.priceMember.discount,
+                "club": this.prices.priceClub.discount
+            };
+            discountWrapper.hidden = false;
+            discountValue.textContent = priceMapping[type];
+        }
+    };
+    getDiscountCodeType(discountCode) {
+        const discountCodesMap = {
+            "SOCI": "member",
+            "PENYA": "club"
+        };
+        const codePrefix = Object.keys(discountCodesMap).find((prefix)=>discountCode.startsWith(prefix));
+        return discountCodesMap[codePrefix];
+    }
+    getDiscountFromCookies() {
+        const [cookieName, cookieValue] = document.cookie.split(";").find((str)=>str.search("discount_code") !== -1)?.trim().split("=") || [];
+        if (cookieValue) return {
+            type: this.getDiscountCodeType(cookieValue),
+            code: cookieValue
+        };
+        else return undefined;
+    }
+}
+new $2f262e4397557bd4$var$MembersClubs();
+
+})();
+//# sourceMappingURL=section-members-clubs.js.map

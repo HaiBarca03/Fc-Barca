@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="x-icon" href="/img/FC_Barcelona_logo.svg.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barca Shop</title>
+    <link rel="stylesheet" href="/css/shop/shop.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/font/fontawesome-free-6.4.2-web/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="menu">
+            <div class="logo">
+                <a href="/interFace/index.html">
+                    Barca<span>Shop</span>
+                </a>
+            </div>
+            <ul>
+                <li class="item__list"><i class="fa-solid fa-house-user"></i><a href="">Trang chủ</a></li>
+                <li class="active item__list">
+                    <i class="fa-solid fa-shirt"></i>
+                    Quầo áo
+                    <ul class="downMenu">
+                        <li>
+                            <a href="">
+                                Sân nhà & sân khách</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Dài & cộc</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Áo khoác</li>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="item__list" >
+                    <i class="fa-solid fa-shoe-prints"></i>
+                    Giày
+                    <ul class="downMenu">
+                        <li>
+                            <a href="">
+                                Giày cao cổ</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Giày thể thao</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Giày thời trang</li>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="item__list" >
+                    <i class="fa-solid fa-gift"></i>
+                    Lưu niệm
+                    <ul class="downMenu">
+                        <li>
+                            <a href="">
+                                Ảnh lưu niệm</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Mô hình</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Kỉ vật</li>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                Chữ ký</li>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+             <ul>
+                <li><i class="fa-solid fa-gear"></i> Tài khoản</li>
+                <li><i class="fa-solid fa-pen-nib"></i>Đăng ký</li>
+                <li><i class="fa-solid fa-user"></i> Đăng nhập</li>
+                <li><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</li>
+            </ul>
+        </div>
+        <div class="center">
+            <div class="search">
+                <div class="form">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search...">
+                    <button>Search</button>
+                </div>
+            </div>
+
+            <h2>Các sản phẩm áo</h2>
+            <div class="list">
+                <div class="item" data-key="1">
+                    <div class="img">
+                        <img src="/img/shop/Ao1.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Sân nhà 2023-2024</div>
+                        <div class="des">
+                            Áo cộc tay, không cổ, sọc xanh đỏ, logo thêu
+                        </div>
+                        <div class="price">$20</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(1)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>                
+                
+                <div class="item" data-key="2">
+                    <div class="img">
+                        <img src="/img/shop/ao2.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Sân khách 2023-2024</div>
+                        <div class="des">
+                            Áo sân khách màu trắng, logo thêu
+                        </div>
+                        <div class="price">$20</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(2)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>                
+                <div class="item" data-key="3">
+                    <div class="img">
+                        <img src="/img/shop/ao3.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Áo sân khách 2023-2024 loại 2</div>
+                        <div class="des">
+                            Áo sân khách thứ 2 của clb, UCL 23-24.Màu pha đẹp mắt
+                        </div>
+                        <div class="price">$20.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(3)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="item" data-key="4">
+                    <div class="img">
+                        <img src="/img/shop/ao4.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Sân nhà trẻ em 23-24</div>
+                        <div class="des">
+                            Áo dành cho trẻ em mọi loại kính cỡ
+                        </div>
+                        <div class="price">$15.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(4)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="item" data-key="5">
+                    <div class="img">
+                        <img src="/img/shop/ao5.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Sân khách phụ nữ 23-24</div>
+                        <div class="des">
+                            Áo trắng sân khách dành cho phụ nữ.Rộng rãi thoáng mát, chất liệu tốt
+                        </div>
+                        <div class="price">$20.00</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(5)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="item" data-key="6">
+                    <div class="img">
+                        <img src="/img/shop/ao6.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Áo thủ môn sân nhà 23-24</div>
+                        <div class="des">
+                            Áo xanh rêu, đủ màu, rộng thoáng.Vải tốt
+                        </div>
+                        <div class="price">$17.00</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(6)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="item" data-key="7">
+                    <div class="img">
+                        <img src="/img/shop/ao7.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Áo thủ môn sân khách</div>
+                        <div class="des">
+                            Sân khách 2023-2024, áo xanh nõn,rộng thoáng.Nhiều lựa chọn size
+                        </div>
+                        <div class="price">$16.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(7)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+                <div class="item" data-key="8">
+                    <div class="img">
+                        <img src="/img/shop/ao8.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Áo khoác cho trẻ em 23-24</div>
+                        <div class="des">
+                            Áo khoác có logo Barca, phối đỏ xanh. Dày ấm, có khoá cài
+                        </div>
+                        <div class="price">$25.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(8)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+
+                <div class="item" data-key="9">
+                    <div class="img">
+                        <img src="/img/shop/ao9.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Hoodies & sweater</div>
+                        <div class="des">
+                            Hoodies dày dặn, chất liệu bông nỉ ấm áp.Nhiều màu khích thước chọn
+                        </div>
+                        <div class="price">$40.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(9)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+
+                <div class="item" data-key="10">
+                    <div class="img">
+                        <img src="/img/shop/a10.webp" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">Áo khoác jackets</div>
+                        <div class="des">
+                           Áo khoác gió ấm, có mũ chùm đầu.Mặc đẹp như De Jong
+                        </div>
+                        <div class="price">$50.03</div>
+                        <input type="number" class="count" min="1" value="1">
+                        <button class="add">Thêm vào giỏ hàng</button>
+                        <button class="remove" onclick="Remove(10)"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="cart">
+            <div class="name">Giỏ hàng của bạn</div>
+            <div class="buy__now">
+                <button type="submit">
+                    <a href="">
+                        Mua ngay
+                    </a>
+                </button>
+            </div>
+            <div class="listCart">
+
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="contents__footer">
+            <div class="name__Club">
+                <img class="logo__footer" src="/img/FC_Barcelona_logo.svg.png" alt="">
+                <p class="name__footer">Fc Barcelona</p>
+            </div>
+            <div class="corporate">
+                <div class="contentFooter">
+                    <p class="monopoly"> <strong style="opacity: 1;" class="copyRight">© Copyright Đoàn Đức Hải</strong>
+                        Official website of FC Barcelona ( Hải )</p>
+                    <p class=""></p>
+                </div>
+                <div class="link__corporate">
+                    <a href="">
+                        <li>Legal Team</li>
+                    </a>
+                    <a href="">
+                        <li>Privacy Policy</li>
+                    </a>
+                    <a href="">
+                        <li>Cookies</li>
+                    </a>
+                    <a href="">
+                        <li>Accessibity</li>
+                    </a>
+                    <a href="">
+                        <li>Contact US</li>
+                    </a>
+                    <a href="">
+                        <li class="last__child">Support/FAQs</li>
+                    </a>
+                </div>
+            </div>
+            <div class="colorFooter">
+
+            </div>
+        </div>
+    </footer>
+    <script src="/js/shop.js"></script>
+</body>
+</html>

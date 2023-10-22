@@ -1,0 +1,444 @@
+/** Shopify CDN: Minification failed
+
+Line 16:0 Transforming const to the configured target environment ("es5") is not supported yet
+Line 19:0 Transforming class syntax to the configured target environment ("es5") is not supported yet
+Line 20:12 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 30:6 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 37:22 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 41:20 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 50:15 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 54:15 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 58:5 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+Line 63:6 Transforming object literal extensions to the configured target environment ("es5") is not supported yet
+... and 66 more hidden warnings
+
+**/
+const isEscKey = ev => ev.key === 'Escape' || ev.keyCode === 27;
+
+
+class Dialog {
+	constructor(element, closeCallback) {
+		this.element = element
+		this.openers = Array.from(document.querySelectorAll(`[aria-controls="${this.element.id}"]`))
+		this.closers = Array.from(this.element.querySelectorAll('.js-close'))
+		this.body = document.body
+    this.closeCallback = closeCallback
+		this.lockScroll = true;
+		this.#init()
+	}
+
+	#init() {
+		this.#activeOpeners()
+		this.#activeClosers()
+		this.#closeOnClickBackdrop()
+		this.#closeOnClickEscKey()
+	}
+
+	#closeOnClickBackdrop() {
+		this.element.addEventListener('click', ev => ev.target.nodeName === 'DIALOG' && this.close())
+	}
+
+	#closeOnClickEscKey() {
+		document.addEventListener('keydown', ev => {
+			if (this.element.open && isEscKey(ev)) {
+				ev.preventDefault()
+				this.close()
+			}
+		})
+	}
+
+	#activeOpeners() {
+		if (this.openers.length > 0) this.openers.forEach(opener => opener.addEventListener('click', () => this.show()))
+	}
+
+	#activeClosers() {
+		if (this.closers.length > 0) this.closers.forEach(closer => closer.addEventListener('click', () => this.close()))
+	}
+
+	show() {
+		this.element.showModal()
+		if (this.lockScroll) this.body.style.overflowY = 'hidden'
+	}
+
+	close() {
+		this.element.classList.add('is-closing')
+
+		this.element.addEventListener('animationend', () => {
+			if (this.lockScroll) this.body.style.overflowY = 'auto'
+			this.element.classList.remove('is-closing')
+			this.element.close()
+      if (this.closeCallback) { this.closeCallback() }
+		}, { once: true })
+	}
+}
+
+
+if (!customElements.get('product-form')) {
+  customElements.define('product-form', class ProductForm extends HTMLElement {
+    constructor() {
+      super();
+
+      this.form = this.querySelector('form');
+      this.form.querySelector('#product-form-main-input').disabled = false;
+      this.form.addEventListener('submit', this.onSubmitHandler.bind(this));
+      this.cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+      this.submitButton = this.querySelector('[type="submit"]');
+
+      this.cartDrawerElement = document.querySelector('#fcb-cart-notification')
+      this.cartDrawer = new Dialog(this.cartDrawerElement, this.resetCartDrawer.bind(this))
+
+      this.cartDrawerProductWrapper = this.cartDrawerElement.querySelector('.fcb-cart-notification-product-wrapper')
+      this.cartDrawerProduct = this.cartDrawerElement.querySelector('.fcb-cart-notification-product')
+      this.originalCartDrawerElement = this.cartDrawerProductWrapper.innerHTML
+
+      if (document.querySelector('cart-drawer')) this.submitButton.setAttribute('aria-haspopup', 'dialog');
+    }
+
+    onSubmitHandler(evt) {
+      evt.preventDefault();
+      if (this.submitButton.getAttribute('aria-disabled') === 'true') return;
+      if (this.submitButton.dataset.noVariant === 'true') {
+        this.handleNoVariant()
+        return
+      };
+
+      this.handleErrorMessage();
+
+      this.submitButton.setAttribute('aria-disabled', true);
+      this.submitButton.classList.add('loading');
+      this.querySelector('.loading-overlay__spinner').classList.remove('hidden');
+
+      const config = fetchConfig('javascript');
+      config.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+      const formData = new FormData(this.form);
+      if (this.cart) {
+        formData.append('sections', this.cart.getSectionsToRender().map((section) => section.id));
+        formData.append('sections_url', window.location.pathname);
+        this.cart.setActiveElement(document.activeElement);
+      }
+
+      const relationUUID = crypto.randomUUID()
+
+      const getCustomFormData = (form) => {
+        const inputs = Array.from(form.querySelectorAll('input'))
+        const data = inputs.map(input => {
+          if (input.disabled == false) {
+            const data = {
+              type: input.dataset.type,
+              name: window.getConstant().nameRegExp.test(input.dataset.name) ? input.dataset.name : undefined,
+              number: window.getConstant().numberRegExp.test(input.dataset.number) ? input.dataset.number : undefined,
+              nameType: input.dataset.nameType,
+              badgeTemplate: input.dataset.badgeTemplate,
+            }
+            return [input.name, input.value, data]
+          }
+        })
+
+        const dataCleaned =  data.filter(element => element !== undefined);
+
+        return dataCleaned
+      }
+
+      const customFormData = getCustomFormData(this.form)
+
+      const productsNumber = customFormData.filter(item => item[0] === 'id').length
+
+      const items = []
+
+      for (const item of customFormData) {
+        const itemData = item[2]
+        let properties
+
+        if (itemData.type === 'customization') {
+          properties = {
+            '_related_product_id': relationUUID,
+          }
+
+          if (itemData.name) {
+            if (itemData.nameType === 'custom') {
+              if (!this.validatecustomizationNameInputMaxLenght(itemData.name)) {
+                location.reload();
+                return;
+              }
+            }
+            properties.name = itemData.name;
+          }
+          if (itemData.number) {
+            if (itemData.nameType === 'custom') {
+              if (itemData.number.length > 2 ) {
+                location.reload();
+                return;
+              }
+            }
+            properties.number = itemData.number
+          };
+          if (itemData.nameType) properties['_name_type'] = itemData.nameType;
+        } 
+        else if (itemData.type === 'badge') {
+          properties = {
+            '_related_product_id': relationUUID
+          }
+        } 
+        else {
+          properties = {
+            '_product_id': relationUUID,
+            '_customization': productsNumber > 1 ? true : false,
+            '_badge_template': itemData.badgeTemplate
+          }
+        }
+
+        if (item[0] === 'id') {
+            items.push({
+              id: item[1],
+              properties
+          })
+        }
+      }
+
+      config.body = JSON.stringify({ items, sections: this.getSectionsToRender().map((section) => section.section) })
+
+      fetch(`${routes.cart_add_url}`, config)
+        .then((response) => response.json())
+        .then((response) => {
+          if (response.status) {
+            this.handleErrorMessage(response.description);
+
+            const soldOutMessage = this.submitButton.querySelector('.sold-out-message');
+            if (!soldOutMessage) return;
+            this.submitButton.setAttribute('aria-disabled', true);
+            this.submitButton.querySelector('span').classList.add('hidden');
+            soldOutMessage.classList.remove('hidden');
+            this.error = true;
+            return;
+          } else if (!this.cart) {
+            // window.location = window.routes.cart_url;
+            this.fillCartDrawer(response)
+            this.cartDrawer.show()
+            this.sendAnalytics(items)
+            return;
+          }
+
+          this.error = false;
+          const quickAddModal = this.closest('quick-add-modal');
+          if (quickAddModal) {
+            document.body.addEventListener('modalClosed', () => {
+              setTimeout(() => { this.cart.renderContents(response) });
+            }, { once: true });
+            quickAddModal.hide(true);
+          } else {
+            this.cart.renderContents(response);
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+        })
+        .finally(() => {
+          this.submitButton.classList.remove('loading');
+          if (this.cart && this.cart.classList.contains('is-empty')) this.cart.classList.remove('is-empty');
+          if (!this.error) this.submitButton.removeAttribute('aria-disabled');
+          this.querySelector('.loading-overlay__spinner').classList.add('hidden');
+        });
+    }
+
+    sendAnalytics(items) {
+      try {
+        trackEvents('product-afegir-cistella', fcbDL.ecommerce.producto)
+
+        const mainProduct = items.find(item => item.properties.hasOwnProperty('_customization'));
+        const mainProductHasCustomization = mainProduct?.properties._customization
+  
+        if (mainProductHasCustomization) {
+          const customizationProduct = items.find(item => item.properties.hasOwnProperty('_name_type'));
+  
+          if (customizationProduct.properties._name_type === 'selected') {
+            trackEvents(`personalitzacio - jugador - ${customizationProduct.properties.name} ${customizationProduct.properties.number}`,fcbDL.ecommerce.producto)
+          } 
+          else if (customizationProduct.properties._name_type === 'custom') {
+            trackEvents('personalitzacio - propia', fcbDL.ecommerce.producto)
+          } 
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    handleErrorMessage(errorMessage = false) {
+      this.errorMessageWrapper = this.errorMessageWrapper || this.querySelector('.product-form__error-message-wrapper');
+      if (!this.errorMessageWrapper) return;
+      this.errorMessage = this.errorMessage || this.errorMessageWrapper.querySelector('.product-form__error-message');
+
+      this.errorMessageWrapper.toggleAttribute('hidden', !errorMessage);
+
+      if (errorMessage) {
+        this.errorMessage.textContent = errorMessage;
+      }
+    }
+
+    getSectionsToRender() {
+      return [
+        {
+          id: 'fcb-cart-notification-footer',
+          section: document.querySelector('#fcb-cart-notification-footer').dataset.sectionid,
+        },
+        {
+          id: 'header-icons',
+          section: document.querySelector('#header-icons').dataset.sectionid,
+        },
+      ]
+    }
+
+    handleNoVariant() {
+      const sizeOptions = document.querySelector('#fcb-product-options-size')
+      sizeOptions.classList.add('has-error')
+      sizeOptions.scrollIntoView()
+    }
+
+    fillCartDrawer(products) {
+      for (const section of this.getSectionsToRender() ) {
+        const mysectionhtml = new DOMParser()
+          .parseFromString(products.sections[section.section], 'text/html')
+          .querySelector(`#${section.id}`).innerHTML;
+
+          document.querySelector(`#${section.id}`).innerHTML = mysectionhtml
+      }
+
+
+      const baseProduct = products.items.find(product => product.product_type.toLowerCase() !== 'badge' && product.product_type.toLowerCase() !== 'customization')
+      const customizationProduct = products.items.find(product => product.product_type.toLowerCase() === 'customization')
+      const badgeProduct = products.items.find(product => product.product_type.toLowerCase() === 'badge')
+
+        if (baseProduct) {
+          const title = this.cartDrawerElement.querySelector(
+            '.fcb-cart-notification-product-title',
+          )
+          const img = this.cartDrawerElement.querySelector(
+            '.fcb-cart-notification-product-img',
+          )
+          const price = this.cartDrawerElement.querySelector(
+            '.fcb-cart-notification-product-price',
+          )
+          const relatedProductsContainer = this.cartDrawerElement.querySelector(
+            '.fcb-cart-notification-product-related',
+          )
+          const customization = this.cartDrawerElement.querySelector(
+            '#fcb-cart-notification-customization',
+          )
+          const customizationValue = customization.querySelector(
+            '.fcb-cart-notification-product-related__value',
+          )
+          const customizationPrice = customization.querySelector(
+            '.fcb-cart-notification-product-related__price',
+          )
+          const badge = this.cartDrawerElement.querySelector(
+            '#fcb-cart-notification-badge',
+          )
+          const badgeValue = badge.querySelector(
+            '.fcb-cart-notification-product-related__value',
+          )
+          const badgePrice = badge.querySelector(
+            '.fcb-cart-notification-product-related__price',
+          )
+          const options = this.cartDrawerElement.querySelector(
+            '.fcb-cart-notification-product-options',
+          )
+
+          const wrapperInsertMessage = document.querySelector(
+            '.fcb-cart-item__customization-alert',
+          )
+          const alertTitle = document.querySelector(
+            '.fcb-cart-item__customization-alert__title',
+          )
+          const alertDescription = document.querySelector(
+            '.fcb-cart-item__customization-alert__description',
+          )
+
+        title.innerHTML = baseProduct.product_title
+        img.src = baseProduct.image
+
+        // Add options
+        if (baseProduct.options_with_values.length > 0) {
+          for (const option of baseProduct.options_with_values) {
+            const htmlElement = new DOMParser()
+              .parseFromString(`
+              <dl>
+                <dt>${option.name}</dt>
+                <dd>${option.value}</dd>
+              </dl>
+              `,
+                'text/xml',
+              )
+              if (option.name != 'Title' || option.value != 'Default Title') {
+                options.appendChild(htmlElement.documentElement)
+              }
+            }
+          }
+
+        if (customizationProduct || badgeProduct) {
+          relatedProductsContainer.hidden = false
+          wrapperInsertMessage.hidden = false
+        }
+
+          // Add customization
+          if (customizationProduct) {
+            customization.hidden = false
+            customizationValue.textContent = `${customizationProduct.properties.name || ''} ${customizationProduct.properties.number || ''}`
+            customizationPrice.textContent = customFformatPrice(
+              customizationProduct.final_price,
+              { prefix: '+' },
+            )
+          }
+
+        // Add badge
+        if (badgeProduct) {
+          badge.hidden = false
+          badge.dataset.badge = badgeProduct.handle
+          badgeValue.textContent = badgeProduct.product_title
+          badgePrice.textContent = customFformatPrice(badgeProduct.final_price, { prefix: '+'})
+        }
+
+        // Add total price
+        const products = [baseProduct, customizationProduct, badgeProduct].filter(Boolean);
+        const totalPrice = products.reduce((total, product) => total + product.final_price, 0);
+        price.textContent = customFformatPrice(totalPrice, { withoutTrailingZeros: false})
+      }
+    }
+
+    resetCartDrawer() {
+      this.cartDrawerProductWrapper.innerHTML = this.originalCartDrawerElement;
+    }
+
+    validatecustomizationNameInputMaxLenght(nameInput) {
+      if ( !isNaN(window.customizationNameInputMaxLenght) ) {
+        const maxLenght = parseInt(window.customizationNameInputMaxLenght)
+        const currentLenght = nameInput.length
+        return currentLenght <= maxLenght
+      }
+      return true
+    }
+  });
+}
+
+
+
+function customFformatPrice(price, options = {}) {
+  const {
+    prefix = '',
+    decimalSeparator = ',',
+    withoutTrailingZeros = true,
+    forceCurrencyFormat = false
+  } = options;
+
+  const format = forceCurrencyFormat ? window.shop.money_with_currency_format : window.shop.money_format;
+
+  let amount = (price / 100).toFixed(2);
+
+  if (withoutTrailingZeros) amount = amount.replace(/\.?0+$/, "");
+  
+  const formattedAmount = amount.replace('.', decimalSeparator);
+  
+  const formattedPrice = format.replace(/{{(.*?)}}/, formattedAmount);
+  
+  return prefix ? `${prefix}${formattedPrice}` : formattedPrice;
+}
