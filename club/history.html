@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="shortcut icon"
+      type="x-icon"
+      href="/img/FC_Barcelona_logo.svg.png"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/club/history.css" />
+    <link rel="stylesheet" href="/css/grid.css" />
+    <link
+      rel="stylesheet"
+      href="/font/fontawesome-free-6.4.2-web/css/all.min.css"
+    />
+    <title>Lịch sử CLB</title>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="grid wide">
+        <nav class="header__navbar">
+          <ul class="header__navbar-list">
+            <li>
+              <a href="/index.html">
+                <div class="imgLogo">
+                  <svg class="icon__barca-logo" viewBox="0 0 559.078 566">
+                    <path
+                      d="M358.605 4.713c-26.059 18.091-51.183 26.518-79.061 26.518-27.881 0-53.005-8.427-79.066-26.518L193.689 0l-6.89 4.563c-29.455 19.504-53.387 23.072-89.904 23.072-12.59 0-26.127-2.376-39.145-6.872l-8.672-2.994-5.276 7.504c-2.806 3.991-4.891 6.526-6.906 8.977-2.483 3.019-4.829 5.872-7.584 10.3L24.9 51.642l5.022 6.674c22.317 29.658 30.739 60.17 30.739 88.892 0 53.56-29.285 100.889-52.35 124.822L0 280.654l8.477 8.46c4.547 4.538 12.646 12.941 19.344 19.981l-.269 3.691-.059.672a289.05 289.05 0 00-.416 15.369c0 54.393 16.077 99.616 47.894 134.593 36.836 40.498 94.434 64.675 162.507 68.438 16.904 15.395 34.083 28.173 34.852 28.744l7.277 5.397 7.268-5.416c.763-.57 17.849-13.34 34.733-28.728 68.071-3.762 125.667-27.938 162.504-68.437 31.815-34.977 47.894-80.2 47.894-134.589 0-5.045-.14-10.169-.416-15.373l-.008-.121-.061-.667s-.24-3.303-.258-3.574c6.2-6.518 14.562-15.211 19.342-19.983l8.474-8.46-8.308-8.623c-23.062-23.935-52.348-71.268-52.348-124.828 0-28.72 8.42-59.231 30.734-88.886l5.021-6.671-4.407-7.091c-2.756-4.432-5.102-7.285-7.585-10.306-2.014-2.45-4.099-4.984-6.902-8.974l-5.275-7.507-8.672 2.995c-13.021 4.496-26.557 6.872-39.146 6.872-36.52 0-60.453-3.568-89.905-23.072L365.394 0l-6.789 4.713z"
+                    ></path>
+                    <path
+                      d="M279.59 550.813s-19.458-14.434-37.037-30.854c-115-4.768-210.16-69.259-202.889-205.854.43-3.604.065-3.361.689-9.51-6.594-6.977-17.505-18.36-23.267-24.11 41.25-42.805 89.384-140.716 22.573-229.5 4.393-7.063 7.573-9.405 14.111-18.705 13.354 4.611 28.203 7.54 43.123 7.54 38.313 0 64.472-3.802 96.633-25.099 25.426 17.65 52.999 28.694 86.018 28.694 33.017 0 60.588-11.044 86.012-28.694 32.16 21.296 58.319 25.099 96.635 25.099 14.916 0 29.769-2.928 43.123-7.54 6.537 9.299 9.717 11.642 14.107 18.705-66.808 88.784-18.671 186.695 22.575 229.5-5.761 5.75-16.674 17.133-23.267 24.11.621 6.148.26 5.906.689 9.51 7.271 136.595-87.893 201.084-202.886 205.854-17.58 16.421-36.942 30.854-36.942 30.854z"
+                      fill="#e2b900"
+                    ></path>
+                    <path
+                      d="M61.478 305.958h-1.623l-.692 5.877-.499 3.783c-2.684 52.618 10.435 95.126 38.984 126.439 32.746 35.92 85.798 56.385 153.421 59.187.066.002 1.136.008 1.136.008 20.29.11 39.453.214 55.757-.006 67.674-2.803 120.726-23.269 153.471-59.188 28.55-31.312 41.668-73.819 38.992-126.343-.007-.095-.509-3.896-.509-3.896l-.686-5.791-1.63-.069H61.478z"
+                    ></path>
+                    <path
+                      d="M63.1 309.61l-.329 2.789s-.462 3.505-.467 3.505a253.642 253.642 0 00-.336 12.939c0 45.576 12.885 82.788 38.38 110.753 6.093 6.685 12.916 12.819 20.421 18.395V309.61H63.1zm433.682 6.387l-.475-3.616-.328-2.771h-57.668v148.382c7.507-5.575 14.33-11.71 20.422-18.395 25.5-27.97 38.384-65.19 38.384-110.707-.001-4.224-.11-8.523-.335-12.893z"
+                      fill="#004b95"
+                    ></path>
+                    <path
+                      d="M184.278 309.61H120.77v148.382c17.573 13.06 38.914 23.035 63.508 29.753V309.61zm190.526 0v178.132c24.6-6.72 45.938-16.694 63.507-29.75V309.61h-63.507z"
+                      fill="#a4234b"
+                    ></path>
+                    <path
+                      d="M218.665 401.004c0-21.983 11.655-41.242 29.122-51.942V309.61h-63.51v178.135c19.253 5.26 40.502 8.516 63.51 9.681v-44.478c-17.466-10.7-29.122-29.96-29.122-51.944zm92.63-91.394v39.451c17.466 10.7 29.122 29.959 29.122 51.942s-11.656 41.244-29.122 51.944v44.476c23.011-1.168 44.259-4.425 63.509-9.682V309.61h-63.509z"
+                      fill="#004b95"
+                    ></path>
+                    <path
+                      d="M311.295 349.062V309.61h-63.508v39.451c9.244-5.666 20.115-8.934 31.752-8.934 11.638.001 22.511 3.27 31.756 8.935zm-63.508 103.886v44.478c1.121.058 2.237.121 3.367.167l1.07.006c20.272.109 39.419.213 55.637-.004 1.151-.048 2.289-.113 3.434-.171v-44.476c-9.246 5.663-20.119 8.933-31.756 8.933-11.636.001-22.508-3.269-31.752-8.933z"
+                      fill="#a4234b"
+                    ></path>
+                    <path
+                      d="M248.474 412.051c-11.015-10.032-11.049-30.418-8.09-43.959.822-3.771 1.857-7.462 2.925-11.681-12.95 10.533-21.223 26.598-21.223 44.593a57.28 57.28 0 004.173 21.541c.979.128 1.974.197 2.984.197 8.508 0 15.455-3.93 19.231-10.691zm59.15 4.397c-1.885 9.629-12.183 16.844-21.887 22.631-9.999 5.965-26.126 9.047-38.261 9.609 9.158 6.169 20.191 9.772 32.063 9.772 21.669 0 40.536-11.997 50.318-29.706-1.713-14.174-15.188-15.839-22.233-12.306z"
+                      fill="#e2b900"
+                    ></path>
+                    <path
+                      d="M243.021 445.36c11.986.093 30.407-2.922 40.966-9.219 13.648-8.144 24.251-16.833 19.213-28.879-2.546-6.087-11.01-13.132-21.983-5.361-.701 8.992-11.801 16.923-19.771 15.901-4.038-.518-7.422-1.792-10.241-3.637-4.479 7.653-12.498 11.997-21.959 11.997-.466 0-.931-.013-1.39-.039a57.579 57.579 0 0015.165 19.237zm36.371-80.161c9.503-3.94 22.675 1.181 32.711 6.784 9.475 5.294 19.368 15.173 24.79 25.548-1.786-29.957-26.517-53.725-56.857-53.981-9.066 5.954-7.828 17.178-.644 21.649z"
+                      fill="#e2b900"
+                    ></path>
+                    <path
+                      d="M277.785 401.858c-11.765-8.581-11.042-22.083-5.98-30.104 1.242-1.968 2.688-3.515 4.294-4.699-6.84-5.46-8.209-16.054-1.583-23.292a57.13 57.13 0 00-26.915 9.475c-2.509 10.79-5.703 20.644-5.543 31.914.215 15.188 6.502 27.552 19.822 29.26 6.216.796 15.185-5.818 15.905-12.554z"
+                      fill="#e2b900"
+                    ></path>
+                    <path
+                      d="M336.757 406.288c-3.279-11.887-15.065-25.028-26.322-31.316-13.879-7.754-29.062-11.97-35.738-1.389-4.285 6.79-4.881 18.006 4.84 25.316 13.214-9.127 23.769-.252 26.817 7.046.979 2.337 1.475 4.56 1.562 6.675 7.799-2.744 20.475-.977 24.378 11.195a57.128 57.128 0 004.463-17.527z"
+                      fill="#e2b900"
+                    ></path>
+                    <path
+                      d="M227.165 239.72h-40.162v56.47h12.237v-23.298h16.664v-11.923H199.24v-9.247h28.514v-12l-.589-.002zm23.356 28.234c0 17.681 9.718 29.104 24.758 29.104 9.805 0 16.867-4.312 20.988-12.812l.236-.488-10.292-6.104-.301.504c-2.936 4.915-5.73 6.742-10.314 6.742-7.489 0-12.522-6.811-12.522-16.946 0-10.452 4.769-16.945 12.444-16.945 4.458 0 7.592 1.86 9.584 5.688l.26.499 11.328-5.227-.262-.54c-3.979-8.228-11.155-12.577-20.754-12.577-14.81-.001-25.153 11.967-25.153 29.102zm114.238-2.348c3.42-2.425 5.427-6.231 5.427-10.685 0-9.518-6.777-15.201-18.126-15.201h-25.944v56.47h25.705c12.686 0 20.257-6.894 20.257-18.44 0-5.408-2.701-9.74-7.319-12.144zm-26.644-14.516h13.471c5.496 0 6.2 2.512 6.2 4.701 0 3.112-1.847 4.625-5.647 4.625h-14.023l-.001-9.326zm14.101 33.416h-14.101v-13.117h14.101c4.988 0 7.311 2.072 7.311 6.519 0 4.316-2.527 6.598-7.311 6.598zm12.709-246.664c-27.359 16.55-55.29 24.606-85.388 24.628-30.095-.021-58.023-8.078-85.383-24.628l-.914-.553-.929.526c-31.167 17.613-58.589 21.058-95.423 21.058-8.852 0-17.984-.889-27.146-2.643l-3.948-.756 2.028 3.471c37.842 64.758 24.408 127.366 6.476 168.486l-1.115 2.557h412.715l-1.117-2.557c-17.931-41.12-31.365-103.728 6.475-168.486l2.028-3.471-3.946.756c-9.161 1.754-18.295 2.643-27.146 2.643-36.834 0-64.257-3.445-95.423-21.058l-.93-.526-.914.553z"
+                    ></path>
+                    <path
+                      d="M152.957 57.315c-17.286 4.101-35.198 5.211-56.068 5.211-7.893 0-16.01-.817-24.159-2.178 9.669 17.289 15.821 34.397 19.311 50.979h60.917l-.001-54.012zm124.758 54.012V66.091c-21.855-.249-42.595-4.685-62.809-13.438v58.674h62.809zm-183.946 61.95c-2.877 19.829-8.618 37.803-15.066 53.057h74.255v-53.057H93.769zm121.137 53.057h62.809v-53.057h-62.809v53.057z"
+                      fill="#fff"
+                    ></path>
+                    <path
+                      d="M214.906 111.327V52.653c-7.304-3.162-14.542-6.873-21.734-11.175-13.754 7.668-26.795 12.653-40.214 15.836v54.012H92.041a171.814 171.814 0 013.683 35.4c0 9.151-.716 18.02-1.954 26.55h59.188v53.057h61.949v-53.057h62.809v-61.95l-62.81.001z"
+                      fill="#db2f36"
+                    ></path>
+                    <path
+                      d="M365.906 41.478l-.088.051v184.804h21.777V51.614c-7.134-2.705-14.308-6.022-21.689-10.136zM322.263 60.38v165.954h21.777V52.709a164.918 164.918 0 01-21.777 7.671zm-40.898 5.711v160.243h19.12V64.747a164.521 164.521 0 01-19.12 1.344zm128.011-8.068v168.311h21.776V61.296c-7.49-.695-14.699-1.752-21.776-3.273zm53.981 88.704c0-27.036 6.251-56.444 22.994-86.379-8.149 1.36-16.268 2.178-24.159 2.178-3.16 0-6.229-.037-9.261-.095v163.903h27.447c-9.223-21.818-17.021-49.184-17.021-79.607z"
+                      fill="#ffdf00"
+                    ></path>
+                    <path
+                      d="M431.153 61.296v165.038h21.777V62.431c-7.587-.144-14.811-.489-21.777-1.135zm-130.667 3.451v161.587h21.777V60.38a158.515 158.515 0 01-21.777 4.367zm43.555-12.038v173.625h21.777V41.529c-7.206 4.306-14.459 8.019-21.777 11.18zm43.555-1.095v174.72h21.779V58.023a150.014 150.014 0 01-21.779-6.409z"
+                      fill="#db2f36"
+                    ></path>
+                  </svg>
+                  <i class="text__logo">FC Barcelona</i>
+                </div>
+              </a>
+            </li>
+          </ul>
+          <ul class="header__navbar-list">
+            <li class="header__navbar-elements">
+              <a class="header__navbar-elements-list active__here" href="">
+                <!-- <i class="fa-solid fa-binoculars"></i> -->
+                CLB
+                <i
+                  class="header__navbar-elements-icon fa-solid fa-caret-down"
+                ></i>
+              </a>
+              <div class="element-child">
+                <div class="downMenu">
+                  <a href="/club/news.html">Tin tức mới</a><br />
+                  <a href="/club/poundation.html">Đối tác</a><br />
+                  <a href="/club/identity.html">Đặc trưng</a><br />
+                  <a href="">Hơn cả một CLB</a><br />
+                  <a href="/club/organisation.html">Tổ chức</a><br />
+                  <a class="item__right" href="">Lịch sử</a>
+                </div>
+                <!-- các phần tử xổ xuống -->
+              </div>
+            </li>
+            <li class="header__navbar-elements">
+              <a class="header__navbar-elements-list" href="">
+                Đội bóng
+                <i
+                  class="header__navbar-elements-icon fa-solid fa-caret-down"
+                ></i>
+              </a>
+              <div class="element-child">
+                <div class="downMenu">
+                  <a href="/footballTeam/standing.html">Bảng xếp hạng</a><br />
+                  <a href="/footballTeam/schedule.html">Lịch thi đấu</a><br />
+                  <a href="/footballTeam/result.html">Kết quả</a><br />
+                  <a href="/footballTeam/player.html">Cầu thủ</a><br />
+                  <a href="/footballTeam/honours.html">Danh hiệu</a><br />
+                  <a href="/footballTeam/legendary.html">Huyền thoại CLB</a
+                  ><br />
+                </div>
+                <!-- các phần tử xổ xuống -->
+              </div>
+            </li>
+            <li class="header__navbar-elements">
+              <a class="header__navbar-elements-list" href="/barcaTV.html">
+                <i class="fa-solid fa-tv"></i>
+                Barca TV
+              </a>
+            </li>
+            <li class="header__navbar-elements">
+              <a class="header__navbar-elements-list" href="/tickets.html">
+                <i class="fa-solid fa-ticket"></i>
+                Vé
+                <!-- <i class="header__navbar-elements-icon fa-solid fa-caret-down"></i> -->
+              </a>
+            </li>
+            <li class="header__navbar-elements">
+              <a class="header__navbar-elements-list" href="/shop.html">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Cửa hàng
+                <!-- <i class="header__navbar-elements-icon fa-solid fa-caret-down"></i> -->
+              </a>
+            </li>
+          </ul>
+
+          <ul class="header__user-connect">
+            <li class="user-login">
+              <a class="acc-login" href="/login.html">
+                <i class="fa-solid fa-user"></i>
+                Đăng nhập
+              </a>
+            </li>
+            <li class="user-register">
+              <a class="acc-regist" href="/register.html"> Đăng ký </a>
+            </li>
+            <li class="select__language">
+              EN
+              <!-- <i class="header__navbar-elements-icon fa-solid fa-caret-down"></i> -->
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <div class="history__container">
+      <div class="grid wide">
+        <div class="row history__contents">
+          <div class="header-history">
+            <span>Lịch sử phát triển Fc Barcelona qua các giai đoạn</span>
+          </div>
+          <div class="detail__history">
+            <div class="page__history">
+              <span class="title__page"> Thành lập những năm đầu </span>
+              <span class="content__detail-his">
+                Vào ngày 22 tháng 10 năm 1899, một người Thụy Sĩ Hans Gamper đã
+                đăng một quảng cáo ở Los Deportes tuyên bố mong muốn thành lập
+                một câu lạc bộ bóng đá; một phản ứng tích cực dẫn đến một cuộc
+                họp tại Gimnasio Solé vào ngày 29 tháng 11. Mười một cầu thủ
+                tham dự – Walter Wild (chủ tịch đầu tiên của câu lạc bộ), Luis
+                de Ossó, Bartomeu Terradas, Otto Kunzle, Otto Maier, Enric
+                Ducal, Pere Cabot, Carles Pujol, Josep Llobet, John Parsons và
+                William Parsons – và Foot-Ball Club Barcelona ra đời.
+                <br /><br />
+                FC Barcelona đã có một khởi đầu thành công ở các cúp khu vực và
+                quốc gia, thi đấu ở Campionat de Catalunya và Copa del Rey. Năm
+                1901, câu lạc bộ tham gia giải đấu bóng đá đầu tiên được tổ chức
+                trên bán đảo Iberia, Copa Macaya, suýt thua Hispania AC, nhưng
+                vào năm sau, Barça đã vô địch giải đấu, chiếc cúp bạc đầu tiên
+                của câu lạc bộ, và sau đó tham dự Copa del Rey đầu tiên, thua
+                1–2 trước Bizcaya (sự kết hợp giữa các cầu thủ của Athletic Club
+                và Bilbao FC) trong trận chung kết. Năm 1908, Hans Gamper – bây
+                giờ được gọi là Joan Gamper - trở thành chủ tịch câu lạc bộ
+                trong một nỗ lực tuyệt vọng để cứu Barcelona khỏi sự diệt vong,
+                nhận thấy câu lạc bộ đang gặp khó khăn không chỉ trên sân cỏ mà
+                còn về tài chính và xã hội, sau khi không giành được chiến thắng
+                nào kể từ Campionat de Catalunya năm 1905. Ông ấy nói trong một
+                cuộc họp: "Barcelona không thể chết và không được chết. Nếu
+                không có ai cố gắng, thì tôi sẽ đảm nhận trách nhiệm điều hành
+                câu lạc bộ từ bây giờ." Chủ tịch câu lạc bộ trong năm lần riêng
+                biệt từ năm 1908 đến năm 1925, ông đã dành tổng cộng 25 năm để
+                lãnh đạo. Một trong những thành tựu chính của anh ấy là đảm bảo
+                Barça có được sân vận động của riêng mình và do đó tạo ra thu
+                nhập ổn định. <br /><br />
+                Vào ngày 14 tháng 3 năm 1909, đội chuyển đến Camp de la
+                Indústria, một sân vận động có sức chứa 8.000 người. Để chào
+                mừng môi trường xung quanh mới của họ, câu lạc bộ đã tổ chức một
+                cuộc thi biểu trưng vào năm sau. Carles Comamala đã giành chiến
+                thắng trong cuộc thi, và gợi ý của anh ấy đã trở thành huy hiệu
+                mà câu lạc bộ vẫn đeo – với một số thay đổi nhỏ – cho đến ngày
+                nay. <br /><br />
+                Sân vận động được coi là yếu tố chính giúp câu lạc bộ phát triển
+                trong những năm 1910 và trở thành một đội thống trị, vô địch ba
+                giải Campionats de Catalunya liên tiếp từ 1909 đến 1911, ba Copa
+                del del Rey trong bốn năm từ 1910 đến 1913, và bốn cúp Pyrenees
+                liên tiếp từ năm khai mạc 1910 đến 1913, đây là một trong những
+                cúp câu lạc bộ quốc tế sớm nhất ở châu Âu vì nó bao gồm các đội
+                mạnh nhất của Languedoc, Midi và Aquitaine (miền Nam nước Pháp),
+                Xứ Basque và Catalonia; tất cả đều là cựu thành viên của Marca
+                Hispanicavùng đất. Cuộc thi là uy tín nhất trong thời kỳ đó.
+                Những nhân vật đáng chú ý của đội bóng vĩ đại đầu tiên của Barça
+                bao gồm Carles Comamala, Alfredo Massana, Amechazurra, Paco Bru
+                and Jack Greenwell. Sau này trở thành huấn luyện viên chính thức
+                đầu tiên của câu lạc bộ vào năm 1917. <br /><br />
+                Trong cùng thời gian, câu lạc bộ đã thay đổi ngôn ngữ chính thức
+                từ Castilian sang tiếng Catalan và dần dần phát triển thành một
+                biểu tượng quan trọng của bản sắc Catalan. Đối với nhiều người
+                hâm mộ, việc tham gia vào câu lạc bộ ít liên quan đến bản thân
+                trò chơi mà hơn thế nữa là trở thành một phần bản sắc tập thể
+                của câu lạc bộ. Vào ngày 4 tháng 2 năm 1917, câu lạc bộ tổ chức
+                trận đấu tưởng nhớ đầu tiên để vinh danh Ramón Torralba, người
+                đã thi đấu từ năm 1913 đến năm 1928. Trận đấu diễn ra với đội
+                bóng địa phương Terrassa, nơi Barcelona giành chiến thắng với tỷ
+                số 6–2. <br />
+                Gamper đồng thời phát động chiến dịch tuyển thêm thành viên câu
+                lạc bộ và đến năm 1922, câu lạc bộ đã có hơn 20.000 người, những
+                người đã giúp tài trợ cho một sân vận động mới. Câu lạc bộ sau
+                đó chuyển đến Les Cortes mới, nơi họ khánh thành cùng năm. Les
+                Cortes có sức chứa ban đầu là 30.000, đến thập niên 1940 được mở
+                rộng lên 60.000. <br /><br />
+                Năm 1912, Gamper chiêu mộ Paulino Alcántara, cầu thủ ghi bàn
+                nhiều thứ bảy mọi thời đại của câu lạc bộ, và vào năm 1917,
+                Gamper cũng chiêu mộ Jack Greenwell làm huấn luyện viên toàn
+                thời gian đầu tiên trong lịch sử của Barcelona. Sau lần tuyển
+                dụng này, vận may của câu lạc bộ bắt đầu được cải thiện trên sân
+                và nhanh chóng tận hưởng "thời kỳ hoàng kim" đầu tiên. Cùng với
+                Alcántara, đội Barça dưới thời Greenwell còn có Sagibarba,
+                Ricardo Zamora, Josep Samitier, Félix Sesúmaga and Franz Platko.
+                Đội bóng này đã giành được 9 trên 10 Campionats de Catalunya từ
+                năm 1919 đến 1928 và hai danh hiệu Copa del Rey vào năm 1920 và
+                1922. Tổng cộng, trong thời kỳ do Gamper dẫn dắt, Barcelona đã
+                giành được 11 Campionats de Catalunya, 6 Copa del Rey và 4 Cúp
+                Pyrenees.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Từ 1923-1939, thời kỳ nội chiến </span>
+              <span class="content__detail-his">
+                Vào dịp kỷ niệm 25 năm thành lập CLB, Barça khánh thành Sân vận
+                động Les Corts và CLB cũng là một tập hợp của nhiều anh tài như
+                là Samitier, Sargi-Barba, Piere, Sancho,... tất cả những điều đó
+                giúp CLB giành được nhiều chức vô địch trong thời kỳ này.
+                <br /><br />
+                Tại đấu trường nội địa, Barça trở thành nhà vô địch đầu tiên khi
+                giải La Liga được thành lập vào năm 1929 và kể từ đó cho đến nay
+                chưa bao giờ xuống hạng (cùng với Real Madrid và Athletic
+                Bilbao). Nhưng cuộc khủng hoảng kinh tế thế giới và sau đó là
+                cuộc nội chiến bắt đầu đã buộc Barça phải bán đi những cầu thủ
+                hay nhất của mình. Chế độ Franco căm thù đội bóng giương cao
+                ngọn cờ của xứ Catalan. Không chỉ gạt bỏ tất cả những gì liên
+                quan đến địa phương, chẳng hạn như ngôn ngữ, Franco còn đưa một
+                người thân cận lên chức chủ tịch CLB và đổi tên Barça thành
+                "Club de Fútbol Barcelona" theo đúng tiếng Tây Ban Nha.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Từ 1939-1988 </span>
+              <span class="content__detail-his">
+                Thập niên 1950 đánh dấu một thời đại mới trong lịch sử CLB với
+                những cầu thủ Hungary như Ladislao Kubala, Zoltán Czibor, Sándor
+                Kocsis và những cầu thủ Tây Ban Nha như Luis Suarez, Barcelona
+                giành được những danh hiệu đầu tiên ở châu Âu. Một cú đánh đầu
+                bằng vàng của Evaristo đã gạt Real ra rìa ở cúp C1 năm 1961.
+                Nhưng sai lầm ngớ ngẩn của thủ thành Ramallets đã dâng chiếc cúp
+                cho Benfica, lúc đó còn vô danh. Đó là trận chung kết C1 đầu
+                tiên của Barça, chiếc cúp mà mãi 31 năm sau mới trở về với họ.
+                Đấy là thời kì huy hoàng của CLB, trong vòng 13 năm Barça đạt
+                được 6 chức vô địch Liga, 5 cúp Nhà vua và 2 cúp Hội chợ liên
+                thành phố (tiền thân của cúp C3 hay là UEFA sau này). Trong suốt
+                lịch sử các cúp châu Âu, Barça là đội bóng duy nhất chưa bao giờ
+                vắng mặt ở đấu trường này. Và Barça cũng cùng với Juventus, Ajax
+                Amsterdam và Bayern München là những đội bóng hiếm hoi đã dành
+                đủ cả ba chiếc cúp C1, C2 và C3. Trong thập niên 1950, với sự
+                phát triển mạnh mẽ của CLB, sân Les Corts trở nên chật chội. Vào
+                ngày 24 tháng 9 năm 1957 sân vận động hiện thời - sân Nou Camp,
+                được khánh thành với sức chứa hơn 90.000 chỗ ngồi.Và sân Nou
+                Camp, trong suốt chiều dài lịch sử của mình và qua các lần sửa
+                chữa nâng cấp đã có lúc lên đến 120.000 chỗ ngồi. Cho đến bây
+                giờ sân Camp Nou vẫn là sân vận động lớn nhất châu Âu.
+                <br /><br />
+                Nhưng những thành công của Barça không làm người ta thoả mãn, họ
+                vẫn chưa có chiếc cúp C1 danh giá, tiền đổ ra như nước nhằm phục
+                vụ tham vọng này. Và rất nhiều những ngôi sao sáng, những huấn
+                luyện viên tài ba nhất của bóng đá thế giới đã đến đây với mục
+                tiêu chinh phục nó: Rinus Michels, Terry Venables, Diego
+                Maradona và những chàng trai người Anh như Gary Lineker,
+                Hughes... Nhưng họ vẫn trắng tay khi thất bại trước Benfica vào
+                năm 1961 tại Thụy Sĩ và trước Steaua Bucharest năm 1986 tại
+                chính Tây Ban Nha.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Các huấn luyện viên Hà Lan </span>
+              <span class="content__detail-his">
+                Và cuối cùng Johan Cruyff - cầu thủ huyền thoại người Hà Lan,
+                người đã từng thi đấu trong màu áo Barcelona, đổ bộ xuống đây
+                vào một ngày mùa thu năm 1988 trên chiếc ghế huấn luyện viên
+                trưởng để mở ra một kỷ nguyên mới trong lịch sử CLB, ông đã biến
+                Barça thành cái gọi là "Dream Team". Và cú sút khủng khiếp của
+                Ronald Koeman trong một đêm Wembley kỳ ảo tháng 5 năm 1992 đã
+                đem đến chiếc cúp châu Âu duy nhất còn thiếu trong lịch sử mà
+                Barca đã đeo đuổi suốt 40 năm. Ngôi đền thiêng của Barca đã mở
+                ra với huyền thoại người Hà Lan, với những chiến công mà không
+                ai có thể lặp lại được cho đến tận bây giờ. Có thể tổng kết lại
+                Barca dưới thời đấy qua phát biểu của Fernando, một cựu cầu thủ
+                của Valencia: "Bạn không thể thắng được Barca đâu. Thứ nhất, họ
+                lúc nào cũng có nhiều bóng. Thứ hai, họ khoẻ hơn chúng ta và thứ
+                ba, họ chạy như những thằng điên". <br /><br />
+                Hai năm sau, Barca cũng đã lọt vào trận chung kết Cup châu Âu
+                năm 1994, nhưng đội hình Dream Team năm ấy lại dễ dàng để thua
+                với tỷ số 0-4, hệ quả Johan Cruyff phải ra đi. Sau này lối chơi
+                của Barca đều xoay quanh tiền vệ Luís Figo. Năm 1996, Barca đã
+                có được chữ ký của tiền đạo Ronaldo với mức phí 19,5 triệu USD
+                từ PSV Eindhoven. <br /><br />
+                Mùa giải ấy với bộ đôi Figo-Ronaldo, Barcelona đã giành được Cup
+                nhà Vua và hơn hết là chiếc Cup C2 với Ronaldo là người ghi bàn
+                thắng duy nhất ở trận chung kết trước PSG. Với phong độ chói
+                sáng của Figo, Barca tiếp tục giành thêm 2 danh hiệu La Liga vào
+                các năm 1998 và 1999 cùng với Cup quốc gia mùa giải 1997-98. Tuy
+                vậy, việc để mất Luís Figo vào tay kình địch Real Madrid hay
+                việc bán đi Ronaldo cho Inter Milan đã khiến cho thành tích của
+                Barca đi xuống vào những năm sau đó. <br /><br />
+                Sau hai chức vô địch La Liga 1998 và 1999, Barca dưới sự dẫn dắt
+                của huấn luyện viên người Hà Lan, Louis van Gaal liên tiếp trải
+                qua những mùa giải trắng tay mặc dù trong đội hình sở hữu những
+                cầu thủ xuất sắc nhất của bóng đá Hà Lan như Frank de Boer,
+                Phillip Cocu, Patrick Kluivert hay Marc Overmars. Kết quả van
+                Gaal phải ra đi, thay thế ông là một huấn luyện viên người Hà
+                Lan khác, ông Frank Rijkaard. <br /><br />
+                Mùa giải đầu tiên dưới thời Frank Rijkaard, Barca đã có được chữ
+                ký của tiền vệ lừng danh Ronaldinho với mức phí 28 triệu euro,
+                tuy nhiên họ lại thi đấu không thực sự thành công khi mùa giải
+                này Barca không giành được danh hiệu nào. Sang mùa giải kế tiếp,
+                Frank Rijkaard lần lượt chia tay các công thần người Hà Lan,
+                thay vào đó là những Samuel Eto'o hay Deco. Mùa giải này Barca
+                đã đánh bại kình địch Real Madrid với tỷ số đậm 3-0, mặc dù ở
+                trận lượt về Real đã đánh bại Barca 4-2 nhưng chức vô địch La
+                Liga vẫn về tay Barca khi họ hơn kình địch 4 điểm. Còn ở châu
+                Âu, Barca phải rời giải sớm khi để thua Chelsea của José
+                Mourinho với tổng tỉ số 5-4 sau 2 lượt trận. <br /><br />
+                Bước sang mùa giải sau đó, 2005-2006, Barca chính thức ra mắt
+                cầu thủ trẻ Lionel Messi, người mà sau này trở thành cầu thủ
+                xuất sắc nhất thế giới. Ở La Liga, Barca đã gây sốc khi đè bẹp
+                Real Madrid khi đó đang sở hữu dành sao Galacticos với tỷ số 3-0
+                ngay tại Bernabeu. Năm 2006, Barca bảo vệ thành công chức vô
+                địch La Liga lần thứ 18. <br /><br />
+                Tại Champions League (tiền thân là cúp C1), Barca đã tiến đến
+                trận chung kết với thành tích không để thua trận nào, khi lần
+                lượt vượt qua Chelsea, Benfica và AC Milan. Ở trận chung kết,
+                Barca chạm trán Arsenal, hiệp 1 Arsenal dẫn trước 1-0 nhưng khi
+                trận đấu còn 15 phút nữa kết thúc, cầu thủ Henrik Larsson với
+                hai đường chuyền kiến tạo cho Samuel Eto'o và Juliano Belletti
+                lập công đã mang chức vô địch về với sân Nou Camp. Khi ấy đội
+                hình Barca được xem là "Dream Team 2" gồm những cái tên
+                Ronaldinho, Eto'o, Messi...
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page">
+                Thời hoàng kim cùng Guardiola (2008-2012)
+              </span>
+              <span class="content__detail-his">
+                Giai đoạn 2006-2008 đánh dấu sự đi xuống của Barca dưới thời
+                Frank Rijkaard khi đội liên tiếp trắng tay 2 năm liền, xếp sau
+                đại kình địch Real Madrid tại La Liga, và thất bại tại UEFA
+                Champions League. Cũng bởi lẽ đó Rijkaard đã phải ra đi và thế
+                chỗ cho ông là Pep Guardiola. <br /><br />
+                Từ năm 2008-2011 mở ra một chu kỳ thành công mới cho đội bóng xứ
+                Catalan dưới sự chỉ huy của Pep Guardiola. Ngay từ mùa giải đầu
+                tiên dẫn dắt 2008-09, Barca đã đạt cú ăn sáu vô tiền khoáng hậu
+                trong lịch sử bóng đá cấp CLB mà cho đến nay chưa có CLB nào đạt
+                được (vô địch tất cả các giải đấu trong một mùa giải cấp CLB ở
+                châu Âu) - bao gồm La Liga, Champions League, Cúp nhà Vua, Siêu
+                cúp TBN, Siêu cúp Châu Âu và World Cup Club, đáng chú ý khi vượt
+                qua Real Madrid tại giải quốc nội, chính là trận thắng 6-2 ngay
+                trên sân của đại kình địch, đánh bại Athletic Bilbao đến 4-1
+                trong trận chung kết Cup Nhà Vua, và thắng ĐKVĐ châu Âu khi đó
+                là Manchester United với tỷ số 2-0 và trở thành câu lạc bộ Tây
+                Ban Nha đầu tiên đoạt được cú ăn ba. <br /><br />
+                Ở mùa giải tiếp theo 2009-10, CLB đã ký hợp đồng với Zlatan
+                Ibrahimović với mức phí chuyển nhượng kỷ lục ở lúc đó là 69
+                triệu euro (46 triệu euro tiền mặt và các thêm Samuel Eto'o).
+                Mùa giải năm ấy, mặc dù kình địch Real Madrid đã mua sắm rầm rộ
+                với hơn 200 triệu euro vào thị trường chuyển nhượng, nhưng rốt
+                cuộc Barca vẫn xếp trên họ. Ở trận El Clasico lượt đi trên sân
+                Nou Camp, Barca đã giành chiến thắng với pha lập công duy nhất
+                của tiền đạo tân binh Zlatan Ibrahimović. Barca còn xuất sắc
+                giành tiếp 3 danh hiệu Siêu Cup châu Âu, Siêu Cúp Tây Ban Nha,
+                và Cup liên lục địa, kết thúc một năm 2009 vinh quang với cú ăn
+                6 vĩ đại. Tại trận Siêu kinh điển lượt về, Barca đã giành chiến
+                thắng 2-0 trên sân Bernabeu nhờ 2 bàn thắng của Lionel Messi và
+                Pedro Rodríguez qua đó bảo vệ thành công chức vô địch La Liga.
+                Tuy nhiên đó lại được xem là một mùa giải không mấy thành công
+                khi họ chỉ giành được 1 danh hiệu quốc nội, trước đó Barca bị
+                Sevilla loại ở Cúp Nhà Vua do luật bàn thắng trên sân khách khi
+                thua 1-2 trên sân nhà và chỉ thắng 1-0 trên sân Sevilla. Ở cup
+                châu Âu, Barca cũng không thể vào tới trận chung kết khi bị
+                Inter Milan đánh bại tại bán kết UEFA Champions League 2009-10.
+                <br /><br />
+                Tại mùa giải 2010-11, Barca đã chính thức sở hữu nhà vô địch thế
+                giới năm 2010, tiền đạo David Villa, chân sút ghi bàn nhiều nhất
+                cho tuyển Tây Ban Nha tại World Cup 2010 với giá 40 triệu euro,
+                khi đó Barca đang có một hàng công mạnh với sự xuất hiện của bộ
+                ba MVP (Messi-Villa-Pedro). Tại La Liga mùa giải năm đó, mặc dù
+                sau thất bại bất ngờ 0-2 trước câu lạc bộ nhược tiểu Hercules
+                ngay trên sân nhà Nou Camp và để kình địch Real Madrid xếp trên
+                trong giai đoạn đầu mùa giải, nhưng trận siêu kinh điển lượt đi
+                đã thay đổi tất cả. Tại trận đấu ấy, Barca đã nã vào lưới Real
+                đến 5 bàn với cú đúp của David Villa và các bàn thắng của Xavi,
+                Pedro Rodríguez Ledesma, Jeffrén Suárez. Trận đấu kết thúc với
+                chiếc thẻ đỏ của Sergio Ramos sau pha phạm lỗi thô bạo với
+                Lionel Messi. Từ đó Real phải xếp sau Barcelona ở La Liga.
+                <br /><br />
+                Tháng 4 năm 2011, một sự kiện hiếm có diễn ra khi lần đầu tiên,
+                4 trận Siêu kinh điển diễn ra liên tiếp trong vòng 8 ngày. Trận
+                đầu tiên trong khuôn khổ La Liga diễn ra ngày 17 tháng 4 (kết
+                thúc với tỉ số hòa 1-1 từ 2 quả penalty), trận chung kết Cúp nhà
+                Vua (Real thắng 1-0) và hai lượt trận bán kết Champions League
+                vào ngày 27 tháng 4 và 2 tháng 5 (Real thua 1-3 sau cả hai
+                lượt). Trận Siêu kinh điển đầu tiên kết thúc với tỷ số hòa 1-1
+                bởi 2 quả Penalty cho cả hai bên. Trận chung kết Cup nhà Vua,
+                Barca không thể giành lấy danh hiệu đầu tiên trong năm 2011 bởi
+                một cú đánh đầu của Cristiano Ronaldo trong khoảng thời gian bù
+                giờ vào lưới thủ môn José Manuel Pinto. Hai trận bán kết
+                Champions League có lẽ chính là những trận gây tranh cãi nhiều
+                nhất sau khi hậu vệ Pepe bị truất quyền thi đấu trong trận lượt
+                đi trên sân Santiago Bernabéu, sau khi anh được cho là đã thực
+                hiện một pha tranh bóng nguy hiểm đối với hậu vệ Barcelona Dani
+                Alves. Sau khi Pepe bị đuổi, huấn luyện viên José Mourinho cũng
+                bị truất quyền thi đấu, bị phạt tiền và cấm chỉ đạo 5 trận. Trận
+                đấu này cũng gây tranh cãi khi tiền vệ của Barcelona Sergio
+                Busquets bị ghi hình trong một đoạn video cho thấy anh đang văng
+                một từ ngữ mang tính phân biệt chủng tộc với hậu vệ trái của
+                Madrid Marcelo. Trận lượt về không nhiều tranh cãi như trận
+                trước, ngoại trừ bàn thắng bị trọng tài từ chối của Gonzalo
+                Higuaín vì Cristiano Ronaldo đã phạm lỗi với Javier Mascherano
+                trước đó. Messi toả sảng với cú đúp bàn thắng, đáng chú ý là pha
+                solo qua một loạt cầu thủ Real từ giữa sân rồi sút chéo góc ghi
+                bàn đánh bại Casillas, đó là bàn thắng đẹp nhất mùa giải ấy.
+                <br /><br />
+                Cuối mùa, Barca gặp lại đối thủ Manchester United tại trận chung
+                kết Champions League năm 2011, với sự tỏa sáng của hàng công,
+                Barca dễ dàng bóp nghẹt MU trong cả 90 phút thi đấu và giành
+                chiến thắng với tỷ số 3-1 bởi bàn thắng của 3 tiền đạo phía
+                trên. Trước đó danh hiệu La Liga 2010-11 cũng về tay Barca khi
+                hơn Real 4 điểm, qua đó kết thúc mùa giải 2010-11 bằng 1 danh
+                hiệu châu Âu và 1 danh hiệu quốc nội. <br /><br />
+                Mùa giải 2011-12 với sự trở lại của đứa con xứ Catalan - tiền vệ
+                Cesc Fabregas và Alexis Sánchez từ Udinese Calcio, họ có khởi
+                đầu mùa khá tốt khi đánh bại Real Madrid tại Siêu cúp TBN với
+                tổng tỷ số 5-4 (2-2 lượt đi & 3-2 lượt về), đánh bại F.C. Porto
+                2-0 để giành UEFA Super Cup và vô địch FIFA Club World Cup khi
+                thắng Santos F.C. 4-0 với cú đúp của Messi và 2 bàn của Xavi &
+                Fabregas. Nhưng ở mùa giải này, Barca chỉ giành được 1 danh hiệu
+                Cup Nhà Vua (thắng Bilbao 3-0), xếp sau Real Madrid tại La Liga
+                sau khi thua 2-1 lượt về ở Nou Camp và thất bại trước Chelsea
+                F.C. tại bán kết Cup C1 khi thua 0-1 lươt đi tại Anh (Drogba ghi
+                bàn phút 45) và dù cho có 2 bàn dẫn trước của Sergio Busquets và
+                Andrés Iniesta, nhưng bàn thắng của Ramires và Fernando Torres ở
+                phút 89 đã nhấn chìm Barca, ngoài raMessi còn sút hỏng quả 11m
+                khi đối mặt với thủ môn Petr Čech, kết quả Barca hòa 2-2 và thua
+                2-3 chung cuộc, trở thành cựu vương cúp C1 mùa đó. <br /><br />
+                Cùng lúc đó, HLV Pep Guardiola xác nhận rời CLB "vì không thể
+                đổi mới được đội hình sau bốn năm thành công và đang có dấu hiệu
+                chững lại vì sự “nghèo nàn” bị các đối thủ bắt bài", trợ lý HLV
+                Tito Vilanova lên nắm quyền sau đó.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Thời hậu Guardiola (2012-2014) </span>
+              <span class="content__detail-his">
+                Sau sự ra đi của Pep Guardiola, người trợ lý Tito Vilanova chính
+                thức lên làm HLV trưởng của CLB. Mùa giải 2012-13, Barcelona đã
+                xuất sắc cân bằng kỉ lục 100 điểm mà kình địch Real lập được ở
+                mùa giải trước, đoạt chức vô địch La Liga lần thứ 22, nhưng đây
+                là mùa giải họ không có kết quả tốt khi đối đầu với Real Madrid,
+                ở lượt đi La Liga mùa giải 2012-13, họ bị kình địch cầm hòa 2-2
+                trên sân Nou Camp trước khi bị Real đánh bại 2-1 ở trận lượt về.
+                Trước đó Barca lại thất bại tại Siêu cúp TBN khi để Real báo thù
+                thành công dù đã thắng 3-2 lượt đi và để Real thắng 2-1 lượt về,
+                chung cuộc 2 đội hòa 4-4 và Real giành cup nhờ luật bàn thắng
+                sân khách. Ở Cup nhà Vua, Barcelona đã gặp Real Madrid ở bán
+                kết, lượt đi hai đội hòa nhau 1-1 tại Bernabeu, nhưng ở trận
+                lượt về, Barca đã thất bại 1-3 trước Real trên sân nhà Nou Camp,
+                đó là trận thua đậm nhất của họ trước kình địch trên sân nhà. Ở
+                đấu trường châu Âu Barca cũng đã lọt vào đến bán kết trước thua
+                Bayern Munich 7 bàn không gỡ (0-4 lượt đi, 0-3 lượt về), đó vẫn
+                là thất bại nặng nề nhất trong kỉ nguyên của CLB xứ Catalan. Khi
+                mùa giải 2012-13 kết thúc, Tito Vilanova xin từ chức HLV trưởng
+                Barca để điều trị căn bệnh ung thư của ông. <br /><br />
+                Thay thế cho Vilanova là Gerardo Martino ở mùa giải 2013-14.
+                Trong mùa giải đó, mặc dù CLB đã ký hợp đồng với tiền đạo triển
+                vọng Neymar từ Santos với mức phí 57 triệu euro. Tại trận tranh
+                Siêu Cup Tây Ban Nha lượt đi đầu mùa giải với Atlético Madrid,
+                dù đã để đối thủ dẫn trước bởi pha làm bàn mở tỷ số của người cũ
+                David Villa, nhưng Barca đã kịp gỡ hòa 1-1 bởi pha lập công của
+                tân binh Neymar. Ở trận lượt về, hai đội đã hòa nhau 0-0, với
+                kết quả đó, Barca đã giành được Siêu cup bởi luật bàn thắng trên
+                sân khách. Tuy nhiên đây lại là một mùa giải đáng thất vọng nhất
+                sau thời Guardiola khi Barca không thể giành được một danh hiệu
+                nào. Tại La Liga, mặc dù đã giành được chiến thắng kép trước
+                kình địch Real, khi thắng 2-1 ở lượt đi và 4-3 ở lượt về với cú
+                hattrick của Lionel Messi nhưng họ bị Atlético Madrid qua mặt
+                tại La Liga và trở thành cựu vương bởi trận hòa 1-1 trên sân Nou
+                Camp ngay tại vòng đấu cuối cùng. Một lần nữa, Barca lại bị
+                Atlético Madrid loại khỏi tứ kết Champions League với tổng tỉ số
+                2-1. Niềm hi vọng cuối cùng cũng tan biến khi Barca tiếp tục
+                đánh rơi danh hiệu Cup nhà Vua do bị đại kình địch Real Madrid
+                đánh bại trong trận chung kết Cup Nhà Vua trên sân Mestalla,
+                đánh dấu mùa giải trắng tay sau 6 năm vinh quang thăng trầm.
+                Chính vì vậy, tháng 6 năm 2014, Gerardo Martino rời khỏi cương
+                vị HLV trưởng Barca.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Thời Luis Enrique </span>
+              <span class="content__detail-his">
+                Năm 2014, Luis Enrique được bổ nhiệm làm HLV trưởng Barca, bắt
+                đầu sự tái thiết đội bóng. Mùa hè năm đó, Barca đã chi hơn 150
+                triệu euro vào thị trường chuyển nhượng, liên tiếp đón nhận
+                những bản hợp đồng chất lượng như Ivan Rakitić, Jeremy Mathieu,
+                Claudio Bravo, Marc-André ter Stegen và đáng chú ý nhất là bản
+                hợp đồng bom tấn Luis Suarez với giá hơn 80 triệu euro. Kể từ
+                đó, Luis Suárez cùng với Lionel Messi và Neymar hợp lại trên
+                hàng công của Barca với biệt danh là tam tấu MSN - bộ 3 tấn công
+                được xem là tam tấu xuất sắc nhất lịch sử bóng đá. Ở mùa giải
+                này, Barca đã tái hiện lại cú ăn 3 như dưới thời Guardiola, mặc
+                dù họ thất bại 1-3 trên sân Bernabeu của kình địch Real, nhưng
+                vẫn đánh bại CLB thành Madrid 2-1 trên sân Nou Camp bằng 2 bàn
+                thắng của các tân binh Mathieu và Suarez, qua đó vượt mặt kình
+                địch trên bảng xếp hạng La Liga.<br /><br />
+                Tháng 5 năm 2015, sau khi vượt qua Atletico Madrid trên sân đối
+                phương bằng bàn thắng duy nhất của tiền đạo Lionel Messi,
+                Barcelona chính thức đăng quang La Liga lần thứ 23 sớm 1 vòng
+                đấu. Tại Cup Nhà Vua, Barca lần lượt vượt qua Atletico,
+                Villarreal, và đánh bại Bilbao 3-1 để đoạt cup, đây là danh hiệu
+                thứ hai của mùa giải. Còn ở Champions League 2014-15, Barca lập
+                chiến tích có một không hai khi lần lượt đả bại các nhà ĐKVĐ ở
+                các giải đấu khác nhau như APOEL, Ajax, PSG, Man City, Bayern
+                Munich, Juventus để vô địch châu Âu lần thứ 5 trong lịch sử,
+                hoàn thành mùa giải với cú ăn 3, trở thành CLB duy nhất trên thế
+                giới 2 lần làm được điều này. Một thành tích vĩ đại mà chưa có
+                CLB nào làm được cho đến nay. <br /><br />
+                Mùa giải 2015-16, Barca đã có sự phục vụ của hậu vệ Aleix Vidal
+                từ Sevilla và tiền vệ Arda Turan của Atlético Madrid, tuy nhiên
+                Barca chỉ được đăng ký 2 cầu thủ này vào tháng 1 năm 2016 do
+                phải thực hiện án cấm chuyển nhượng của FIFA. Mở đầu mùa giải
+                Barca có chiến thắng nghẹt thở 5-4 trước Sevilla tại trận tranh
+                Siêu Cup châu Âu bằng bàn thắng của Pedro, người sau này chuyển
+                sang Chelsea F.C.. Vài ngày sau, họ bất ngờ để thua 0-4 trước
+                Bilbao ở lượt đi trận tranh Siêu Cup Tây Ban Nha và bị cầm hòa
+                1-1 ở lượt về, qua đó đánh mất danh hiệu duy nhất mà họ không
+                đạt được trong năm 2015. Tại đầu trường quốc nội, đáng nói nhất
+                là trận thắng 4-0 trước đại kình địch Real Madrid ngay tại sân
+                Bernanbeu vào ngày 21 năm 11, đó là trận thắng đậm nhất trên sân
+                của Real kể từ năm 2009 đến nay, qua đó bỏ xa đại kình địch trên
+                bảng xếp hạng. Tại giải Cup thế giới các CLB, Barca lần lượt
+                vượt qua Quảng Châu Evergrande và River Plate với cùng tỉ số
+                3-0, qua đó kết thúc năm 2015 cùng cú ăn 5 vĩ đại
+                <br /><br />
+                Bước sang năm 2016, dù ở trận lượt về El Clasico, Barca thất bại
+                1-2 trước Real Madrid trên sân Nou Camp, nhưng điều đó không ảnh
+                hưởng đến vị trí trên bảng xếp hạng của họ, và cuối mùa Barca đã
+                bảo vệ thành công chức vô địch La Liga. Còn ở Cúp nhà Vua, họ
+                cũng lọt vào trận chung kết để đối đầu với Sevilla, kết quả đội
+                bóng xứ Catalan đã giành chiến thắng với tỷ số 2-0 nhờ pha lập
+                công của Jordi Alba và Neymar sau 120 phút thi đấu. Còn ở Cup
+                châu Âu, Barca cũng tiến vào vòng đấu loại trực tiếp khi đứng
+                nhất vòng bảng. Ở vòng 1/16, họ đối đầu với Arsenal, nhiều người
+                lo ngại bởi Lionel Messi chưa bao giờ ghi bàn vào lưới của thủ
+                môn Petr Čech, nhưng tại trận lượt đi Barca đã giành chiến thắng
+                2-0 ngay tại Sân vận động Emirates bằng cú đúp của Messi, và
+                trận lượt về sau đó Barca đè bẹp Arsenal 3-1 để tiến vào tứ kết.
+                Đối thủ tiếp theo của họ là Atlético Madrid. Mặc dù đã thắng 2-1
+                ở trận lượt đi, nhưng cũng không đủ để Barcelona đi tiếp bởi họ
+                để thua 0-2 ở trận lượt về, trọng tài đã từ chối 1 quả Penalty
+                mười mươi khi 1 cầu thủ bên phía Atlético đã để bóng chạm tay
+                trong vòng cấm. Mặc dù trở thành cựu vương ở Cúp châu Âu, nhưng
+                với hai danh hiệu La Liga và Cup nhà Vua, Barca khép lại một mùa
+                giải 2015-16 thành công. Vào ngày 8 tháng 3 năm 2017, Barcelona
+                làm nên lịch sử của Champions League tại mùa giải 2016-17 ở trận
+                lượt về vòng 1/8 khi đánh bại Paris Saint-Germain với tỷ số 6-1
+                (tổng tỷ số 6-5), mặc dù đã thua đậm tại trận lượt đi ở Pháp với
+                tỷ số 4-0.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page"> Thời kỳ hậu Enrique </span>
+              <span class="content__detail-his">
+                Vào ngày 29 tháng 5 năm 2017, cựu cầu thủ của Barca Ernesto
+                Valverde trở thành huấn luyện viên kế nhiệm của Luis Enrique với
+                bản hợp đồng có thời hạn hai năm. Vào ngày 9 tháng 5 năm 2018,
+                Barcelona đánh bại Villarreal 5-1, thiết lập chuỗi trận bất bại
+                dài nhất (43 trận) trong lịch sử La Liga. Ngày 27 tháng 4 năm
+                2019, Barcelona giành danh hiệu La Liga thứ 26. Vào ngày 13
+                tháng 1 năm 2020, cựu huấn luyện viên Real Betis Quique Setién
+                thay thế Ernesto Valverde làm huấn luyện viên trưởng mới của
+                Barcelona, ​​sau trận thua trước Atlético Madrid tại Siêu cúp
+                Tây Ban Nha.
+              </span>
+            </div>
+            <div class="page__history">
+              <span class="title__page">
+                2021-nay: Sự trở lại của Laporta và kỷ nguyên hậu Messi
+              </span>
+              <span class="content__detail-his">
+                Vào ngày 7 tháng 3 năm 2021, Joan Laporta được bầu làm chủ tịch
+                của Barcelona với 54,28% phiếu bầu. Barcelona giành Copa del Rey
+                lần thứ 31, danh hiệu duy nhất của họ dưới thời Ronald Koeman,
+                sau khi đánh bại Athletic Bilbao 4–0 trong trận chung kết. Vào
+                tháng 8 năm 2021, Barcelona nhận thấy mình không thể tuân thủ
+                các yêu cầu của Luật công bằng tài chính của La Liga, đồng thời
+                tiết lộ khoản nợ của câu lạc bộ là 1,35 tỷ euro và hóa đơn tiền
+                lương chiếm 103% tổng thu nhập. Các cuộc đàm phán với Lionel
+                Messi, hiện đang trong năm cuối cùng của hợp đồng, đã diễn ra
+                được một thời gian. Tuy nhiên, vào ngày 5 tháng 8 năm 2021,
+                Barcelona thông báo rằng họ sẽ không thể tái ký hợp đồng với
+                Messi để gia hạn do các quy định của La Liga. Điều này xảy ra
+                bất chấp việc câu lạc bộ và Messi đã đạt được thỏa thuận về các
+                chi tiết của hợp đồng mới. Messi rời câu lạc bộ sau 21 năm với
+                tư cách là một cầu thủ Barça, và là tay săn bàn hàng đầu mọi
+                thời đại của câu lạc bộ, và ký hợp đồng chuyển nhượng tự do với
+                câu lạc bộ Pháp Paris Saint-Germain. Những tác động tài chính
+                cũng hạn chế Barcelona trên thị trường chuyển nhượng và kết quả
+                là hầu hết các cầu thủ mới đến đều là chuyển nhượng tự do hoặc
+                cho mượn và họ phải giảm lương của các cầu thủ để đăng ký những
+                cầu thủ mới đến. <br /><br />
+                Những màn trình diễn kém cỏi ở La Liga và Champions League đã
+                dẫn đến việc Ronald Koeman bị sa thải vào ngày 28 tháng 10, với
+                huyền thoại của câu lạc bộ là Xavi thay thế ông. Xavi không thể
+                đảo ngược vận may ở Champions League, và Barcelona rớt xuống
+                Europa League lần đầu tiên kể từ mùa giải 2003–04, sau đó bị
+                loại ở tứ kết. Ở giải quốc nội, Xavi đã cải thiện phong độ của
+                Barça và dẫn dắt họ từ vị trí thứ chín lên vị trí thứ hai, đảm
+                bảo một suất tham dự Champions League mùa giải tới. Tuy nhiên,
+                điều này cũng có nghĩa là Barcelona đã kết thúc mùa giải trắng
+                tay sau khi bị loại trước đó ở Supercopa và Copa del Rey.
+                <br /><br />
+                Vào ngày 15 tháng 1 năm 2023, Xavi dẫn dắt Barcelona đến chiếc
+                cúp đầu tiên kể từ Copa del Rey 2021, khi đội bóng xứ Catalan
+                đánh bại Real Madrid 3–1 trong trận chung kết Supercopa de
+                España. <br /><br />
+                Vào ngày 10 tháng 3 năm 2023, các công tố viên Tây Ban Nha cho
+                biết họ đã đệ đơn khiếu nại Barcelona và hai cựu chủ tịch của
+                câu lạc bộ La Liga về các khoản thanh toán bị cáo buộc cho một
+                công ty thuộc sở hữu của một quan chức trọng tài cấp cao để gây
+                ảnh hưởng đến kết quả trận đấu. Vào ngày 23 tháng 3 năm 2023,
+                UEFA cho biết họ đã mở một cuộc điều tra về câu lạc bộ vì có khả
+                năng vi phạm khuôn khổ pháp lý của cơ quan quản lý bóng đá châu
+                Âu liên quan đến các khoản thanh toán mà câu lạc bộ thực hiện
+                cho một công ty thuộc sở hữu của một quan chức trọng tài cấp
+                cao. <br /><br />
+                Kết thúc mùa giải 2022/23. Barcelona lên ngôi vô địch La Liga
+                với 88 điểm, hơn đội bóng xếp ngay sau là Real Madrid tới 10
+                điểm. Ở đấu trường châu Âu, Barca bị loại ngay từ vòng bảng Cúp
+                C1 và phải chuyển xuống chơi Cúp C2. Tuy nhiên, đội bóng Tây Ban
+                Nha cũng sớm phải chia tay giải đấu khi để thua Man Utd ngay từ
+                vòng play-off với tổng tỷ số 3-4.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div class="contents__footer">
+        <div class="name__Club">
+          <img
+            class="logo__footer"
+            src="/img/FC_Barcelona_logo.svg.png"
+            alt=""
+          />
+          <p class="name__footer">Fc Barcelona</p>
+        </div>
+        <div class="corporate">
+          <div class="contentFooter">
+            <p class="monopoly">
+              <strong style="opacity: 1" class="copyRight"
+                >© Copyright Đoàn Đức Hải</strong
+              >
+              Official website of FC Barcelona ( Hải )
+            </p>
+            <p class=""></p>
+          </div>
+          <div class="link__corporate">
+            <a href="">
+              <li>Legal Team</li>
+            </a>
+            <a href="">
+              <li>Privacy Policy</li>
+            </a>
+            <a href="">
+              <li>Cookies</li>
+            </a>
+            <a href="">
+              <li>Accessibity</li>
+            </a>
+            <a href="">
+              <li>Contact US</li>
+            </a>
+            <a href="">
+              <li class="last__child">Support/FAQs</li>
+            </a>
+          </div>
+        </div>
+        <div class="colorFooter"></div>
+      </div>
+    </footer>
+  </body>
+</html>
