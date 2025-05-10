@@ -1,38 +1,38 @@
-body{
-  background-image: url(/img/bgLogin1.jpg);
+body {
+  background-image: url(https://haibarca03.github.io/Fc-Barca/img/bgLogin1.jpg);
   background-repeat: no-repeat;
-  background-size:cover;
+  background-size: cover;
 }
-.background{
+.background {
   width: 430px;
   height: 520px;
   position: absolute;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
 }
-form{
+form {
   height: 520px;
   width: 400px;
-  background-color: rgba(255,255,255,0.13);
+  background-color: rgba(255, 255, 255, 0.13);
   position: absolute;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   border-radius: 10px;
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(255,255,255,0.1);
-  box-shadow: 0 0 40px rgba(8,7,16,0.6);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
   padding: 50px 35px;
 }
-form *{
-  font-family: 'Poppins',sans-serif;
+form * {
+  font-family: 'Poppins', sans-serif;
   color: #ffffff;
   letter-spacing: 0.5px;
   outline: none;
   border: none;
 }
-form h3{
+form h3 {
   margin: 0;
   font-size: 32px;
   font-weight: 500;
@@ -40,26 +40,26 @@ form h3{
   text-align: center;
 }
 
-label{
+label {
   display: block;
   font-size: 16px;
   font-weight: 500;
 }
-input{
+input {
   display: block;
   height: 50px;
   width: 100%;
-  background-color: rgba(255,255,255,0.07);
+  background-color: rgba(255, 255, 255, 0.07);
   border-radius: 3px;
   padding: 0 10px;
   margin-top: 8px;
   font-size: 14px;
   font-weight: 300;
 }
-::placeholder{
+::placeholder {
   color: #e5e5e5;
 }
-button{
+button {
   margin-top: 50px;
   width: 100%;
   background-color: #ffffff;
@@ -73,26 +73,26 @@ button a {
   color: #080710;
   text-decoration: none;
 }
-.social{
-margin-top: 30px;
-display: flex;
-justify-content: center;
+.social {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
 }
-.social div{
-background: red;
-width: 150px;
-border-radius: 3px;
-padding: 5px 10px 10px 5px;
-background-color: rgba(255,255,255,0.27);
-color: #eaf0fb;
-text-align: center;
+.social div {
+  background: red;
+  width: 150px;
+  border-radius: 3px;
+  padding: 5px 10px 10px 5px;
+  background-color: rgba(255, 255, 255, 0.27);
+  color: #eaf0fb;
+  text-align: center;
 }
-.social div:hover{
-background-color: rgba(255,255,255,0.47);
+.social div:hover {
+  background-color: rgba(255, 255, 255, 0.47);
 }
-.social .fb{
-margin-left: 25px;
+.social .fb {
+  margin-left: 25px;
 }
-.social i{
-margin-right: 4px;
+.social i {
+  margin-right: 4px;
 }
